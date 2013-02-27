@@ -158,7 +158,7 @@ class Renderer {
 
 			} else {
 				// Single page
-				$content	= $this->build_template_file('archive', array(
+				$content	= $this->build_template_file('list', array(
 					'year'	=> $year,
 					'posts'	=> $posts
 				));
