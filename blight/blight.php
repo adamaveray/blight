@@ -10,8 +10,9 @@ date_default_timezone_set('UTC');
 require('src/autoload.php');
 
 // Initialise blog
-$config	= array_merge(parse_ini_file('../config.ini', true), array(
-	'root_path'	=> dirname(__DIR__).'/'
+$root_path	= dirname(__DIR__).'/';
+$config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
+	'root_path'	=> $root_path
 ));
 $config['paths']['web']	= rtrim($web_path,'/').'/blog/';
 $blog	= new Blog($config);
