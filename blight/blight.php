@@ -57,4 +57,4 @@ $renderer	= new Renderer($blog, $manager);
 
 // Redirect to generated pages
 header('HTTP/1.1 302 Found');
-header('Location: /');
+header('Location: '.$_SERVER['REQUEST_URI']);
