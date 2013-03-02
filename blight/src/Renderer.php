@@ -132,6 +132,8 @@ class Renderer {
 
 		$years	= $this->manager->get_posts_by_year();
 		foreach($years as $year => $posts){
+			$page_title	= 'Archive '.$year;
+
 			if($pagination){
 				// Paginated
 				$no_pages	= ceil(count($posts)/$options['per_page']);
@@ -145,6 +147,7 @@ class Renderer {
 					$content	= $this->build_template_file('archive', array(
 						'year'	=> $year,
 						'posts'	=> array_slice($posts, ($page-1)*$options['per_page'], $options['per_page']),
+						'page_title'	=> $page_title,
 						'pagination'	=> array(
 							'current'	=> $page+1,
 							'pages'		=> $pages
@@ -160,7 +163,8 @@ class Renderer {
 				// Single page
 				$content	= $this->build_template_file('list', array(
 					'year'	=> $year,
-					'posts'	=> $posts
+					'posts'	=> $posts,
+					'page_title'	=> $page_title
 				));
 				$this->write($archive_dir.$year.'.html', $content);
 			}
