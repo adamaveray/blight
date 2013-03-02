@@ -39,17 +39,17 @@ $renderer	= new Renderer($blog, $manager);
 
 	// Render archive pages
 	$renderer->render_archives(array(
-		'limit'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
 
 	// Render tag pages
 	$tags = $renderer->render_tags(array(
-		'limit'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
 
 	// Render category pages
 	$tags = $renderer->render_categories(array(
-		'limit'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
 
 	// Render home page
