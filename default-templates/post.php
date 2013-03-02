@@ -21,6 +21,24 @@ $page_title	= $post->get_title();
 	</header>
 
 	<?php echo $text->process($post->get_content());?>
+
+	<footer>
+		<?php
+		$tags	= $post->get_tags();
+		if($tags){?>
+			<p>
+				<strong>Tags:</strong>
+				<ul>
+				<?php foreach($tags as $tag){?>
+					<li>
+						<a href="<?php echo $tag->get_url();?>"><?php echo $tag->get_name();?></a>
+					</li>
+				<?php }?>
+				</ul>
+			</p>
+		<?php
+		} ?>
+	</footer>
 </article>
 
 <?php include('inc/footer.php');?>
