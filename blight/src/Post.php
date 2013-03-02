@@ -108,10 +108,26 @@ class Post {
 
 
 	/**
+	 * @param bool $raw	Whether to prepend any additional linkblog glyphs to the title
 	 * @return string	The post title
 	 */
-	public function get_title(){
-		return $this->title;
+	public function get_title($raw = false){
+		if(!$raw){
+			$is_linkblog	= $this->blog->is_linkblog();
+			$is_linkpost	= $this->is_linked();
+
+			$prepend	= '';
+			if($is_linkblog && !$is_linkpost){
+				// Unlinked post - prepend glyph
+				$prepend	= $this->blog->get('post_character', 'linkblog', '★').' ';
+
+			} elseif(!$is_linkblog && $is_linkpost){
+				// Linked post - prepend arrow
+				$prepend	= $this->blog->get('link_character', 'linkblog', '→').' ';
+			}
+		}
+
+		return $prepend.$this->title;
 	}
 
 	/**

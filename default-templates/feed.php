@@ -1,10 +1,6 @@
 <?php
 /** @var \Blight\Blog $blog */
 
-	if($post->is_linked()){
-		// Prepend arrow
-		$title	= '→ '.$title;
-	}
 function post_title(\Blight\Blog $blog, \Blight\Post $post, $title){
 	return $title;
 }
