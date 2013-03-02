@@ -20,7 +20,7 @@ abstract class Collection implements \Blight\Interfaces\Collection {
 
 	public function get_slug(){
 		if(!isset($this->slug)){
-			$this->slug	= $this->name;
+			$this->slug	= $this->convert_to_slug($this->name);
 		}
 
 		return $this->slug;
@@ -45,5 +45,14 @@ abstract class Collection implements \Blight\Interfaces\Collection {
 
 	public function get_posts(){
 		return $this->posts;
+	}
+
+
+	protected function convert_to_slug($name){
+		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
+		$clean	= strtolower(trim($clean, '-'));
+		$clean	= preg_replace('/[\/_|+ -]+/', '-', $clean);
+
+		return $clean;
 	}
 };
