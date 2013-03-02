@@ -1,19 +1,19 @@
 <?php
 /** @var \Blight\Blog $blog */
 
-function post_title(\Blight\Post $post, $title){
 	if($post->is_linked()){
 		// Prepend arrow
 		$title	= '→ '.$title;
 	}
+function post_title(\Blight\Blog $blog, \Blight\Post $post, $title){
 	return $title;
 }
 
-function post_url(\Blight\Post $post, $url){
+function post_url(\Blight\Blog $blog, \Blight\Post $post, $url){
 	return $url;
 }
 
-function post_content(\Blight\Post $post, $content){
+function post_content(\Blight\Blog $blog, \Blight\Post $post, $content){
 	if($post->is_linked()){
 		// Append permalink link
 		$content	.= "\n\n".'<p><a href="'.$post->get_permalink().'">∞ Permalink</a></p>';
@@ -66,13 +66,13 @@ $channel	= $dom->createElement('channel');
 		/** @var \Blight\Post $post */
 		$item	= $dom->createElement('item');
 
-			create_node($dom, $item, 'title', post_title($post, $post->get_title()));
-			create_node($dom, $item, 'link', post_url($post, $post->get_link()));
+			create_node($dom, $item, 'title', post_title($blog, $post, $post->get_title()));
+			create_node($dom, $item, 'link', post_url($blog, $post, $post->get_link()));
 			create_node($dom, $item, 'guid', $post->get_link(), array(
 				'isPermaLink'	=> 'false'
 			));
 			create_node($dom, $item, 'pubDate', $post->get_date()->format('r'));
-			create_node($dom, $item, 'description', $text->process_markdown(post_content($post, $post->get_content())));
+			create_node($dom, $item, 'description', $text->process_markdown(post_content($blog, $post, $post->get_content())));
 
 		$channel->appendChild($item);
 	}
