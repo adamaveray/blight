@@ -1,7 +1,7 @@
 <?php
 namespace Blight\Collections;
 
-abstract class Collection implements \Blight\Interfaces\Collection {
+abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	/** @var \Blight\Blog */
 	protected $blog;
 	protected $slug;
@@ -47,12 +47,35 @@ abstract class Collection implements \Blight\Interfaces\Collection {
 		return $this->posts;
 	}
 
-
 	protected function convert_to_slug($name){
 		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
 		$clean	= strtolower(trim($clean, '-'));
 		$clean	= preg_replace('/[\/_|+ -]+/', '-', $clean);
 
 		return $clean;
+	}
+
+
+	/* Iterator */
+	protected $iterator_position	= 0;
+
+	function rewind(){
+		$this->iterator_position	= 0;
+	}
+
+	function current(){
+		return $this->posts[$this->iterator_position];
+	}
+
+	function key(){
+		return $this->iterator_position;
+	}
+
+	function next(){
+		++$this->iterator_position;
+	}
+
+	function valid(){
+		return isset($this->posts[$this->iterator_position]);
 	}
 };
