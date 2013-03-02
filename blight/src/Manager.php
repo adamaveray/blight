@@ -9,6 +9,7 @@ class Manager {
 
 	protected $posts;
 	protected $posts_by_year;
+	protected $posts_by_tag;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -155,5 +156,44 @@ class Manager {
 		}
 
 		return $this->posts_by_year;
+	}
+
+	/**
+	 * Groups posts by tag
+	 *
+	 * @return array	An array of tags containing posts
+	 *
+	 * 		Example:
+	 * 		array(
+	 * 			Tag (
+	 * 				get_posts()
+	 * 			),
+	 * 			Tag (
+	 * 				get_posts()
+	 * 			)
+	 * 		);
+	 */
+	public function get_posts_by_tag(){
+		if(!isset($this->posts_by_tag)){
+			$posts	= $this->get_posts();
+
+			$tags	= array();
+			foreach($posts as &$post){
+				$post_tags	= $post->get_tags();
+
+				foreach($post_tags as $tag){
+					$slug	= $tag->get_slug();
+					if(!isset($tags[$slug])){
+						$tags[$slug]	= $tag;
+					}
+
+					$tags[$slug]->add_post($post);
+				}
+			}
+
+			$this->posts_by_tag	= $tags;
+		}
+
+		return $this->posts_by_tag;
 	}
 };
