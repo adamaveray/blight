@@ -141,7 +141,7 @@ class Renderer {
 
 			$posts	= $year->get_posts();
 
-			if($pagination){
+			if($pagination && count($posts) > $options['per_page']){
 				// Paginated
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
@@ -199,7 +199,7 @@ class Renderer {
 			$posts	= $tag->get_posts();
 
 			$page_title	= 'Tag '.$tag->get_name();
-			if($pagination){
+			if($pagination && count($posts) > $options['per_page']){
 				// Paginated
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
@@ -259,7 +259,7 @@ class Renderer {
 			$posts	= $category->get_posts();
 
 			$page_title	= 'Category '.$category->get_name();
-			if($pagination){
+			if($pagination && count($posts) > $options['per_page']){
 				// Paginated
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
