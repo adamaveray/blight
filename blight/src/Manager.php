@@ -169,6 +169,9 @@ class Manager {
 			}
 			$this->posts_by_category[$slug]->add_post($post);
 		}
+
+		ksort($this->posts_by_tag);
+		ksort($this->posts_by_category);
 	}
 
 	/**
