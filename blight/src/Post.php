@@ -12,6 +12,8 @@ class Post {
 	protected $date;
 	protected $content;
 	protected $metadata;
+	protected $tags;
+	protected $category;
 
 	protected $link;
 	protected $permalink;
@@ -232,6 +234,52 @@ class Post {
 	 */
 	public function get_relative_permalink(){
 		return $this->date->format('Y/m').'/'.$this->slug;
+	}
+
+	/**
+	 * Creates a collection for the year the post was authored
+	 *
+	 * @return \Blight\Collections\Year	The Year collection the post belongs in
+	 */
+	public function get_year(){
+		if(!isset($this->year)){
+			$this->year	= new \Blight\Collections\Year($this->blog, $this->get_date()->format('Y'));
+		}
+
+		return $this->year;
+	}
+
+	/**
+	 * Creates collections for each tag assigned to the post.
+	 *
+	 * The post could have no tags assigned, which would result in an
+	 * empty array being returned.
+	 *
+	 * @return array	An array of Tag collections
+	 */
+	public function get_tags(){
+		if(!isset($this->tags) && $this->has_meta('tags')){
+			$this->tags	= array_map(function($item){
+				return new \Blight\Collections\Tag($this->blog, trim($item));
+			}, explode(',', $this->get_meta('tags')));
+		}
+
+		return $this->tags;
+	}
+
+	/**
+	 * Creates a collection for the category the post has assigned.
+	 *
+	 * If the post has no category assigned, null will be returned
+	 *
+	 * @return \Blight\Collections\Category|null	The Category collection the post belongs in, or null
+	 */
+	public function get_category(){
+		if(!isset($this->category) && $this->has_meta('category')){
+			$this->category	= new \Blight\Collections\Category($this->blog, $this->get_meta('category'));
+		}
+
+		return $this->category;
 	}
 
 	/**

@@ -9,6 +9,8 @@ class Manager {
 
 	protected $posts;
 	protected $posts_by_year;
+	protected $posts_by_tag;
+	protected $posts_by_category;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -89,6 +91,7 @@ class Manager {
 			$files	= $this->get_raw_posts();
 
 			$posts	= array();
+
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
 				if(!in_array($extension, $this->allowed_extensions)){
@@ -126,34 +129,113 @@ class Manager {
 	}
 
 	/**
+	 * Groups posts by year, tag and category
+	 */
+	protected function group_posts(){
+		$this->posts_by_year		= array();
+		$this->posts_by_tag			= array();
+		$this->posts_by_category	= array();
+
+		$posts	= $this->get_posts();
+
+		foreach($posts as $post){
+			// Group post by year
+			$year	= $post->get_year();
+			$slug	= $year->get_slug();
+			if(!isset($this->posts_by_year[$slug])){
+				$this->posts_by_year[$slug]	= $year;
+			}
+			$this->posts_by_year[$slug]->add_post($post);
+
+			// Group post by tag
+			$tags	= $post->get_tags();
+			foreach($tags as $tag){
+				$slug	= $tag->get_slug();
+				if(!isset($this->posts_by_tag[$slug])){
+					$this->posts_by_tag[$slug]	= $tag;
+				}
+				$this->posts_by_tag[$slug]->add_post($post);
+			}
+
+			// Group post by category
+			$category	= $post->get_category();
+			$slug		= $category->get_slug();
+			if(!isset($this->posts_by_category[$slug])){
+				$this->posts_by_category[$slug]	= $category;
+			}
+			$this->posts_by_category[$slug]->add_post($post);
+		}
+
+		ksort($this->posts_by_tag);
+		ksort($this->posts_by_category);
+	}
+
+	/**
 	 * Groups all posts by publication year
 	 *
-	 * @return array	An multi-dimensional array containing arrays of posts grouped by year
+	 * @return array	An array of tags containing posts
 	 *
 	 * 		Example:
 	 * 		array(
-	 * 			2013	=> array( $post, $post, $post ),
-	 * 			2012	=> array( $post, $post, $post )
+	 * 			Year (
+	 * 				get_posts()
+	 * 			),
+	 * 			Year (
+	 * 				get_posts()
+	 * 			)
 	 * 		);
 	 */
 	public function get_posts_by_year(){
-		if(!isset($this->posts_by_year)){
-			$posts	= $this->get_posts();
-
-			$years	= array();
-			foreach($posts as &$post){
-				$date	= $post->get_date();
-				$y	= $date->format('Y');
-				if(!isset($years[$y])){
-					$years[$y]	= array();
-				}
-
-				$years[$y][]	= &$post;
-			}
-
-			$this->posts_by_year	= $years;
+		if(!isset($this->posts_by_tag)){
+			$this->group_posts();
 		}
 
 		return $this->posts_by_year;
+	}
+
+	/**
+	 * Groups posts by tag
+	 *
+	 * @return array	An array of tags containing posts
+	 *
+	 * 		Example:
+	 * 		array(
+	 * 			Tag (
+	 * 				get_posts()
+	 * 			),
+	 * 			Tag (
+	 * 				get_posts()
+	 * 			)
+	 * 		);
+	 */
+	public function get_posts_by_tag(){
+		if(!isset($this->posts_by_tag)){
+			$this->group_posts();
+		}
+
+		return $this->posts_by_tag;
+	}
+
+	/**
+	 * Groups posts by category
+	 *
+	 * @return array	An array of categories containing posts
+	 *
+	 * 		Example:
+	 * 		array(
+	 * 			Category (
+	 * 				get_posts()
+	 * 			),
+	 * 			Category (
+	 * 				get_posts()
+	 * 			)
+	 * 		);
+	 */
+	public function get_posts_by_category(){
+		if(!isset($this->posts_by_tag)){
+			$this->group_posts();
+		}
+
+		return $this->posts_by_category;
 	}
 };

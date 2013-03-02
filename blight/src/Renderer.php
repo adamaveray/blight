@@ -75,7 +75,8 @@ class Renderer {
 		$params	= $this->extend_options($params, array(
 			'blog'	=> $this->blog,
 			'text'	=> new TextProcessor($this->blog),
-			'archives'	=> array_keys($this->manager->get_posts_by_year())
+			'archives'		=> $this->manager->get_posts_by_year(),
+			'categories'	=> $this->manager->get_posts_by_category()
 		));
 
 		$template	= $this->blog->get_path_templates($file.'.php');
@@ -96,6 +97,12 @@ class Renderer {
 	 * @param string $content	The content to write to the file
 	 */
 	protected function write($path, $content){
+		$url	= $this->blog->get_url();
+		if(strpos($path, $url) === 0){
+			// Convert web path to file
+			$path	= $this->blog->get_path_www(substr($path, strlen($url)));
+		}
+		
 		$this->blog->get_file_system()->create_file($path, $content);
 	}
 
@@ -128,16 +135,18 @@ class Renderer {
 
 		$pagination	= ($options['per_page'] > 0);
 
-		$archive_dir	= $this->blog->get_path_www('/archive/');
-
 		$years	= $this->manager->get_posts_by_year();
-		foreach($years as $year => $posts){
+		foreach($years as $year){
+			$page_title	= 'Archive '.$year->get_name();
+
+			$posts	= $year->get_posts();
+
 			if($pagination){
 				// Paginated
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
 				for($page = 0; $page < $no_pages; $page++){
-					$pages[$page+1]	= '/archive/'.$year.($page == 0 ? '' : '/'.($page+1));
+					$pages[$page+1]	= $year->get_url().($page == 0 ? '' : '/'.($page+1));
 				}
 
 				// Build each page
@@ -145,13 +154,14 @@ class Renderer {
 					$content	= $this->build_template_file('archive', array(
 						'year'	=> $year,
 						'posts'	=> array_slice($posts, ($page-1)*$options['per_page'], $options['per_page']),
+						'page_title'	=> $page_title,
 						'pagination'	=> array(
 							'current'	=> $page+1,
 							'pages'		=> $pages
 						)
 					));
 
-					$output_file	= $archive_dir.$year.'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+					$output_file	= $year->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 
 					$this->write($output_file, $content);
 				}
@@ -160,9 +170,129 @@ class Renderer {
 				// Single page
 				$content	= $this->build_template_file('list', array(
 					'year'	=> $year,
-					'posts'	=> $posts
+					'posts'	=> $posts,
+					'page_title'	=> $page_title
 				));
-				$this->write($archive_dir.$year.'.html', $content);
+				$this->write($year->get_url().'.html', $content);
+			}
+		}
+	}
+
+	/**
+	 * Generates and saves the static files for posts grouped by tags. Posts are retrieved from the
+	 * Manager set during class construction.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 */
+	public function render_tags($options = null){
+		$options	= $this->extend_options($options, array(
+			'per_page'	=> 0	// Default to no pagination
+		));
+
+		$pagination	= ($options['per_page'] > 0);
+
+		$tags	= $this->manager->get_posts_by_tag();
+		foreach($tags as $tag){
+			/** @var $tag \Blight\Collections\Tag */
+			$posts	= $tag->get_posts();
+
+			$page_title	= 'Tag '.$tag->get_name();
+			if($pagination){
+				// Paginated
+				$no_pages	= ceil(count($posts)/$options['per_page']);
+				$pages	= array();
+				for($page = 0; $page < $no_pages; $page++){
+					$pages[$page+1]	= $tag->get_url().($page == 0 ? '' : '/'.($page+1));
+				}
+
+				// Build each page
+				for($page = 0; $page < $no_pages; $page++){
+					$content	= $this->build_template_file('list', array(
+						'tag'	=> $tag,
+						'posts'	=> array_slice($posts, ($page-1)*$options['per_page'], $options['per_page']),
+						'page_title'	=> $page_title,
+						'pagination'	=> array(
+							'current'	=> $page+1,
+							'pages'		=> $pages
+						)
+					));
+
+					$output_file	= $tag->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+
+					$this->write($output_file, $content);
+				}
+
+			} else {
+				// Single page
+				$content	= $this->build_template_file('list', array(
+					'tag'	=> $tag,
+					'posts'	=> $posts,
+					'page_title'	=> $page_title
+				));
+
+				$this->write($tag->get_url().'.html', $content);
+			}
+		}
+	}
+
+	/**
+	 * Generates and saves the static files for posts grouped by category. Posts are retrieved from the
+	 * Manager set during class construction.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 */
+	public function render_categories($options = null){
+		$options	= $this->extend_options($options, array(
+			'per_page'	=> 0	// Default to no pagination
+		));
+
+		$pagination	= ($options['per_page'] > 0);
+
+		$categories	= $this->manager->get_posts_by_category();
+
+		foreach($categories as $category){
+			/** @var $category \Blight\Collections\Category */
+			$posts	= $category->get_posts();
+
+			$page_title	= 'Category '.$category->get_name();
+			if($pagination){
+				// Paginated
+				$no_pages	= ceil(count($posts)/$options['per_page']);
+				$pages	= array();
+				for($page = 0; $page < $no_pages; $page++){
+					$pages[$page+1]	= $category->get_url().($page == 0 ? '' : '/'.($page+1));
+				}
+
+				// Build each page
+				for($page = 0; $page < $no_pages; $page++){
+					$content	= $this->build_template_file('list', array(
+						'category'	=> $category,
+						'posts'		=> array_slice($posts, ($page-1)*$options['per_page'], $options['per_page']),
+						'page_title'	=> $page_title,
+						'pagination'	=> array(
+							'current'	=> $page+1,
+							'pages'		=> $pages
+						)
+					));
+
+					$output_file	= $category->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+
+					$this->write($output_file, $content);
+				}
+
+			} else {
+				// Single page
+				$content	= $this->build_template_file('list', array(
+					'category'	=> $category,
+					'posts'		=> $posts,
+					'page_title'	=> $page_title
+				));
+
+				$this->write($category->get_url().'.html', $content);
 			}
 		}
 	}

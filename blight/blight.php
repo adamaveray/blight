@@ -42,6 +42,16 @@ $renderer	= new Renderer($blog, $manager);
 		'limit'	=> $blog->get('page', 'limits', 0)
 	));
 
+	// Render tag pages
+	$tags = $renderer->render_tags(array(
+		'limit'	=> $blog->get('page', 'limits', 0)
+	));
+
+	// Render category pages
+	$tags = $renderer->render_categories(array(
+		'limit'	=> $blog->get('page', 'limits', 0)
+	));
+
 	// Render home page
 	$renderer->render_home(array(
 		'limit'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
