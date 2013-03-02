@@ -187,10 +187,7 @@ class Renderer {
 
 		$pagination	= ($options['per_page'] > 0);
 
-		$tags_dir	= $this->blog->get_path_www('/tag/');
-
 		$tags	= $this->manager->get_posts_by_tag();
-
 		foreach($tags as $tag){
 			/** @var $tag \Blight\Collections\Tag */
 			$posts	= $tag->get_posts();
@@ -201,7 +198,7 @@ class Renderer {
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
 				for($page = 0; $page < $no_pages; $page++){
-					$pages[$page+1]	= '/tag/'.$tag->get_slug().($page == 0 ? '' : '/'.($page+1));
+					$pages[$page+1]	= $tag->get_url().($page == 0 ? '' : '/'.($page+1));
 				}
 
 				// Build each page
@@ -216,7 +213,7 @@ class Renderer {
 						)
 					));
 
-					$output_file	= $tags_dir.$tag->get_slug().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+					$output_file	= $tag->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 
 					$this->write($output_file, $content);
 				}
@@ -229,7 +226,7 @@ class Renderer {
 					'page_title'	=> $page_title
 				));
 
-				$this->write($tags_dir.$tag->get_slug().'.html', $content);
+				$this->write($tag->get_url().'.html', $content);
 			}
 		}
 	}
@@ -249,8 +246,6 @@ class Renderer {
 
 		$pagination	= ($options['per_page'] > 0);
 
-		$categories_dir	= $this->blog->get_path_www('/category/');
-
 		$categories	= $this->manager->get_posts_by_category();
 
 		foreach($categories as $category){
@@ -263,7 +258,7 @@ class Renderer {
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
 				for($page = 0; $page < $no_pages; $page++){
-					$pages[$page+1]	= '/category/'.$category->get_slug().($page == 0 ? '' : '/'.($page+1));
+					$pages[$page+1]	= $category->get_url().($page == 0 ? '' : '/'.($page+1));
 				}
 
 				// Build each page
@@ -278,7 +273,7 @@ class Renderer {
 						)
 					));
 
-					$output_file	= $categories_dir.$category->get_slug().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+					$output_file	= $category->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 
 					$this->write($output_file, $content);
 				}
@@ -291,7 +286,7 @@ class Renderer {
 					'page_title'	=> $page_title
 				));
 
-				$this->write($categories_dir.$category->get_slug().'.html', $content);
+				$this->write($category->get_url().'.html', $content);
 			}
 		}
 	}
