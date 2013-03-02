@@ -196,4 +196,41 @@ class Manager {
 
 		return $this->posts_by_tag;
 	}
+
+	/**
+	 * Groups posts by category
+	 *
+	 * @return array	An array of categories containing posts
+	 *
+	 * 		Example:
+	 * 		array(
+	 * 			Category (
+	 * 				get_posts()
+	 * 			),
+	 * 			Category (
+	 * 				get_posts()
+	 * 			)
+	 * 		);
+	 */
+	public function get_posts_by_category(){
+		if(!isset($this->posts_by_category)){
+			$posts	= $this->get_posts();
+
+			$categories	= array();
+			foreach($posts as &$post){
+				$category	= $post->get_category();
+
+				$slug	= $category->get_slug();
+				if(!isset($categories[$slug])){
+					$categories[$slug]	= $category;
+				}
+
+				$categories[$slug]->add_post($post);
+			}
+
+			$this->posts_by_category	= $categories;
+		}
+
+		return $this->posts_by_category;
+	}
 };
