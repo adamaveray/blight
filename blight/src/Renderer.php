@@ -75,7 +75,7 @@ class Renderer {
 		$params	= $this->extend_options($params, array(
 			'blog'	=> $this->blog,
 			'text'	=> new TextProcessor($this->blog),
-			'archives'		=> array_keys($this->manager->get_posts_by_year()),
+			'archives'		=> $this->manager->get_posts_by_year(),
 			'categories'	=> $this->manager->get_posts_by_category()
 		));
 
@@ -135,18 +135,18 @@ class Renderer {
 
 		$pagination	= ($options['per_page'] > 0);
 
-		$archive_dir	= $this->blog->get_path_www('/archive/');
-
 		$years	= $this->manager->get_posts_by_year();
-		foreach($years as $year => $posts){
-			$page_title	= 'Archive '.$year;
+		foreach($years as $year){
+			$page_title	= 'Archive '.$year->get_name();
+
+			$posts	= $year->get_posts();
 
 			if($pagination){
 				// Paginated
 				$no_pages	= ceil(count($posts)/$options['per_page']);
 				$pages	= array();
 				for($page = 0; $page < $no_pages; $page++){
-					$pages[$page+1]	= '/archive/'.$year.($page == 0 ? '' : '/'.($page+1));
+					$pages[$page+1]	= $year->get_url().($page == 0 ? '' : '/'.($page+1));
 				}
 
 				// Build each page
@@ -161,7 +161,7 @@ class Renderer {
 						)
 					));
 
-					$output_file	= $archive_dir.$year.'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+					$output_file	= $year->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 
 					$this->write($output_file, $content);
 				}
@@ -173,7 +173,7 @@ class Renderer {
 					'posts'	=> $posts,
 					'page_title'	=> $page_title
 				));
-				$this->write($archive_dir.$year.'.html', $content);
+				$this->write($year->get_url().'.html', $content);
 			}
 		}
 	}

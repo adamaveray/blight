@@ -92,11 +92,6 @@ class Manager {
 
 			$posts	= array();
 
-			$grouping	= array(
-				'year'	=> array(),
-				'tag'	=> array(),
-				'category'	=> array()
-			);
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
 				if(!in_array($extension, $this->allowed_extensions)){
@@ -145,11 +140,12 @@ class Manager {
 
 		foreach($posts as $post){
 			// Group post by year
-			$year	= $post->get_date()->format('Y');
-			if(!isset($this->posts_by_year[$year])){
-				$this->posts_by_year[$year]	= array();
+			$year	= $post->get_year();
+			$slug	= $year->get_slug();
+			if(!isset($this->posts_by_year[$slug])){
+				$this->posts_by_year[$slug]	= $year;
 			}
-			$this->posts_by_year[$year][]	= &$post;
+			$this->posts_by_year[$slug]->add_post($post);
 
 			// Group post by tag
 			$tags	= $post->get_tags();
@@ -177,12 +173,16 @@ class Manager {
 	/**
 	 * Groups all posts by publication year
 	 *
-	 * @return array	An multi-dimensional array containing arrays of posts grouped by year
+	 * @return array	An array of tags containing posts
 	 *
 	 * 		Example:
 	 * 		array(
-	 * 			2013	=> array( $post, $post, $post ),
-	 * 			2012	=> array( $post, $post, $post )
+	 * 			Year (
+	 * 				get_posts()
+	 * 			),
+	 * 			Year (
+	 * 				get_posts()
+	 * 			)
 	 * 		);
 	 */
 	public function get_posts_by_year(){

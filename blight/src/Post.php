@@ -236,6 +236,14 @@ class Post {
 		return $this->date->format('Y/m').'/'.$this->slug;
 	}
 
+	public function get_year(){
+		if(!isset($this->year)){
+			$this->year	= new \Blight\Collections\Year($this->blog, $this->get_date()->format('Y'));
+		}
+
+		return $this->year;
+	}
+
 	public function get_tags(){
 		if(!isset($this->tags) && $this->has_meta('tags')){
 			$this->tags	= array_map(function($item){

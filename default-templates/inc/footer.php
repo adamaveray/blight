@@ -18,7 +18,7 @@
 			<ol>
 				<?php foreach($archives as $year){?>
 				<li>
-					<a href="<?php echo $blog->get_url('archive/'.$year);?>"><?php echo $year;?></a>
+					<a href="<?php echo $year->get_url();?>"><?php echo $year->get_name();?></a>
 				</li>
 				<?php }?>
 			</ol>
