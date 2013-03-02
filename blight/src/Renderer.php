@@ -97,6 +97,12 @@ class Renderer {
 	 * @param string $content	The content to write to the file
 	 */
 	protected function write($path, $content){
+		$url	= $this->blog->get_url();
+		if(strpos($path, $url) === 0){
+			// Convert web path to file
+			$path	= $this->blog->get_path_www(substr($path, strlen($url)));
+		}
+		
 		$this->blog->get_file_system()->create_file($path, $content);
 	}
 
