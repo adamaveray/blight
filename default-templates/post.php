@@ -26,7 +26,7 @@ $page_title	= $post->get_title();
 		<?php
 		$tags	= $post->get_tags();
 		if($tags){?>
-			<p>
+			<p class="tags">
 				<strong>Tags:</strong>
 				<ul>
 				<?php foreach($tags as $tag){?>
@@ -35,6 +35,15 @@ $page_title	= $post->get_title();
 					</li>
 				<?php }?>
 				</ul>
+			</p>
+		<?php
+		} ?>
+		
+		<?php
+		$category	= $post->get_category();
+		if($category){?>
+			<p class="category">
+				<strong>Category:</strong> <a href="<?php echo $category->get_url();?>"><?php echo $category->get_name();?></a>
 			</p>
 		<?php
 		} ?>
