@@ -7,6 +7,8 @@ abstract class Collection implements \Blight\Interfaces\Collection {
 	protected $slug;
 	protected $name;
 
+	protected $posts;
+
 	public function __construct(\Blight\Blog $blog, $name){
 		$this->blog	= $blog;
 		$this->name	= $name;
@@ -26,5 +28,22 @@ abstract class Collection implements \Blight\Interfaces\Collection {
 
 	public function get_url(){
 		return $this->blog->get_url($this->get_slug());
+	}
+
+
+	public function set_posts($posts){
+		$this->posts	= $posts;
+	}
+
+	public function add_post(\Blight\Post $post){
+		if(!isset($this->posts)){
+			$this->posts	= array();
+		}
+
+		$this->posts[]	= $post;
+	}
+
+	public function get_posts(){
+		return $this->posts;
 	}
 };
