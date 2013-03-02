@@ -247,7 +247,7 @@ class Post {
 	}
 
 	public function get_category(){
-		if($this->has_meta('category')){
+		if(!isset($this->category) && $this->has_meta('category')){
 			$this->category	= new \Blight\Collections\Category($this->blog, $this->get_meta('category'));
 		}
 
