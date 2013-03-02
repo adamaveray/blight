@@ -75,7 +75,8 @@ class Renderer {
 		$params	= $this->extend_options($params, array(
 			'blog'	=> $this->blog,
 			'text'	=> new TextProcessor($this->blog),
-			'archives'	=> array_keys($this->manager->get_posts_by_year())
+			'archives'		=> array_keys($this->manager->get_posts_by_year()),
+			'categories'	=> $this->manager->get_posts_by_category()
 		));
 
 		$template	= $this->blog->get_path_templates($file.'.php');
