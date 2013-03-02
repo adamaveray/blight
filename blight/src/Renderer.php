@@ -151,7 +151,7 @@ class Renderer {
 
 				// Build each page
 				for($page = 0; $page < $no_pages; $page++){
-					$content	= $this->build_template_file('archive', array(
+					$content	= $this->build_template_file('list', array(
 						'year'	=> $year,
 						'posts'	=> array_slice($posts, ($page-1)*$options['per_page'], $options['per_page']),
 						'page_title'	=> $page_title,
