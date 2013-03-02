@@ -12,6 +12,8 @@ class Post {
 	protected $date;
 	protected $content;
 	protected $metadata;
+	protected $tags;
+	protected $category;
 
 	protected $link;
 	protected $permalink;
@@ -232,6 +234,24 @@ class Post {
 	 */
 	public function get_relative_permalink(){
 		return $this->date->format('Y/m').'/'.$this->slug;
+	}
+
+	public function get_tags(){
+		if(!isset($this->tags) && $this->has_meta('tags')){
+			$this->tags	= array_map(function($item){
+				return new \Blight\Collections\Tag($this->blog, trim($item));
+			}, explode(',', $this->get_meta('tags')));
+		}
+
+		return $this->tags;
+	}
+
+	public function get_category(){
+		if($this->has_meta('category')){
+			$this->category	= new \Blight\Collections\Category($this->blog, $this->get_meta('category'));
+		}
+
+		return $this->category;
 	}
 
 	/**
