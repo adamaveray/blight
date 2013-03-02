@@ -152,6 +152,13 @@ class Blog {
 	}
 
 	/**
+	 * @return bool	Whether the blog is a linkblog
+	 */
+	public function is_linkblog(){
+		return (bool)$this->get('linkblog', 'linkblog', false);
+	}
+
+	/**
 	 * Retrieves settings from the blog configation
 	 *
 	 * @param string $parameter		The name of the parameter to retrieve

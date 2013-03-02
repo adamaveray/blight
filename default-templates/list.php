@@ -2,8 +2,6 @@
 /** @var \Blight\Blog $blog */
 /** @var \Blight\TextProcessor $text */
 /** @var \Blight\Post $post */
-
-$page_title	= $year.' Archive';
 ?>
 <?php include('inc/header.php');?>
 

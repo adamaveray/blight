@@ -1,7 +1,7 @@
 <?php
 /**
  * Blight
- * v0.1
+ * v0.2
  */
 namespace Blight;
 
@@ -10,10 +10,10 @@ date_default_timezone_set('UTC');
 require('src/autoload.php');
 
 // Initialise blog
-$config	= array_merge(parse_ini_file('../config.ini', true), array(
-	'root_path'	=> dirname(__DIR__).'/'
+$root_path	= dirname(__DIR__).'/';
+$config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
+	'root_path'	=> $root_path
 ));
-$config['paths']['web']	= rtrim($web_path,'/').'/blog/';
 $blog	= new Blog($config);
 
 
@@ -39,7 +39,17 @@ $renderer	= new Renderer($blog, $manager);
 
 	// Render archive pages
 	$renderer->render_archives(array(
-		'limit'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('page', 'limits', 0)
+	));
+
+	// Render tag pages
+	$tags = $renderer->render_tags(array(
+		'per_page'	=> $blog->get('page', 'limits', 0)
+	));
+
+	// Render category pages
+	$tags = $renderer->render_categories(array(
+		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
 
 	// Render home page
@@ -56,4 +66,4 @@ $renderer	= new Renderer($blog, $manager);
 
 // Redirect to generated pages
 header('HTTP/1.1 302 Found');
-header('Location: /');
+header('Location: '.$_SERVER['REQUEST_URI']);
