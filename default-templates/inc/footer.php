@@ -4,7 +4,11 @@
 			<?php foreach($pagination['pages'] as $page => $url){
 				$current	= ($page == $pagination['current']);?>
 			<li<?php if($current){?> class="current"<?php }?>>
-				<?php if(!$current){?><a href="<?php echo $url;?>"><?php }?><?php echo $page;?><?php if($current){?></a><?php }?>
+				<?php if($current){?>
+					<span href="<?php echo $url;?>"><?php echo $page;?></span>
+				<?php } else {?>
+                	<a href="<?php echo $url;?>"><?php echo $page;?></a>
+				<?php }?>
 			</li>
 			<?php }?>
 		</ol>

@@ -39,14 +39,22 @@ A new post should be formatted as follows:
 	
 	Content
 	
-The title and content are standard Markdown. The headers section under the title allows you to set a number of options for your post MultiMarkdown-style. Simply include the name of the header, a colon, spaces or tabs, and the value for that option. Parameters are case-insensitive.
+The title and content are standard Markdown. The headers section under the title allows you to set a number of options and metadata for your post MultiMarkdown-style. Simply include the name of the header, a colon, spaces or tabs, and the value for that option. Parameters are case-insensitive.
 
 
 ### Special Headers
 
-- **Link** allows you to create linked posts, where the main link for the article in both the article lists and RSS feed links to the URL provided, while the permalink links to the post itself.
+- **Link**: Allows you to create linked posts, where the main link for the article in both the article lists and RSS feed links to the URL provided, while the permalink links to the post itself.
 
 	`Link: http://www.example.com/`
+
+- **Tags**: A comma-separated list of tags to group the post under. Tags should be written in a human-readable format, as URL-friendly versions will be generated automatically.
+
+	`Tags: Example Tag, Other Tag`
+
+- **Category**: A category to group the post under. Similar to _tags_, it should be written in a human-readable format, as a URL-friendly versions will be generated automatically.
+
+	`Category: General`
 
 
 ### Publishing
@@ -105,6 +113,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 
 - **posts**: The path to the posts directory
 - **templates**: The path to the templates directory
+- **web**: The path to output rendered files to
 
 ### Limits
 
@@ -112,10 +121,16 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 - **home**: The number of posts to show on the home page. If not set, defaults to **page**
 - **feed**: The number of posts to include in the RSS feed. If not set, defaults to **page**
 
+### Linkblog
+
+- **linkblog**: Whether to treat the blog as a linkblog (linked post titles are displayed normally, non-linked post
+                titles are prefixed with a glyph)
+- **link_character**: The glyph to prefix linked posts with when the _linkblog_ option is disabled
+- **post_character**: The glyph to prefix non-linked posts with when the _linkblog_ option is enabled
+
 
 ## Planned Features
 
-- Post tags and categories
 - Drafts
 - Basic web admin
 - Hooks
