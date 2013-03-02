@@ -10,6 +10,7 @@ class Manager {
 	protected $posts;
 	protected $posts_by_year;
 	protected $posts_by_tag;
+	protected $posts_by_category;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -90,6 +91,12 @@ class Manager {
 			$files	= $this->get_raw_posts();
 
 			$posts	= array();
+
+			$grouping	= array(
+				'year'	=> array(),
+				'tag'	=> array(),
+				'category'	=> array()
+			);
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
 				if(!in_array($extension, $this->allowed_extensions)){
@@ -127,6 +134,44 @@ class Manager {
 	}
 
 	/**
+	 * Groups posts by year, tag and category
+	 */
+	protected function group_posts(){
+		$this->posts_by_year		= array();
+		$this->posts_by_tag			= array();
+		$this->posts_by_category	= array();
+
+		$posts	= $this->get_posts();
+
+		foreach($posts as $post){
+			// Group post by year
+			$year	= $post->get_date()->format('Y');
+			if(!isset($this->posts_by_year[$year])){
+				$this->posts_by_year[$year]	= array();
+			}
+			$this->posts_by_year[$year][]	= &$post;
+
+			// Group post by tag
+			$tags	= $post->get_tags();
+			foreach($tags as $tag){
+				$slug	= $tag->get_slug();
+				if(!isset($this->posts_by_tag[$slug])){
+					$this->posts_by_tag[$slug]	= $tag;
+				}
+				$this->posts_by_tag[$slug]->add_post($post);
+			}
+
+			// Group post by category
+			$category	= $post->get_category();
+			$slug		= $category->get_slug();
+			if(!isset($this->posts_by_category[$slug])){
+				$this->posts_by_category[$slug]	= $category;
+			}
+			$this->posts_by_category[$slug]->add_post($post);
+		}
+	}
+
+	/**
 	 * Groups all posts by publication year
 	 *
 	 * @return array	An multi-dimensional array containing arrays of posts grouped by year
@@ -138,21 +183,8 @@ class Manager {
 	 * 		);
 	 */
 	public function get_posts_by_year(){
-		if(!isset($this->posts_by_year)){
-			$posts	= $this->get_posts();
-
-			$years	= array();
-			foreach($posts as &$post){
-				$date	= $post->get_date();
-				$y	= $date->format('Y');
-				if(!isset($years[$y])){
-					$years[$y]	= array();
-				}
-
-				$years[$y][]	= &$post;
-			}
-
-			$this->posts_by_year	= $years;
+		if(!isset($this->posts_by_tag)){
+			$this->group_posts();
 		}
 
 		return $this->posts_by_year;
@@ -175,23 +207,7 @@ class Manager {
 	 */
 	public function get_posts_by_tag(){
 		if(!isset($this->posts_by_tag)){
-			$posts	= $this->get_posts();
-
-			$tags	= array();
-			foreach($posts as &$post){
-				$post_tags	= $post->get_tags();
-
-				foreach($post_tags as $tag){
-					$slug	= $tag->get_slug();
-					if(!isset($tags[$slug])){
-						$tags[$slug]	= $tag;
-					}
-
-					$tags[$slug]->add_post($post);
-				}
-			}
-
-			$this->posts_by_tag	= $tags;
+			$this->group_posts();
 		}
 
 		return $this->posts_by_tag;
@@ -213,22 +229,8 @@ class Manager {
 	 * 		);
 	 */
 	public function get_posts_by_category(){
-		if(!isset($this->posts_by_category)){
-			$posts	= $this->get_posts();
-
-			$categories	= array();
-			foreach($posts as &$post){
-				$category	= $post->get_category();
-
-				$slug	= $category->get_slug();
-				if(!isset($categories[$slug])){
-					$categories[$slug]	= $category;
-				}
-
-				$categories[$slug]->add_post($post);
-			}
-
-			$this->posts_by_category	= $categories;
+		if(!isset($this->posts_by_tag)){
+			$this->group_posts();
 		}
 
 		return $this->posts_by_category;
