@@ -1,0 +1,43 @@
+{% set page_title = post.title %}
+{% extends "inc/base.tpl.html" %}
+
+{% block content %}
+<article>
+	<header>
+        <a href="{{ post.get_link() }}">
+			<h2>$text->process_typography($post->get_title())</h2>
+		</a>
+
+		<p>
+            <time datetime="{{ post.get_date()|date('c') }}" pubdate="pubdate">{{ post.get_date()|date('F j, Y') }}</time>
+			•
+            <a class="permalink" title="Permalink" href="{{ post.get_permalink() }}">∞</a>
+		</p>
+	</header>
+
+	$text->process($post->get_content())
+
+	<footer>
+        {% set tags = post.tags %}
+        {% if tags is not empty %}
+			<p class="tags">
+				<strong>Tags:</strong>
+				<ul>
+				{% for tag in tags %}
+					<li>
+						<a href="{{ tag.get_url() }}">{{ tag.get_name() }}</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</p>
+		{% endif %}
+
+        {% set category = post.get_category() %}
+        {% if category is not empty %}
+			<p class="category">
+				<strong>Category:</strong> <a href="{{ category.get_url() }}">{{ category.get_name() }}</a>
+			</p>
+		{% endif %}
+	</footer>
+</article>
+{% endblock %}

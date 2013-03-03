@@ -1,0 +1,25 @@
+{% extends "inc/base.tpl.html" %}
+
+{% block content %}
+<ol class="posts_list">
+    {% for post in posts %}
+	<li>
+		<article>
+			<header>
+				<a href="{{ post.get_link() }}">
+					<h2>$text->process_typography($post->get_title())</h2>
+				</a>
+
+				<p>
+					<time datetime="{{ post.get_date()|date('c') }}" pubdate="pubdate">{{ post.get_date()|date('F j, Y') }}</time>
+					•
+					<a class="permalink" title="Permalink" href="{{ post.get_permalink() }}">∞</a>
+				</p>
+			</header>
+
+			$text->process($post->get_content())
+		</article>
+	</li>
+	{% endfor %}
+</ol>
+{% endblock %}
