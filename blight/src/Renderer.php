@@ -12,6 +12,8 @@ class Renderer {
 	protected $template_dir;
 	protected $posts;
 
+	protected $twig_environment;
+
 	/**
 	 * Initialises the output renderer
 	 *
@@ -79,15 +81,39 @@ class Renderer {
 			'categories'	=> $this->manager->get_posts_by_category()
 		));
 
-		$template	= $this->blog->get_path_templates($file.'.php');
-		if(!file_exists($template)){
+		$template	= $this->blog->get_path_templates($file);
+		if(file_exists($template.'.php')){
+			// Use PHP
+			extract($params);
+			ob_start();
+			include($template.'.php');
+			return ob_get_clean();
+
+		} elseif(file_exists($template.'.tpl.html')){
+			// Use Twig
+			$twig	= $this->get_twig_environment();
+			return $twig->render($file.'.tpl.html', $params);
+
+		} else {
+			// No template found
 			throw new \RuntimeException('Template "'.$file.'" not found');
 		}
+	}
 
-		extract($params);
-		ob_start();
-		include($template);
-		return ob_get_clean();
+	/**
+	 * Retrieves the standardised Twig environment object, with the correct template and cache paths set
+	 *
+	 * @return \Twig_Environment	The Twig environment object
+	 */
+	protected function get_twig_environment(){
+		if(!isset($this->twig_environment)){
+			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
+			$this->twig_environment	= new \Twig_Environment($loader, array(
+				'cache' => $this->blog->get_path_root('cache/')
+			));
+		}
+
+		return $this->twig_environment;
 	}
 
 	/**
