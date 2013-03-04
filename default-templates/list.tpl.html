@@ -7,18 +7,18 @@
 	<li>
 		<article>
 			<header>
-                <a href="{{ post.get_link()|e }}">
-                    <h2>{{ post.get_title()|e|typo }}</h2>
+                <a href="{{ post._link|e }}">
+                    <h2>{{ post._title|e|typo }}</h2>
 				</a>
 
 				<p>
-                    <time datetime="{{ post.get_date()|date('c') }}" pubdate="pubdate">{{ post.get_date()|date('F j, Y') }}</time>
+                    <time datetime="{{ post._date|date('c') }}" pubdate="pubdate">{{ post._date|date('F j, Y') }}</time>
 					•
-                    <a class="permalink" title="Permalink" href="{{ post.get_permalink()|e }}">∞</a>
+                    <a class="permalink" title="Permalink" href="{{ post._permalink|e }}">∞</a>
 				</p>
 			</header>
 
-            {{ post.get_content()|md }}
+            {{ post._content|md }}
 		</article>
 	</li>
 	{% endfor %}
