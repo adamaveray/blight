@@ -61,7 +61,8 @@ class Renderer {
 	protected function build_post_content(Post $post){
 		$content	= $post->get_content();
 		return $this->build_template_file('post', array(
-			'post'	=> $post
+			'post'	=> $post,
+			'page_title'	=> $post->get_title()
 		));
 	}
 
