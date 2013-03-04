@@ -97,9 +97,9 @@ class Post {
 			}
 
 			$line	= array_map('trim', explode(':', $line, 2));
-			if(count($line) != 2){
-				// Unknown metadata
-				continue;
+			if(count($line) === 1){
+				// Single param
+				$line[]	= true;
 			}
 
 			$metadata[$this->normalise_meta_name($line[0])]	= $line[1];
