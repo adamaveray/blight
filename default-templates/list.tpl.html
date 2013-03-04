@@ -1,20 +1,20 @@
 {% extends "inc/base.tpl.html" %}
 
 {% block content %}
-<h1>{{ page_title }}</h1>
+<h1>{{ page_title|e|typo }}</h1>
 <ol class="posts_list">
     {% for post in posts %}
 	<li>
 		<article>
 			<header>
-                <a href="{{ post.get_link() }}">
-                    <h2>{{ post.get_title()|typo }}</h2>
+                <a href="{{ post.get_link()|e }}">
+                    <h2>{{ post.get_title()|e|typo }}</h2>
 				</a>
 
 				<p>
                     <time datetime="{{ post.get_date()|date('c') }}" pubdate="pubdate">{{ post.get_date()|date('F j, Y') }}</time>
 					•
-                    <a class="permalink" title="Permalink" href="{{ post.get_permalink() }}">∞</a>
+                    <a class="permalink" title="Permalink" href="{{ post.get_permalink()|e }}">∞</a>
 				</p>
 			</header>
 

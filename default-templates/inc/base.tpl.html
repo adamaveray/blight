@@ -3,19 +3,19 @@
 <head>
     <meta charset="utf-8">
     {% block head %}
-        <title>{% block title %}{% if page_title is defined %}{{ page_title }} • {% endif %}{% endblock %}{{ blog.get_name() }}</title>
+        <title>{% if page_title is defined %}{{ page_title|e }} • {% endif %}{{ blog.get_name()|e }}</title>
 
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 
-        <link type="application/rss+xml" rel="alternate" title="RSS Feed" href="{{ blog.get_feed_url() }}"  />
+        <link type="application/rss+xml" rel="alternate" title="RSS Feed" href="{{ blog.get_feed_url()|e }}"  />
     {% endblock %}
 </head>
 <body>
 <header role="banner">
-	<h1><a href="{{ blog.get_url() }}">{{ blog.get_name() }}</a></h1>
+	<h1><a href="{{ blog.get_url()|e }}">{{ blog.get_name()|e|typo }}</a></h1>
 
-	<p class="description">{{ blog.get_description() }}</p>
+	<p class="description">{{ blog.get_description()|e|typo }}</p>
 </header>
 
 <div id="main" role="main">
@@ -28,9 +28,9 @@
                 {% set current = (page == pagination.current) %}
 			<li{% if current %} class="current"{% endif %}>
                 {% if current %}
-					<span href="{{ url }}">{{ page }}</span>
+					<span href="{{ url|e }}">{{ page|e }}</span>
 				{% else %}
-                	<a href="{{ url }}">{{ page }}</a>
+                	<a href="{{ url|e }}">{{ page|e }}</a>
 				{% endif %}
 			</li>
 			{% endfor %}
@@ -45,7 +45,7 @@
 			<ol>
                 {% for year in archives %}
 				<li>
-					<a href="{{ year.get_url() }}">{{ year.get_name() }}</a>
+					<a href="{{ year.get_url()|e }}">{{ year.get_name()|e|typo }}</a>
 				</li>
 				{% endfor %}
 			</ol>
@@ -58,7 +58,7 @@
 			<ol>
                 {% for category in categories %}
 				<li>
-					<a href="{{ category.get_url() }}">{{ category.get_name() }}</a>
+					<a href="{{ category.get_url()|e }}">{{ category.get_name()|e|typo }}</a>
 				</li>
 				{% endfor %}
 			</ol>
@@ -70,7 +70,7 @@
 <footer role="contentinfo">
     {% block footer %}
         <p class="copyright">Copyright {{ 'now'|date('Y') }} – All Rights Reserved</p>
-        <p><a href="{{ blog.get_feed_url() }}">RSS</a></p>
+        <p><a href="{{ blog.get_feed_url()|e }}">RSS</a></p>
     {% endblock %}
 </footer>
 </body>

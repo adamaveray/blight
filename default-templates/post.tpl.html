@@ -1,17 +1,16 @@
-{% set page_title = post.title %}
 {% extends "inc/base.tpl.html" %}
 
 {% block content %}
 <article>
 	<header>
-        <a href="{{ post.get_link() }}">
-            <h2>{{ post.get_title()|typo }}</h2>
+        <a href="{{ post.get_link()|e }}">
+            <h2>{{ post.get_title()|e|typo }}</h2>
 		</a>
 
 		<p>
             <time datetime="{{ post.get_date()|date('c') }}" pubdate="pubdate">{{ post.get_date()|date('F j, Y') }}</time>
 			•
-            <a class="permalink" title="Permalink" href="{{ post.get_permalink() }}">∞</a>
+            <a class="permalink" title="Permalink" href="{{ post.get_permalink()|e }}">∞</a>
 		</p>
 	</header>
 
@@ -25,7 +24,7 @@
 				<ul>
 				{% for tag in tags %}
 					<li>
-						<a href="{{ tag.get_url() }}">{{ tag.get_name() }}</a>
+						<a href="{{ tag.get_url()|e }}">{{ tag.get_name()|e|typo }}</a>
 					</li>
 				{% endfor %}
 				</ul>
@@ -35,7 +34,7 @@
         {% set category = post.get_category() %}
         {% if category is not empty %}
 			<p class="category">
-				<strong>Category:</strong> <a href="{{ category.get_url() }}">{{ category.get_name() }}</a>
+				<strong>Category:</strong> <a href="{{ category.get_url()|e }}">{{ category.get_name()|e|typo }}</a>
 			</p>
 		{% endif %}
 	</footer>
