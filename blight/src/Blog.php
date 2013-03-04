@@ -40,7 +40,8 @@ class Blog {
 		$this->paths	= array(
 			'www'		=> $config['paths']['web'],
 			'posts'		=> $config['paths']['posts'],
-			'templates'	=> $config['paths']['templates']
+			'templates'	=> $config['paths']['templates'],
+			'cache'		=> $config['paths']['cache']
 		);
 
 		$this->config	= $config;
@@ -54,6 +55,16 @@ class Blog {
 	 */
 	public function get_path_root($append = ''){
 		return $this->root_path.$append;
+	}
+
+	/**
+	 * Returns the path to the cache directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The cache directory path, with the provided string appended
+	 */
+	public function get_path_cache($append = ''){
+		return $this->paths['cache'].$append;
 	}
 
 	/**

@@ -111,7 +111,7 @@ class Renderer {
 		if(!isset($this->twig_environment)){
 			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
 			$this->twig_environment	= new \Twig_Environment($loader, array(
-				'cache' => $this->blog->get_path_root('cache/')
+				'cache' => $this->blog->get_path_cache('twig/')
 			));
 
 			// Set up filters
