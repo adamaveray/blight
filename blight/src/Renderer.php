@@ -12,6 +12,8 @@ class Renderer {
 	protected $template_dir;
 	protected $posts;
 
+	protected $twig_environment;
+
 	/**
 	 * Initialises the output renderer
 	 *
@@ -59,7 +61,8 @@ class Renderer {
 	protected function build_post_content(Post $post){
 		$content	= $post->get_content();
 		return $this->build_template_file('post', array(
-			'post'	=> $post
+			'post'	=> $post,
+			'page_title'	=> $post->get_title()
 		));
 	}
 
@@ -74,20 +77,74 @@ class Renderer {
 	protected function build_template_file($file, $params = null){
 		$params	= $this->extend_options($params, array(
 			'blog'	=> $this->blog,
-			'text'	=> new TextProcessor($this->blog),
 			'archives'		=> $this->manager->get_posts_by_year(),
 			'categories'	=> $this->manager->get_posts_by_category()
 		));
 
-		$template	= $this->blog->get_path_templates($file.'.php');
-		if(!file_exists($template)){
+		$template	= $this->blog->get_path_templates($file);
+		if(file_exists($template.'.php')){
+			// Use PHP
+			$params['text']	= new TextProcessor($this->blog);
+
+			extract($params);
+			ob_start();
+			include($template.'.php');
+			return ob_get_clean();
+
+		} elseif(file_exists($template.'.tpl.html')){
+			// Use Twig
+			$twig	= $this->get_twig_environment();
+			return $twig->render($file.'.tpl.html', $params);
+
+		} else {
+			// No template found
 			throw new \RuntimeException('Template "'.$file.'" not found');
 		}
+	}
 
-		extract($params);
-		ob_start();
-		include($template);
-		return ob_get_clean();
+	/**
+	 * Retrieves the standardised Twig environment object, with the correct template and cache paths set
+	 *
+	 * @return \Twig_Environment	The Twig environment object
+	 */
+	protected function get_twig_environment(){
+		if(!isset($this->twig_environment)){
+			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
+			$this->twig_environment	= new \Twig_Environment($loader, array(
+				'cache' => $this->blog->get_path_cache('twig/')
+			));
+
+			// Set up filters
+			$blog	= $this->blog;
+			$text_processor	= new TextProcessor($this->blog);
+
+			// Markdown filter
+			$this->twig_environment->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
+				$filters	= array(
+					'markdown'		=> true,
+					'typography'	=> true
+				);
+				if(!$filter_typography){
+					$filters['typography']	= false;
+				}
+				return $text_processor->process($string, $filters);
+			}, array(
+				'is_safe' => array('html')
+			)));
+
+			// Typography filter
+			$this->twig_environment->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
+				'pre_escape'	=> 'html',
+				'is_safe'		=> array('html')
+			)));
+
+			// Truncate filter
+			$this->twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html')), array(
+				'is_safe'	=> array('html')
+			));
+		}
+
+		return $this->twig_environment;
 	}
 
 	/**

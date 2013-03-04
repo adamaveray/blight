@@ -1,0 +1,42 @@
+{% extends "inc/base.tpl.html" %}
+
+{% block content %}
+<article>
+	<header>
+        <a href="{{ post._link|e }}">
+            <h2>{{ post._title|e|typo }}</h2>
+		</a>
+
+		<p>
+            <time datetime="{{ post._date|date('c') }}" pubdate="pubdate">{{ post._date|date('F j, Y') }}</time>
+			•
+            <a class="permalink" title="Permalink" href="{{ post._permalink|e }}">∞</a>
+		</p>
+	</header>
+
+    {{ post._content|md }}
+
+	<footer>
+        {% set tags = post._tags %}
+        {% if tags is not empty %}
+			<p class="tags">
+				<strong>Tags:</strong>
+				<ul>
+				{% for tag in tags %}
+					<li>
+						<a href="{{ tag._url|e }}">{{ tag._name|e|typo }}</a>
+					</li>
+				{% endfor %}
+				</ul>
+			</p>
+		{% endif %}
+
+        {% set category = post._category %}
+        {% if category is not empty %}
+			<p class="category">
+				<strong>Category:</strong> <a href="{{ category._url|e }}">{{ category._name|e|typo }}</a>
+			</p>
+		{% endif %}
+	</footer>
+</article>
+{% endblock %}
