@@ -5,7 +5,7 @@
 <article>
 	<header>
         <a href="{{ post.get_link() }}">
-			<h2>$text->process_typography($post->get_title())</h2>
+            <h2>{{ post.get_title()|typo }}</h2>
 		</a>
 
 		<p>
@@ -15,7 +15,7 @@
 		</p>
 	</header>
 
-	$text->process($post->get_content())
+    {{ post.get_content()|md }}
 
 	<footer>
         {% set tags = post.tags %}

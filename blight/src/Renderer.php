@@ -112,6 +112,35 @@ class Renderer {
 			$this->twig_environment	= new \Twig_Environment($loader, array(
 				'cache' => $this->blog->get_path_root('cache/')
 			));
+
+			// Set up filters
+			$blog	= $this->blog;
+			$text_processor	= new TextProcessor($this->blog);
+
+			// Markdown filter
+			$this->twig_environment->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
+				$filters	= array(
+					'markdown'		=> true,
+					'typography'	=> true
+				);
+				if(!$filter_typography){
+					$filters['typography']	= false;
+				}
+				return $text_processor->process($string, $filters);
+			}, array(
+				'is_safe' => array('html')
+			)));
+
+			// Typography filter
+			$this->twig_environment->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
+				'pre_escape'	=> 'html',
+				'is_safe'		=> array('html')
+			)));
+
+			// Truncate filter
+			$this->twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html')), array(
+				'is_safe'	=> array('html')
+			));
 		}
 
 		return $this->twig_environment;
