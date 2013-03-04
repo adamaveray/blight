@@ -76,7 +76,6 @@ class Renderer {
 	protected function build_template_file($file, $params = null){
 		$params	= $this->extend_options($params, array(
 			'blog'	=> $this->blog,
-			'text'	=> new TextProcessor($this->blog),
 			'archives'		=> $this->manager->get_posts_by_year(),
 			'categories'	=> $this->manager->get_posts_by_category()
 		));
@@ -84,6 +83,8 @@ class Renderer {
 		$template	= $this->blog->get_path_templates($file);
 		if(file_exists($template.'.php')){
 			// Use PHP
+			$params['text']	= new TextProcessor($this->blog);
+
 			extract($params);
 			ob_start();
 			include($template.'.php');
