@@ -76,6 +76,42 @@ class Manager {
 	 * @param string $current_path	The current path to the post's file
 	 */
 	protected function organise_post_file(Post $post, $current_path){
+		// Check for special headers
+		$has_date		= $post->has_meta('date');
+		$has_publish	= $post->has_meta('publish-now');
+		if(!$has_date || $has_publish){
+			$lines	= explode("\n", $this->blog->get_file_system()->load_file($current_path));
+
+			if($has_publish){
+				// Remove publish header
+				$count	= count($lines);
+				for($i = 2; $i < $count; $i++){
+					$line	= rtrim($lines[$i]);
+					if($line === ''){
+						// Reached end of header
+						break;
+					}
+
+					if(preg_match('/^publish[- ]now$/i', strtolower($line))){
+						// Found header
+						array_splice($lines, $i, 1);
+						break;
+					}
+				}
+			}
+
+			if(!$has_date && ($has_publish || !$post->is_draft())){
+				// Add date header
+				$now	= new \DateTime();
+				$post->set_date($now);
+				$date_line	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
+				array_splice($lines, 2, 0, $date_line);
+			}
+
+			// Update file
+			$this->blog->get_file_system()->create_file($current_path, implode("\n", $lines));
+		}
+
 		// Build filename
 		$new_path	= $post->get_relative_permalink().'.'.current($this->allowed_extensions);
 		$new_path	= $this->blog->get_path_posts(pathinfo($new_path, \PATHINFO_DIRNAME).'/'.$post->get_date()->format('Y-m-d').'-'.pathinfo($new_path, \PATHINFO_BASENAME));
@@ -85,7 +121,7 @@ class Manager {
 			return;
 		}
 
-		$this->blog->get_file_system()->move_file($current_path, $new_path, true);
+		$this->blog->get_file_system()->move_file($current_path, $new_path, !$post->is_draft());	// Don't clean up drafts
 	}
 
 	/**
@@ -109,10 +145,18 @@ class Manager {
 
 				// Create post object
 				try {
-					$posts[]	= new Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
+					$post	= new Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
 				} catch(\Exception $e){
 					continue;
 				}
+
+				if($post->has_meta('publish-now')){
+					// Publish post
+					$this->organise_post_file($post, $file);
+					continue;
+				}
+
+				$posts[]	= $post;
 			}
 
 			$this->draft_posts	= $posts;

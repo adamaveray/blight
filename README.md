@@ -46,6 +46,8 @@ The title and content are standard Markdown. The headers section under the title
 
 Draft posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be displayed on the site itself.
 
+When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
+
 
 ### Special Headers
 
