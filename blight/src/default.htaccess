@@ -5,13 +5,13 @@ AddDefaultCharset UTF-8
 	RewriteEngine on
 
 	# Map individual posts
-	RewriteCond %{DOCUMENT_ROOT}/blog/$1.html -f
-	RewriteRule (.*) blog/$1.html [L,QSA]
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.html -f
+	RewriteRule (.*) {%WEB_PATH%}/$1.html [L,QSA]
 
 	# Map indexes
-	RewriteCond %{DOCUMENT_ROOT}/blog/$1/index.html -f
-	RewriteRule (.*) blog/$1/index.html [L,QSA]
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1/index.html -f
+	RewriteRule (.*) {%WEB_PATH%}/$1/index.html [L,QSA]
 
 	# Map feed
-	RewriteRule ^feed$ blog/feed.xml [L,QSA]
+	RewriteRule ^feed$ {%WEB_PATH%}/feed.xml [L,QSA]
 </IfModule>

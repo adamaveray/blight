@@ -69,9 +69,19 @@ class FileSystem {
 	 * @see delete_file()
 	 */
 	public function move_file($old_path, $new_path, $cleanup = false){
-		$content	= $this->load_file($old_path);
-		$this->create_file($new_path, $content);
+		$this->copy_file($old_path, $new_path);
 		$this->delete_file($old_path, $cleanup);
+	}
+
+	/**
+	 * Copies a file's contents to a second location
+	 *
+	 * @param string $source_path	The path to the original file
+	 * @param string $target_path	The path to the file to create
+	 */
+	public function copy_file($source_path, $target_path){
+		$content	= $this->load_file($source_path);
+		$this->create_file($target_path, $content);
 	}
 
 	/**
@@ -111,9 +121,49 @@ class FileSystem {
 	 * @see mkdir()
 	 */
 	public function create_dir($path, $mode = 0777, $recursive = true){
+		if(is_dir($path)){
+			// Already exists
+			return;
+		}
+
 		$result	= mkdir($path, $mode, $recursive);
 		if($result === false){
 			throw new \RuntimeException('Cannot create '.$path);
+		}
+	}
+
+	/**
+	 * Copies files from the source directory to a second location. If the target directory does not exist,
+	 * it will be created.
+	 *
+	 * @param string $source_dir	The directory to copy files from
+	 * @param string $target_dir	The directory to copy files to
+	 * @param int $mode				The directory permissions mode to use
+	 * @param bool $recursive		Whether to copy and child directories
+	 *
+	 * @throws \RuntimeException	Source directory does not exist
+	 * @throws \RuntimeException	Cannot create target directory
+	 */
+	public function copy_dir($source_dir, $target_dir, $mode = 0777, $recursive = true){
+		if(!is_dir($source_dir)){
+			throw new \RuntimeException('Source dir does not exist');
+		}
+
+		$this->create_dir($target_dir, $mode, true);
+
+		$source	= new \FilesystemIterator($source_dir);
+		foreach($source as $file){
+			$target_file	= str_replace($source_dir, $target_dir, $file);
+
+			if(is_dir($file)){
+				if(!$recursive){
+					continue;
+				}
+
+				$this->copy_dir($file, $target_file, $mode, $recursive);
+			} else {
+				$this->copy_file($file, $target_file);
+			}
 		}
 	}
 };

@@ -12,6 +12,10 @@ class Renderer {
 	protected $template_dir;
 	protected $posts;
 
+	protected $templates	= array();
+
+	protected $twig_environment;
+
 	/**
 	 * Initialises the output renderer
 	 *
@@ -36,58 +40,27 @@ class Renderer {
 	}
 
 	/**
-	 * Extends an array with a second array, handling if the extending array is null
-	 *
-	 * @param array|null $options	The custom options that will overwrite any matching defaults, or null
-	 * @param array $defaults		The default options to be used if not present in $options
-	 * @return array				An array containing the merged options
-	 */
-	protected function extend_options($options, $defaults){
-		if(!isset($options)){
-			$options	= array();
-		}
-
-		return array_merge($defaults, $options);
-	}
-
-	/**
-	 * Builds a post's rendered page, and returns the generated HTML
-	 *
-	 * @param Post $post	The post to build the page for
-	 * @return string		The rendered content from the template
-	 */
-	protected function build_post_content(Post $post){
-		$content	= $post->get_content();
-		return $this->build_template_file('post', array(
-			'post'	=> $post
-		));
-	}
-
-	/**
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
-	 * @param string $file			The template to use
+	 * @param string $name			The template to use
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
 	 * @return string	The rendered content from the template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	protected function build_template_file($file, $params = null){
-		$params	= $this->extend_options($params, array(
-			'blog'	=> $this->blog,
-			'text'	=> new TextProcessor($this->blog),
+	protected function render_template($name, $params = null){
+		$params	= array_merge(array(
+			'blog'			=> $this->blog,
 			'archives'		=> $this->manager->get_posts_by_year(),
 			'categories'	=> $this->manager->get_posts_by_category()
-		));
+		), (array)$params);
 
-		$template	= $this->blog->get_path_templates($file.'.php');
-		if(!file_exists($template)){
-			throw new \RuntimeException('Template "'.$file.'" not found');
+		// Check if template cached
+		if(!isset($this->templates[$name])){
+			// Create template
+			$this->templates[$name]	= new \Blight\Template($this->blog, $name);
 		}
 
-		extract($params);
-		ob_start();
-		include($template);
-		return ob_get_clean();
+		return $this->templates[$name]->render($params);
 	}
 
 	/**
@@ -102,10 +75,23 @@ class Renderer {
 			// Convert web path to file
 			$path	= $this->blog->get_path_www(substr($path, strlen($url)));
 		}
-		
+
 		$this->blog->get_file_system()->create_file($path, $content);
 	}
 
+	/**
+	 * Builds a template file with the provided parameters, and writes the rendered content to the specified file
+	 *
+	 * @param string $template_name	The template to use
+	 * @param string $output_path	The file to write to
+	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
+	 *
+	 * @see render_template
+	 * @see write
+	 */
+	protected function render_template_to_file($template_name, $output_path, $params = null){
+		$this->write($output_path, $this->render_template($template_name, $params));
+	}
 
 	/**
 	 * Generates and saves the static file for the given post
@@ -115,9 +101,10 @@ class Renderer {
 	public function render_post(Post $post){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
-		$content	= $this->build_post_content($post);
-
-		$this->write($path, $content);
+		$this->render_template_to_file('post', $path, array(
+			'post'			=> $post,
+			'page_title'	=> $post->get_title()
+		));
 	}
 
 	/**
@@ -127,27 +114,27 @@ class Renderer {
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_year
+	 * @see render_collections
 	 */
 	public function render_archives($options = null){
-		$options	= $this->extend_options($options, array(
-			'per_page'	=> 0	// Default to no pagination
-		));
+		$this->render_collections($this->manager->get_posts_by_year(), 'year', 'Archive %s', $options);
+	}
 
-		$years	= $this->manager->get_posts_by_year();
-
-		foreach($years as $year){
-			$pages	= $this->paginate_collection($year, $options['per_page']);
-
-			$page_title	= 'Archive '.$year->get_name();
-			foreach($pages as $output_file => $page){
-				$content	= $this->build_template_file('list', $this->extend_options($page, array(
-					'year'			=> $year,
-					'page_title'	=> $page_title
-				)));
-
-				$this->write($output_file, $content);
-			}
-		}
+	/**
+	 * Generates and saves the static files for posts in the provided year
+	 *
+	 * @param \Blight\Interfaces\Collection $year	The archive year to render
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_archives
+	 * @see render_collection
+	 */
+	public function render_year(\Blight\Interfaces\Collection $year, $options = null){
+		$this->render_collection($year, 'year', 'Archive '.$year->get_name(), $options);
 	}
 
 	/**
@@ -157,27 +144,11 @@ class Renderer {
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_collections
 	 */
 	public function render_tags($options = null){
-		$options	= $this->extend_options($options, array(
-			'per_page'	=> 0	// Default to no pagination
-		));
-
-		$tags	= $this->manager->get_posts_by_tag();
-
-		foreach($tags as $tag){
-			$pages	= $this->paginate_collection($tag, $options['per_page']);
-
-			$page_title	= 'Tag '.$tag->get_name();
-			foreach($pages as $output_file => $page){
-				$content	= $this->build_template_file('list', $this->extend_options($page, array(
-					'tag'			=> $tag,
-					'page_title'	=> $page_title
-				)));
-
-				$this->write($output_file, $content);
-			}
-		}
+		$this->render_collections($this->manager->get_posts_by_tag(), 'tag', 'Tag %s', $options);
 	}
 
 	/**
@@ -187,26 +158,51 @@ class Renderer {
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_collections
 	 */
 	public function render_categories($options = null){
-		$options	= $this->extend_options($options, array(
+		$this->render_collections($this->manager->get_posts_by_category(), 'category', 'Category %s', $options);
+	}
+
+	/**
+	 * Generates and saves the static files for posts grouped by the provided collections
+	 *
+	 * @param array $collections	An array of \Blight\Interfaces\Collection objects
+	 * @param string $collection_type	The name of collection, used to assign it as a template variable
+	 * @param string $title_format	A sprintf-formatted string for each collection's page title. The collection
+	 * 								name will be passed in (replacing %s)
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * @see sprintf
+	 */
+	protected function render_collections($collections, $collection_type, $title_format, $options = null){
+		foreach($collections as $collection){
+			/** @var \Blight\Interfaces\Collection $collection */
+			$this->render_collection($collection, $collection_type, sprintf($title_format, $collection->get_name()), $options);
+		}
+	}
+
+	/**
+	 * Generates and saves the static file for posts within the provided collection
+	 *
+	 * @param \Blight\Interfaces\Collection $collection	The collection to render
+	 * @param string $collection_type	The name of collection, used to assign it as a template variable
+	 * @param string $page_title	The title to be used for the rendered collection page
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 */
+	protected function render_collection(\Blight\Interfaces\Collection $collection, $collection_type, $page_title, $options = null){
+		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		));
+		), $options);
 
-		$categories	= $this->manager->get_posts_by_category();
+		$pages	= $this->paginate_collection($collection, $options['per_page']);
 
-		foreach($categories as $category){
-			$pages	= $this->paginate_collection($category, $options['per_page']);
-
-			$page_title	= 'Category '.$category->get_name();
-			foreach($pages as $output_file => $page){
-				$content	= $this->build_template_file('list', $this->extend_options($page, array(
-					'category'		=> $category,
-					'page_title'	=> $page_title
-				)));
-
-				$this->write($output_file, $content);
-			}
+		foreach($pages as $output_file => $page){
+			$this->render_template_to_file('list', $output_file, array_merge(array(
+				$collection_type	=> $collection,
+				'page_title'		=> $page_title
+			), $page));
 		}
 	}
 
@@ -272,9 +268,9 @@ class Renderer {
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
 	 */
 	public function render_home($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'limit'	=> 20
-		));
+		), $options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -285,11 +281,9 @@ class Renderer {
 
 		$path	= $this->blog->get_path_www('index.html');
 
-		$content	= $this->build_template_file('home', array(
+		$this->render_template_to_file('home', $path, array(
 			'posts'	=> $posts
 		));
-
-		$this->write($path, $content);
 	}
 
 	/**
@@ -301,9 +295,9 @@ class Renderer {
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
 	 */
 	public function render_feed($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'limit'	=> 20
-		));
+		), $options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -314,10 +308,8 @@ class Renderer {
 
 		$path	= $this->blog->get_path_www('feed.xml');
 
-		$content	= $this->build_template_file('feed', array(
+		$this->render_template_to_file('feed', $path, array(
 			'posts'	=> $posts
 		));
-
-		$this->write($path, $content);
 	}
 };

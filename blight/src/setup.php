@@ -1,27 +1,43 @@
 <?php
-/** @var $blog \Blight\Blog */
+$setup	= function(\Blight\Blog $blog){
+	$file_system	= $blog->get_file_system();
 
-$file_system	= $blog->get_file_system();
+	// Create posts directory
+	$file_system->create_dir($blog->get_path_posts());
 
-// Set up directories
-$dirs	= array(
-	$blog->get_path_posts(),
-	$blog->get_path_templates()
-);
-foreach($dirs as $dir){
-	$file_system->create_dir($dir);
-}
+	$template_dir	= $blog->get_path_templates();
+	if(!is_dir($template_dir) || count(glob($template_dir.'*')) === 0){
+		// Set up default template
+		$file_system->copy_dir($blog->get_path_root('default-templates/'), $template_dir);
+	}
 
-// Copy .htaccess
-$file_system->create_file(rtrim($web_path,'/').'/.htaccess', $file_system->load_file($blog->get_path_app('src/default.htaccess')));
+	// Copy .htaccess
+	$htaccess	= $file_system->load_file($blog->get_path_app('src/default.htaccess'));
 
-// Update config with domain
-$path		= $blog->get_path_root('config.ini');
-$content	= $file_system->load_file($path);
-$find	= 'http://www.example.com/';
-if(strstr($find) !== false){
-	$file_system->create_file($path, str_replace($find, $_SERVER['SERVER_NAME'], $content));
-}
+	$web_dir		= explode('/', str_replace($blog->get_path_root(), '', $blog->get_path_www()));
+	$htaccess_dir	= implode('/', array_slice($web_dir, 0, -1));
 
-echo 'Blog set up. Create templates and reload.';
-exit;
+	$common_www_dirs	= array('www', 'public_html', 'htdocs');
+	foreach($common_www_dirs as $dir){
+		if($web_dir[0] === $dir){
+			// Found - replace only instance at start
+			$web_dir	= array_slice($web_dir, 1);
+			break;
+		}
+	}
+	$web_dir	= implode('/', $web_dir);
+	$htaccess	= str_replace('{%WEB_PATH%}', rtrim($web_dir, '/'), $htaccess);
+	$file_system->create_file(rtrim($htaccess_dir,'/').'/.htaccess', $htaccess);
+
+
+	// Update config with domain
+	$path		= $blog->get_path_root('config.ini');
+	$content	= $file_system->load_file($path);
+	$find	= 'http://www.example.com/';
+	if(isset($_SERVER['SERVER_NAME']) && strstr($content, $find) !== false){
+		$host	= 'http://'.$_SERVER['SERVER_NAME'].'/';
+		$file_system->create_file($path, str_replace($find, $host, $content));
+	}
+};
+
+$setup($blog);
