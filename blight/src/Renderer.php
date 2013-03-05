@@ -72,6 +72,19 @@ class Renderer {
 		$this->blog->get_file_system()->create_file($path, $content);
 	}
 
+	/**
+	 * Builds a template file with the provided parameters, and writes the rendered content to the specified file
+	 *
+	 * @param string $template_name	The template to use
+	 * @param string $output_path	The file to write to
+	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
+	 *
+	 * @see render_template
+	 * @see write
+	 */
+	protected function render_template_to_file($template_name, $output_path, $params = null){
+		$this->write($output_path, $this->render_template($template_name, $params));
+	}
 
 	/**
 	 * Generates and saves the static file for the given post
@@ -81,12 +94,10 @@ class Renderer {
 	public function render_post(Post $post){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
-		$content	= $this->render_template('post', array(
+		$this->render_template_to_file('post', $path, array(
 			'post'			=> $post,
 			'page_title'	=> $post->get_title()
 		));
-
-		$this->write($path, $content);
 	}
 
 	/**
@@ -109,12 +120,10 @@ class Renderer {
 
 			$page_title	= 'Archive '.$year->get_name();
 			foreach($pages as $output_file => $page){
-				$content	= $this->render_template('list', array_merge(array(
+				$this->render_template_to_file('list', $output_file, array_merge(array(
 					'year'			=> $year,
 					'page_title'	=> $page_title
 				), $page));
-
-				$this->write($output_file, $content);
 			}
 		}
 	}
@@ -139,12 +148,10 @@ class Renderer {
 
 			$page_title	= 'Tag '.$tag->get_name();
 			foreach($pages as $output_file => $page){
-				$content	= $this->render_template('list', array_merge(array(
+				$this->render_template_to_file('list', $output_file, array_merge(array(
 					'tag'			=> $tag,
 					'page_title'	=> $page_title
 				), $page));
-
-				$this->write($output_file, $content);
 			}
 		}
 	}
@@ -169,12 +176,10 @@ class Renderer {
 
 			$page_title	= 'Category '.$category->get_name();
 			foreach($pages as $output_file => $page){
-				$content	= $this->render_template('list', array_merge(array(
+				$this->render_template_to_file('list', $output_file, array_merge(array(
 					'category'		=> $category,
 					'page_title'	=> $page_title
 				), $page));
-
-				$this->write($output_file, $content);
 			}
 		}
 	}
@@ -254,11 +259,9 @@ class Renderer {
 
 		$path	= $this->blog->get_path_www('index.html');
 
-		$content	= $this->render_template('home', array(
+		$this->render_template_to_file('home', $path, array(
 			'posts'	=> $posts
 		));
-
-		$this->write($path, $content);
 	}
 
 	/**
@@ -283,10 +286,8 @@ class Renderer {
 
 		$path	= $this->blog->get_path_www('feed.xml');
 
-		$content	= $this->render_template('feed', array(
+		$this->render_template_to_file('feed', $path, array(
 			'posts'	=> $posts
 		));
-
-		$this->write($path, $content);
 	}
 };
