@@ -5,12 +5,14 @@ class Template {
 	const TYPE_PHP	= 'php';
 	const TYPE_TWIG	= 'twig';
 
+	/** @var \Twig_Environment	The Twig environment to use across all templates */
+	static protected $twig_environment;
+
+
 	/** @var \Blight\Blog */
 	protected $blog;
 	protected $filename;
 	protected $type;
-	/** @var \Twig_Environment */
-	protected $twig_environment;
 
 	/**
 	 * Initialises the template and confirms the template file exists
@@ -109,9 +111,9 @@ class Template {
 	 * @return \Twig_Environment	The Twig environment object
 	 */
 	protected function get_twig_environment(){
-		if(!isset($this->twig_environment)){
+		if(!isset(self::$twig_environment)){
 			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
-			$this->twig_environment	= new \Twig_Environment($loader, array(
+			self::$twig_environment	= new \Twig_Environment($loader, array(
 				'cache' => $this->blog->get_path_cache('twig/')
 			));
 
@@ -120,7 +122,7 @@ class Template {
 			$text_processor	= new TextProcessor($this->blog);
 
 			// Markdown filter
-			$this->twig_environment->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
+			self::$twig_environment->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
 				$filters	= array(
 					'markdown'		=> true,
 					'typography'	=> true
@@ -134,17 +136,17 @@ class Template {
 			)));
 
 			// Typography filter
-			$this->twig_environment->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
+			self::$twig_environment->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
 				'pre_escape'	=> 'html',
 				'is_safe'		=> array('html')
 			)));
 
 			// Truncate filter
-			$this->twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html')), array(
+			self::$twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html')), array(
 				'is_safe'	=> array('html')
 			));
 		}
 
-		return $this->twig_environment;
+		return self::$twig_environment;
 	}
 };
