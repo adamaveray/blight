@@ -12,6 +12,14 @@ if(!isset($_SERVER['REQUEST_TIME_FLOAT'])) $_SERVER['REQUEST_TIME_FLOAT'] = micr
 date_default_timezone_set('UTC');
 require('src/autoload.php');
 
+function debug_output($message){
+	if(!IS_CLI){
+		return;
+	}
+
+	echo number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '').': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
+}
+
 // Initialise blog
 $root_path	= dirname(__DIR__).'/';
 $config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
@@ -28,44 +36,51 @@ if(!is_dir($blog->get_path_posts())){
 
 // Load posts
 $manager	= new Manager($blog);
+debug_output('Manager initialised');
 $archive	= $manager->get_posts_by_year();
+debug_output('Archive built');
 
 // Begin rendering
 $renderer	= new Renderer($blog, $manager);
+debug_output('Renderer initialised');
 
 	// Render posts
 	foreach($archive as $year){
 		foreach($year as $post){
 			$renderer->render_post($post);
 		}
+		debug_output('Year "%s" posts rendered', $year->get_name());
 	}
 
 	// Render archive pages
 	$renderer->render_archives(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
+	debug_output('Archives rendered');
 
 	// Render tag pages
 	$renderer->render_tags(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
+	debug_output('Tags rendered');
 
 	// Render category pages
 	$renderer->render_categories(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
+	debug_output('Categories rendered');
 
 	// Render home page
 	$renderer->render_home(array(
 		'limit'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
 	));
+	debug_output('Home rendered');
 
 	// Render feed
 	$renderer->render_feed(array(
 		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
 	));
+	debug_output('Feed rendered');
 
 // Rendering completed
-if(IS_CLI){
-	echo 'Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s'.PHP_EOL;
-}
+debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
