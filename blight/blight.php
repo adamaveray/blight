@@ -35,6 +35,7 @@ $blog	= new Blog($config);
 // Check install
 if(!is_dir($blog->get_path_posts())){
 	require('src/setup.php');
+	debug_output('Set up blog');
 }
 
 
