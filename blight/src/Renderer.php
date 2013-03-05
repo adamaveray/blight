@@ -38,21 +38,6 @@ class Renderer {
 	}
 
 	/**
-	 * Extends an array with a second array, handling if the extending array is null
-	 *
-	 * @param array|null $options	The custom options that will overwrite any matching defaults, or null
-	 * @param array $defaults		The default options to be used if not present in $options
-	 * @return array				An array containing the merged options
-	 */
-	protected function extend_options($options, $defaults){
-		if(!isset($options)){
-			$options	= array();
-		}
-
-		return array_merge($defaults, $options);
-	}
-
-	/**
 	 * Builds a post's rendered page, and returns the generated HTML
 	 *
 	 * @param Post $post	The post to build the page for
@@ -60,7 +45,7 @@ class Renderer {
 	 */
 	protected function build_post_content(Post $post){
 		$content	= $post->get_content();
-		return $this->build_template_file('post', array(
+		return $this->render_template('post', array(
 			'post'	=> $post,
 			'page_title'	=> $post->get_title()
 		));
@@ -69,82 +54,20 @@ class Renderer {
 	/**
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
-	 * @param string $file			The template to use
+	 * @param string $name			The template to use
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
 	 * @return string	The rendered content from the template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	protected function build_template_file($file, $params = null){
-		$params	= $this->extend_options($params, array(
-			'blog'	=> $this->blog,
+	protected function render_template($name, $params = null){
+		$params	= array_merge(array(
+			'blog'			=> $this->blog,
 			'archives'		=> $this->manager->get_posts_by_year(),
 			'categories'	=> $this->manager->get_posts_by_category()
-		));
+		), (array)$params);
 
-		$template	= $this->blog->get_path_templates($file);
-		if(file_exists($template.'.php')){
-			// Use PHP
-			$params['text']	= new TextProcessor($this->blog);
-
-			extract($params);
-			ob_start();
-			include($template.'.php');
-			return ob_get_clean();
-
-		} elseif(file_exists($template.'.tpl.html')){
-			// Use Twig
-			$twig	= $this->get_twig_environment();
-			return $twig->render($file.'.tpl.html', $params);
-
-		} else {
-			// No template found
-			throw new \RuntimeException('Template "'.$file.'" not found');
-		}
-	}
-
-	/**
-	 * Retrieves the standardised Twig environment object, with the correct template and cache paths set
-	 *
-	 * @return \Twig_Environment	The Twig environment object
-	 */
-	protected function get_twig_environment(){
-		if(!isset($this->twig_environment)){
-			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
-			$this->twig_environment	= new \Twig_Environment($loader, array(
-				'cache' => $this->blog->get_path_cache('twig/')
-			));
-
-			// Set up filters
-			$blog	= $this->blog;
-			$text_processor	= new TextProcessor($this->blog);
-
-			// Markdown filter
-			$this->twig_environment->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
-				$filters	= array(
-					'markdown'		=> true,
-					'typography'	=> true
-				);
-				if(!$filter_typography){
-					$filters['typography']	= false;
-				}
-				return $text_processor->process($string, $filters);
-			}, array(
-				'is_safe' => array('html')
-			)));
-
-			// Typography filter
-			$this->twig_environment->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
-				'pre_escape'	=> 'html',
-				'is_safe'		=> array('html')
-			)));
-
-			// Truncate filter
-			$this->twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html')), array(
-				'is_safe'	=> array('html')
-			));
-		}
-
-		return $this->twig_environment;
+		$template	= new \Blight\Template($this->blog, $name);
+		return $template->render($params);
 	}
 
 	/**
@@ -159,7 +82,7 @@ class Renderer {
 			// Convert web path to file
 			$path	= $this->blog->get_path_www(substr($path, strlen($url)));
 		}
-		
+
 		$this->blog->get_file_system()->create_file($path, $content);
 	}
 
@@ -186,9 +109,9 @@ class Renderer {
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
 	 */
 	public function render_archives($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		));
+		), $options);
 
 		$years	= $this->manager->get_posts_by_year();
 
@@ -197,10 +120,10 @@ class Renderer {
 
 			$page_title	= 'Archive '.$year->get_name();
 			foreach($pages as $output_file => $page){
-				$content	= $this->build_template_file('list', $this->extend_options($page, array(
+				$content	= $this->render_template('list', array_merge(array(
 					'year'			=> $year,
 					'page_title'	=> $page_title
-				)));
+				), $page));
 
 				$this->write($output_file, $content);
 			}
@@ -216,9 +139,9 @@ class Renderer {
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
 	 */
 	public function render_tags($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		));
+		), $options);
 
 		$tags	= $this->manager->get_posts_by_tag();
 
@@ -227,10 +150,10 @@ class Renderer {
 
 			$page_title	= 'Tag '.$tag->get_name();
 			foreach($pages as $output_file => $page){
-				$content	= $this->build_template_file('list', $this->extend_options($page, array(
+				$content	= $this->render_template('list', array_merge(array(
 					'tag'			=> $tag,
 					'page_title'	=> $page_title
-				)));
+				), $page));
 
 				$this->write($output_file, $content);
 			}
@@ -246,9 +169,9 @@ class Renderer {
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
 	 */
 	public function render_categories($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		));
+		), $options);
 
 		$categories	= $this->manager->get_posts_by_category();
 
@@ -257,10 +180,10 @@ class Renderer {
 
 			$page_title	= 'Category '.$category->get_name();
 			foreach($pages as $output_file => $page){
-				$content	= $this->build_template_file('list', $this->extend_options($page, array(
+				$content	= $this->render_template('list', array_merge(array(
 					'category'		=> $category,
 					'page_title'	=> $page_title
-				)));
+				), $page));
 
 				$this->write($output_file, $content);
 			}
@@ -329,9 +252,9 @@ class Renderer {
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
 	 */
 	public function render_home($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'limit'	=> 20
-		));
+		), $options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -342,7 +265,7 @@ class Renderer {
 
 		$path	= $this->blog->get_path_www('index.html');
 
-		$content	= $this->build_template_file('home', array(
+		$content	= $this->render_template('home', array(
 			'posts'	=> $posts
 		));
 
@@ -358,9 +281,9 @@ class Renderer {
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
 	 */
 	public function render_feed($options = null){
-		$options	= $this->extend_options($options, array(
+		$options	= array_merge(array(
 			'limit'	=> 20
-		));
+		), $options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -371,7 +294,7 @@ class Renderer {
 
 		$path	= $this->blog->get_path_www('feed.xml');
 
-		$content	= $this->build_template_file('feed', array(
+		$content	= $this->render_template('feed', array(
 			'posts'	=> $posts
 		));
 
