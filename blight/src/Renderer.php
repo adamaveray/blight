@@ -107,6 +107,9 @@ class Renderer {
 		));
 	}
 
+	/**
+	 * Generates and saves the static files for all draft posts.
+	 */
 	public function render_drafts(){
 		$drafts	= $this->manager->get_draft_posts();
 
