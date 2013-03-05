@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
     {% block head %}
-        <title>{% if page_title is defined %}{{ page_title|e }} • {% endif %}{{ blog._feed_url|e }}</title>
+        <title>{% if page_title is defined %}{{ page_title|e }} • {% endif %}{{ blog._name|e }}</title>
 
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
