@@ -322,4 +322,31 @@ class Manager {
 
 		return $this->posts_by_category;
 	}
+
+	/**
+	 * Deletes any rendered drafts without an associated draft post
+	 */
+	public function cleanup_drafts(){
+		$posts_dir	= $this->blog->get_path_drafts();
+		$files	= glob($this->blog->get_path_drafts_web('*.html'));
+		foreach($files as $file){
+			$slug	= pathinfo($file, \PATHINFO_BASENAME);
+
+			$found	= false;
+			foreach($this->allowed_extensions as $ext){
+				if(file_exists($posts_dir.$slug.'.'.$ext)){
+					$found	= true;
+					break;
+				}
+			}
+
+			if($found){
+				// Post exists - ignore
+				continue;
+			}
+
+			// Post not found - remove
+			$this->blog->get_file_system()->delete_file($file);
+		}
+	}
 };
