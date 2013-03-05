@@ -5,6 +5,9 @@
  */
 namespace Blight;
 
+define('IS_CLI', (PHP_SAPI === 'cli'));
+if(!isset($_SERVER['REQUEST_TIME_FLOAT'])) $_SERVER['REQUEST_TIME_FLOAT'] = microtime(true);
+
 // Set up environment
 date_default_timezone_set('UTC');
 require('src/autoload.php');
@@ -63,3 +66,6 @@ $renderer	= new Renderer($blog, $manager);
 	));
 
 // Rendering completed
+if(IS_CLI){
+	echo 'Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s'.PHP_EOL;
+}
