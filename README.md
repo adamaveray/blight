@@ -15,6 +15,7 @@ After installation, your directory structure should look like the following:
 	blight/
 	
 	blog-data/
+		drafts/
 		posts/
 		templates/
 	
@@ -24,12 +25,12 @@ After installation, your directory structure should look like the following:
 		
 The paths to these directories are stored in the `config.ini` file, so to change the directory structure, simply update this file.
 
-The application will need write access to the `posts/`, `templates/`, and the web directory.
+The application will need write access to the `drafts/`, `posts/`, `templates/` and web directories.
 
 
 ## Authoring
 
-New posts should be added to the `posts/` directory. The filename will become the post's URL slug, so for example a post with the file `test-post.md` will become `2013/02/test-post.md`.
+New posts should be added to the `drafts/` or `posts/` directories. The filename will become the post's URL slug, so for example a post with the file `test-post.md` will become `2013/02/test-post.md`.
 
 A new post should be formatted as follows:
 
@@ -40,6 +41,12 @@ A new post should be formatted as follows:
 	Content
 	
 The title and content are standard Markdown. The headers section under the title allows you to set a number of options and metadata for your post MultiMarkdown-style. Simply include the name of the header, a colon, spaces or tabs, and the value for that option. Parameters are case-insensitive.
+
+### Drafts
+
+Draft posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be displayed on the site itself.
+
+When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
 
 
 ### Special Headers

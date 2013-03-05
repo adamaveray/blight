@@ -39,7 +39,9 @@ class Blog {
 		}
 		$this->paths	= array(
 			'www'		=> $config['paths']['web'],
+			'drafts-web'	=> $config['paths']['drafts-web'],
 			'posts'		=> $config['paths']['posts'],
+			'drafts'	=> $config['paths']['drafts'],
 			'templates'	=> $config['paths']['templates'],
 			'cache'		=> $config['paths']['cache']
 		);
@@ -98,6 +100,28 @@ class Blog {
 	 */
 	public function get_path_posts($append = ''){
 		return $this->paths['posts'].$append;
+	}
+
+	/**
+	 * Returns the path to the draft posts directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_drafts($append = ''){
+		return $this->paths['drafts'].$append;
+	}
+
+	/**
+	 * Returns the path to the rendered drafts HTML directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_drafts_web($append = ''){
+		return $this->paths['drafts-web'].$append;
 	}
 
 	/**

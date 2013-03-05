@@ -108,6 +108,24 @@ class Renderer {
 	}
 
 	/**
+	 * Generates and saves the static files for all draft posts.
+	 */
+	public function render_drafts(){
+		$drafts	= $this->manager->get_draft_posts();
+
+		$output_path	= $this->blog->get_path_drafts_web();
+
+		foreach($drafts as $draft_post){
+			/** @var \Blight\Post $draft_post */
+			$path	= $output_path.$draft_post->get_slug().'.html';
+			$this->render_template_to_file('post', $path, array(
+				'post'			=> $draft_post,
+				'page_title'	=> $draft_post->get_title()
+			));
+		}
+	}
+
+	/**
 	 * Generates and saves the static files for posts grouped by years. Posts are retrieved from the
 	 * Manager set during class construction.
 	 *

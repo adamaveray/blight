@@ -14,6 +14,7 @@ class Post {
 	protected $metadata;
 	protected $tags;
 	protected $category;
+	protected $is_draft;
 
 	protected $link;
 	protected $permalink;
@@ -26,8 +27,10 @@ class Post {
 	 * @param string $slug		The post URL slug
 	 * @throws \InvalidArgumentException	Article date is invalid
 	 */
-	public function __construct(Blog $blog, $content, $slug){
+	public function __construct(Blog $blog, $content, $slug, $is_draft = false){
 		$this->blog	= $blog;
+
+		$this->is_draft	= $is_draft;
 
 		$data	= $this->parse_content($content);
 
@@ -35,15 +38,12 @@ class Post {
 		$this->content	= $data['content'];
 		$this->metadata	= $data['metadata'];
 
-		try {
-			if(!$this->has_meta('date')){
-				throw new \Exception();
+		if($this->has_meta('date')){
+			try {
+				$this->date	= new \DateTime($this->get_meta('date'));
+			} catch(\Exception $e){
+				throw new \InvalidArgumentException('Article date invalid');
 			}
-
-			$this->date	= new \DateTime($this->get_meta('date'));
-
-		} catch(\Exception $e){
-			throw new \InvalidArgumentException('Article date invalid');
 		}
 
 		$this->slug	= strtolower($slug);
@@ -142,9 +142,30 @@ class Post {
 
 	/**
 	 * @return \DateTime	The post date
+	 * @throws \RuntimeException	The post does not have a date set
 	 */
 	public function get_date(){
+		if(!isset($this->date)){
+			if($this->is_draft()){
+				// Draft - use current date
+				return new \DateTime();
+			} else {
+				echo PHP_EOL.PHP_EOL;
+				echo $this->get_slug();
+				echo PHP_EOL;
+				echo 'No Date'.PHP_EOL;
+				exit;
+				throw new \RuntimeException('Post does not have date set');
+			}
+		}
 		return $this->date;
+	}
+
+	/**
+	 * @param \DateTime $date	The new date for the post
+	 */
+	public function set_date(\DateTime $date){
+		$this->date	= $date;
 	}
 
 	/**
@@ -234,7 +255,7 @@ class Post {
 	 * @return string	The URL to the post without the prefixed site URL
 	 */
 	public function get_relative_permalink(){
-		return $this->date->format('Y/m').'/'.$this->slug;
+		return $this->get_date()->format('Y/m').'/'.$this->slug;
 	}
 
 	/**
@@ -281,6 +302,13 @@ class Post {
 		}
 
 		return $this->category;
+	}
+
+	/**
+	 * @return bool	Whether the post is a draft
+	 */
+	public function is_draft(){
+		return (bool)$this->is_draft;
 	}
 
 	/**

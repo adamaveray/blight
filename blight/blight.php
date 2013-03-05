@@ -49,6 +49,10 @@ debug_output('Archive built');
 $renderer	= new Renderer($blog, $manager);
 debug_output('Renderer initialised');
 
+	// Render draft posts
+	$renderer->render_drafts();
+	debug_output('Drafts rendered');
+
 	// Render posts and archives
 	foreach($archive as $year){
 		/** @var \Blight\Collections\Year $year */
@@ -90,6 +94,9 @@ debug_output('Renderer initialised');
 	debug_output('Feed rendered');
 
 // Rendering completed
+
+$manager->cleanup_drafts();
+
 debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
 debug_output('Peak Memory: '.floor(memory_get_usage()/1024).'KB');
 if(IS_CLI){
