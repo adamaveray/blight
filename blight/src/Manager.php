@@ -11,6 +11,7 @@ class Manager {
 	protected $posts_by_year;
 	protected $posts_by_tag;
 	protected $posts_by_category;
+	protected $draft_posts;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -34,13 +35,19 @@ class Manager {
 	/**
 	 * Locates all files within the posts directory
 	 *
+	 * @param bool $drafts	Whether to return only drafts or only published posts
 	 * @return array	A list of filenames for each post file found
 	 */
-	protected function get_raw_posts(){
-		$files	= array_merge(
-			glob($this->blog->get_path_posts('*.*')),		// Unsorted
-			glob($this->blog->get_path_posts('*/*/*.*'))	// Sorted (YYYY/DD/post.md)
-		);
+	protected function get_raw_posts($drafts = false){
+		$dir	= ($drafts ? $this->blog->get_path_drafts() : $this->blog->get_path_posts());
+		$files	= glob($dir.'*.*');
+
+		if(!$drafts){
+			$files	= array_merge(
+				$files,		// Unsorted
+				glob($dir.'*/*/*.*')	// Sorted (YYYY/DD/post.md)
+			);
+		}
 
 		return $files;
 	}
@@ -79,6 +86,39 @@ class Manager {
 		}
 
 		$this->blog->get_file_system()->move_file($current_path, $new_path, true);
+	}
+
+	/**
+	 * Retrieves all draft posts found as Post objects
+	 *
+	 * @return array	An array of posts
+	 */
+	public function get_draft_posts(){
+		if(!isset($this->draft_posts)){
+			$files	= $this->get_raw_posts(true);
+			$posts	= array();
+
+			foreach($files as $file){
+				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
+				if(!in_array($extension, $this->allowed_extensions)){
+					// Unknown filetype - ignore
+					continue;
+				}
+
+				$content	= $this->blog->get_file_system()->load_file($file);
+
+				// Create post object
+				try {
+					$posts[]	= new Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
+				} catch(\Exception $e){
+					continue;
+				}
+			}
+
+			$this->draft_posts	= $posts;
+		}
+
+		return $this->draft_posts;
 	}
 
 	/**
