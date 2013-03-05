@@ -14,6 +14,7 @@ class Post {
 	protected $metadata;
 	protected $tags;
 	protected $category;
+	protected $is_draft;
 
 	protected $link;
 	protected $permalink;
@@ -26,8 +27,10 @@ class Post {
 	 * @param string $slug		The post URL slug
 	 * @throws \InvalidArgumentException	Article date is invalid
 	 */
-	public function __construct(Blog $blog, $content, $slug){
+	public function __construct(Blog $blog, $content, $slug, $is_draft = false){
 		$this->blog	= $blog;
+
+		$this->is_draft	= false;
 
 		$data	= $this->parse_content($content);
 
@@ -280,6 +283,13 @@ class Post {
 		}
 
 		return $this->category;
+	}
+
+	/**
+	 * @return bool	Whether the post is a draft
+	 */
+	public function is_draft(){
+		return (bool)$this->is_draft;
 	}
 
 	/**
