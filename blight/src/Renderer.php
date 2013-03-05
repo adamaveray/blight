@@ -146,6 +146,7 @@ class Renderer {
 	 * Generates and saves the static files for posts grouped by the provided collections
 	 *
 	 * @param array $collections	An array of \Blight\Interfaces\Collection objects
+	 * @param string $collection_type	The name of collection, used to assign it as a template variable
 	 * @param string $title_format	A sprintf-formatted string for each collection's page title. The collection
 	 * 								name will be passed in (replacing %s)
 	 * @param array|null $options	An array of options to alter the rendered pages
