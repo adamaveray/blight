@@ -12,6 +12,8 @@ class Renderer {
 	protected $template_dir;
 	protected $posts;
 
+	protected $templates	= array();
+
 	protected $twig_environment;
 
 	/**
@@ -52,8 +54,13 @@ class Renderer {
 			'categories'	=> $this->manager->get_posts_by_category()
 		), (array)$params);
 
-		$template	= new \Blight\Template($this->blog, $name);
-		return $template->render($params);
+		// Check if template cached
+		if(!isset($this->templates[$name])){
+			// Create template
+			$this->templates[$name]	= new \Blight\Template($this->blog, $name);
+		}
+
+		return $this->templates[$name]->render($params);
 	}
 
 	/**
