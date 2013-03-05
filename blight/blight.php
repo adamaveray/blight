@@ -43,12 +43,12 @@ $renderer	= new Renderer($blog, $manager);
 	));
 
 	// Render tag pages
-	$tags = $renderer->render_tags(array(
+	$renderer->render_tags(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
 
 	// Render category pages
-	$tags = $renderer->render_categories(array(
+	$renderer->render_categories(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
 
