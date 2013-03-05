@@ -17,7 +17,10 @@ function debug_output($message){
 		return;
 	}
 
-	echo number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '').': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
+	$timestamp	= number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '');
+	$memstamp	= floor(memory_get_usage()/1024).'k';
+
+	echo $timestamp.'-'.$memstamp.': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
 }
 
 // Initialise blog
@@ -86,3 +89,4 @@ debug_output('Renderer initialised');
 
 // Rendering completed
 debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
+debug_output('Peak Memory: '.floor(memory_get_usage()/1024).'KB');
