@@ -49,6 +49,10 @@ debug_output('Archive built');
 $renderer	= new Renderer($blog, $manager);
 debug_output('Renderer initialised');
 
+	// Render draft posts
+	$renderer->render_drafts();
+	debug_output('Drafts rendered');
+
 	// Render posts and archives
 	foreach($archive as $year){
 		/** @var \Blight\Collections\Year $year */
