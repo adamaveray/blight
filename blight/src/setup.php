@@ -4,6 +4,7 @@ $setup	= function(\Blight\Blog $blog){
 
 	// Create posts directory
 	$file_system->create_dir($blog->get_path_posts());
+	$file_system->create_dir($blog->get_path_drafts());
 
 	$template_dir	= $blog->get_path_templates();
 	if(!is_dir($template_dir) || count(glob($template_dir.'*')) === 0){
