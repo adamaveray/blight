@@ -115,10 +115,26 @@ class Renderer {
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
 	 *
+	 * @see render_year
 	 * @see render_collections
 	 */
 	public function render_archives($options = null){
 		$this->render_collections($this->manager->get_posts_by_year(), 'year', 'Archive %s', $options);
+	}
+
+	/**
+	 * Generates and saves the static files for posts in the provided year
+	 *
+	 * @param \Blight\Interfaces\Collection $year	The archive year to render
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_archives
+	 * @see render_collection
+	 */
+	public function render_year(\Blight\Interfaces\Collection $year, $options = null){
+		$this->render_collection($year, 'year', 'Archive '.$year->get_name(), $options);
 	}
 
 	/**
@@ -161,21 +177,32 @@ class Renderer {
 	 * @see sprintf
 	 */
 	protected function render_collections($collections, $collection_type, $title_format, $options = null){
+		foreach($collections as $collection){
+			/** @var \Blight\Interfaces\Collection $collection */
+			$this->render_collection($collection, $collection_type, sprintf($title_format, $collection->get_name()), $options);
+		}
+	}
+
+	/**
+	 * Generates and saves the static file for posts within the provided collection
+	 *
+	 * @param \Blight\Interfaces\Collection $collection	The collection to render
+	 * @param string $collection_type	The name of collection, used to assign it as a template variable
+	 * @param string $page_title	The title to be used for the rendered collection page
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 */
+	protected function render_collection(\Blight\Interfaces\Collection $collection, $collection_type, $page_title, $options = null){
 		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
 		), $options);
 
-		foreach($collections as $collection){
-			/** @var \Blight\Interfaces\Collection $collection */
-			$pages	= $this->paginate_collection($collection, $options['per_page']);
+		$pages	= $this->paginate_collection($collection, $options['per_page']);
 
-			$page_title	= sprintf($title_format, $collection->get_name());
-			foreach($pages as $output_file => $page){
-				$this->render_template_to_file('list', $output_file, array_merge(array(
-					$collection_type	=> $collection,
-					'page_title'		=> $page_title
-				), $page));
-			}
+		foreach($pages as $output_file => $page){
+			$this->render_template_to_file('list', $output_file, array_merge(array(
+				$collection_type	=> $collection,
+				'page_title'		=> $page_title
+			), $page));
 		}
 	}
 

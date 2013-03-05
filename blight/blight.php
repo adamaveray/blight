@@ -44,19 +44,21 @@ debug_output('Archive built');
 $renderer	= new Renderer($blog, $manager);
 debug_output('Renderer initialised');
 
-	// Render posts
+	// Render posts and archives
 	foreach($archive as $year){
+		/** @var \Blight\Collections\Year $year */
+		// Render posts
 		foreach($year as $post){
 			$renderer->render_post($post);
 		}
 		debug_output('Year "%s" posts rendered', $year->get_name());
-	}
 
-	// Render archive pages
-	$renderer->render_archives(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
-	));
-	debug_output('Archives rendered');
+		// Render archive
+		$renderer->render_year($year, array(
+			'per_page'	=> $blog->get('page', 'limits', 0)
+		));
+		debug_output('Year "%s" archive rendered', $year->get_name());
+	}
 
 	// Render tag pages
 	$renderer->render_tags(array(
