@@ -114,11 +114,12 @@ class Post {
 	 * @return string	The post title
 	 */
 	public function get_title($raw = false){
+		$prepend	= '';
+		
 		if(!$raw){
 			$is_linkblog	= $this->blog->is_linkblog();
 			$is_linkpost	= $this->is_linked();
 
-			$prepend	= '';
 			if($is_linkblog && !$is_linkpost){
 				// Unlinked post - prepend glyph
 				$prepend	= $this->blog->get('post_character', 'linkblog', '★').' ';
