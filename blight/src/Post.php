@@ -150,6 +150,13 @@ class Post {
 	}
 
 	/**
+	 * @param \DateTime $date	The new date for the post
+	 */
+	public function set_date(\DateTime $date){
+		$this->date	= $date;
+	}
+
+	/**
 	 * @return string	The post's raw Markdown content
 	 */
 	public function get_content(){
