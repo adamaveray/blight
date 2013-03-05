@@ -107,25 +107,11 @@ class Renderer {
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_collections
 	 */
 	public function render_archives($options = null){
-		$options	= array_merge(array(
-			'per_page'	=> 0	// Default to no pagination
-		), $options);
-
-		$years	= $this->manager->get_posts_by_year();
-
-		foreach($years as $year){
-			$pages	= $this->paginate_collection($year, $options['per_page']);
-
-			$page_title	= 'Archive '.$year->get_name();
-			foreach($pages as $output_file => $page){
-				$this->render_template_to_file('list', $output_file, array_merge(array(
-					'year'			=> $year,
-					'page_title'	=> $page_title
-				), $page));
-			}
-		}
+		$this->render_collections($this->manager->get_posts_by_year(), 'year', 'Archive %s', $options);
 	}
 
 	/**
@@ -135,25 +121,11 @@ class Renderer {
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_collections
 	 */
 	public function render_tags($options = null){
-		$options	= array_merge(array(
-			'per_page'	=> 0	// Default to no pagination
-		), $options);
-
-		$tags	= $this->manager->get_posts_by_tag();
-
-		foreach($tags as $tag){
-			$pages	= $this->paginate_collection($tag, $options['per_page']);
-
-			$page_title	= 'Tag '.$tag->get_name();
-			foreach($pages as $output_file => $page){
-				$this->render_template_to_file('list', $output_file, array_merge(array(
-					'tag'			=> $tag,
-					'page_title'	=> $page_title
-				), $page));
-			}
-		}
+		$this->render_collections($this->manager->get_posts_by_tag(), 'tag', 'Tag %s', $options);
 	}
 
 	/**
@@ -163,22 +135,37 @@ class Renderer {
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see render_collections
 	 */
 	public function render_categories($options = null){
+		$this->render_collections($this->manager->get_posts_by_category(), 'category', 'Category %s', $options);
+	}
+
+	/**
+	 * Generates and saves the static files for posts grouped by the provided collections
+	 *
+	 * @param array $collections	An array of \Blight\Interfaces\Collection objects
+	 * @param string $title_format	A sprintf-formatted string for each collection's page title. The collection
+	 * 								name will be passed in (replacing %s)
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * @see sprintf
+	 */
+	protected function render_collections($collections, $collection_type, $title_format, $options = null){
 		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
 		), $options);
 
-		$categories	= $this->manager->get_posts_by_category();
+		foreach($collections as $collection){
+			/** @var \Blight\Interfaces\Collection $collection */
+			$pages	= $this->paginate_collection($collection, $options['per_page']);
 
-		foreach($categories as $category){
-			$pages	= $this->paginate_collection($category, $options['per_page']);
-
-			$page_title	= 'Category '.$category->get_name();
+			$page_title	= sprintf($title_format, $collection->get_name());
 			foreach($pages as $output_file => $page){
 				$this->render_template_to_file('list', $output_file, array_merge(array(
-					'category'		=> $category,
-					'page_title'	=> $page_title
+					$collection_type	=> $collection,
+					'page_title'		=> $page_title
 				), $page));
 			}
 		}
