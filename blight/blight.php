@@ -6,6 +6,7 @@
 namespace Blight;
 
 define('IS_CLI', (PHP_SAPI === 'cli'));
+define('VERBOSE', isset($argv[0]) && in_array('-v', $argv));
 if(!isset($_SERVER['REQUEST_TIME_FLOAT'])) $_SERVER['REQUEST_TIME_FLOAT'] = microtime(true);
 
 // Set up environment
@@ -13,7 +14,7 @@ date_default_timezone_set('UTC');
 require('src/autoload.php');
 
 function debug_output($message){
-	if(!IS_CLI){
+	if(!IS_CLI || !VERBOSE){
 		return;
 	}
 
@@ -90,3 +91,6 @@ debug_output('Renderer initialised');
 // Rendering completed
 debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
 debug_output('Peak Memory: '.floor(memory_get_usage()/1024).'KB');
+if(IS_CLI){
+	echo 'Blog built'.PHP_EOL;
+}
