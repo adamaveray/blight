@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+## 0.3
+
+_5 Mar 2013_
+
+- Added support for [Twig](http://twig.sensiolabs.org/) templates
+- Switched default templates to use Twig
+- Added support for rebuilding site through command line
+- Set rendered files web path from config in .htaccesss when setting up site
+- Added support for valueless/name-only metadata in posts
+
+
 ## 0.2
 
 _2 Mar 2013_
