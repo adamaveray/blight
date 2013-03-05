@@ -38,20 +38,6 @@ class Renderer {
 	}
 
 	/**
-	 * Builds a post's rendered page, and returns the generated HTML
-	 *
-	 * @param Post $post	The post to build the page for
-	 * @return string		The rendered content from the template
-	 */
-	protected function build_post_content(Post $post){
-		$content	= $post->get_content();
-		return $this->render_template('post', array(
-			'post'	=> $post,
-			'page_title'	=> $post->get_title()
-		));
-	}
-
-	/**
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
 	 * @param string $name			The template to use
@@ -95,7 +81,10 @@ class Renderer {
 	public function render_post(Post $post){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
-		$content	= $this->build_post_content($post);
+		$content	= $this->render_template('post', array(
+			'post'			=> $post,
+			'page_title'	=> $post->get_title()
+		));
 
 		$this->write($path, $content);
 	}
