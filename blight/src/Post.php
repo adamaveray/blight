@@ -30,7 +30,7 @@ class Post {
 	public function __construct(Blog $blog, $content, $slug, $is_draft = false){
 		$this->blog	= $blog;
 
-		$this->is_draft	= false;
+		$this->is_draft	= $is_draft;
 
 		$data	= $this->parse_content($content);
 
