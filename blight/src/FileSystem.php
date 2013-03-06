@@ -123,6 +123,7 @@ class FileSystem {
 	 * @see mkdir()
 	 */
 	public function create_dir($path, $mode = 0777, $recursive = true){
+		$path	= rtrim($path, '/');
 		if(is_dir($path)){
 			// Already exists
 			return;
@@ -147,6 +148,9 @@ class FileSystem {
 	 * @throws \RuntimeException	Cannot create target directory
 	 */
 	public function copy_dir($source_dir, $target_dir, $mode = 0777, $recursive = true){
+		$source_dir	= rtrim($source_dir, '/');
+		$target_dir	= rtrim($target_dir, '/');
+
 		if(!is_dir($source_dir)){
 			throw new \RuntimeException('Source dir does not exist');
 		}
