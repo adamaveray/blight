@@ -52,8 +52,10 @@ class FileSystem {
 	 * @throws \RuntimeException	The file cannot be read
 	 */
 	public function load_file($path){
-		$content	= file_get_contents($path);
-		if($content === false){
+		if(file_exists($path)){
+			$content	= file_get_contents($path);
+		}
+		if(!isset($content) || $content === false){
 			throw new \RuntimeException('Cannot read '.$path);
 		}
 
