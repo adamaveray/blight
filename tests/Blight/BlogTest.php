@@ -8,36 +8,10 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	protected $config;
 
 	public function setUp(){
-		$this->root_path	= realpath(__DIR__.'/../../').'/';
+		global $root_path, $config;
 
-		$this->config	= array(
-			'root_path'	=>	$this->root_path,
-
-			'name'	=> 'Test Blog',
-			'url'	=> 'http://www.example.com/',
-			'description'	=> 'Test blog description',
-
-			'paths'	=> array(
-				'posts'			=> 'blog-data/posts/',
-				'drafts'		=> 'blog-data/drafts/',
-				'templates'		=> 'blog-data/templates/',
-				'web'			=> 'www/_blog/',
-				'drafts-web'	=> 'www/_drafts/',
-				'cache'			=> 'cache/'
-			),
-
-			'limits'	=> array(
-				'page'	=> 10,
-				'home'	=> 20,
-				'feed'	=> 20
-			),
-
-			'linkblog'	=> array(
-				'linkblog'	=> false,
-				'link_character'	=> '→',
-				'post_character'	=> '★'
-			)
-		);
+		$this->root_path	= $root_path;
+		$this->config		= $config;
 
 		$this->blog	= new \Blight\Blog($this->config);
 	}
