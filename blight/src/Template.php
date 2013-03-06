@@ -61,6 +61,9 @@ class Template {
 		if(!isset($params)){
 			$params	= array();
 		}
+		if(!is_array($params)){
+			throw new \InvalidArgumentException('Params must be array');
+		}
 
 		switch($this->type){
 			case self::TYPE_PHP:
