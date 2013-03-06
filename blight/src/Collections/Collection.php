@@ -59,8 +59,18 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * Sets the collection's Posts
 	 *
 	 * @param array $posts	An array of Post objects
+	 * @throws \InvalidArgumentException	Invalid posts
 	 */
 	public function set_posts($posts){
+		if(!is_array($posts)){
+			throw new \InvalidArgumentException('Posts must be an array');
+		}
+		foreach($posts as $post){
+			if(!($post instanceof \Blight\Post)){
+				throw new \InvalidArgumentException('Posts must be instances of \Blight\Post');
+			}
+		}
+
 		$this->posts	= $posts;
 	}
 
@@ -84,6 +94,9 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * @return array	An array of Post objects
 	 */
 	public function get_posts(){
+		if(!isset($this->posts)){
+			$this->posts	= array();
+		}
 		return $this->posts;
 	}
 
