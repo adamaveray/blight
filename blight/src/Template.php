@@ -46,7 +46,7 @@ class Template {
 
 		if(!isset($this->filename)){
 			// No template found
-			throw new \RuntimeException('Template "'.$file.'" not found');
+			throw new \RuntimeException('Template "'.$name.'" not found');
 		}
 	}
 
