@@ -243,11 +243,13 @@ class Manager implements \Blight\Interfaces\Manager {
 
 			// Group post by category
 			$category	= $post->get_category();
-			$slug		= $category->get_slug();
-			if(!isset($this->posts_by_category[$slug])){
-				$this->posts_by_category[$slug]	= $category;
+			if(isset($category)){
+				$slug		= $category->get_slug();
+				if(!isset($this->posts_by_category[$slug])){
+					$this->posts_by_category[$slug]	= $category;
+				}
+				$this->posts_by_category[$slug]->add_post($post);
 			}
-			$this->posts_by_category[$slug]->add_post($post);
 		}
 
 		ksort($this->posts_by_tag);
