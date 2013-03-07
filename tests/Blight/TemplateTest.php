@@ -2,7 +2,7 @@
 namespace Blight;
 
 class TemplateTest extends \PHPUnit_Framework_TestCase {
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
 	protected $template_php_name;
@@ -10,9 +10,9 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	protected $template_content;
 	protected $template_content_variable;
 
-	/** @var \Blight\Template */
+	/** @var \Blight\Interfaces\Template */
 	protected $template_php;
-	/** @var \Blight\Template */
+	/** @var \Blight\Interfaces\Template */
 	protected $template_twig;
 
 	public function setUp(){

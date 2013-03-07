@@ -2,7 +2,7 @@
 namespace Blight;
 
 class PostTest extends \PHPUnit_Framework_TestCase {
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 	protected $content_title;
 	protected $content_date;
@@ -15,7 +15,7 @@ class PostTest extends \PHPUnit_Framework_TestCase {
 	protected $linked_content;
 	protected $linked_content_link;
 
-	/** @var \Blight\Post */
+	/** @var \Blight\Interfaces\Post */
 	protected $post;
 
 	public function setUp(){

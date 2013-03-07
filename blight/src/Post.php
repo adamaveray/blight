@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * A blog post
  */
-class Post {
+class Post implements \Blight\Interfaces\Post {
 	protected $blog;
 
 	protected $title;
@@ -23,13 +23,13 @@ class Post {
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
 	 *
-	 * @param Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 * @param string $content	The raw Markdown content for the post
 	 * @param string $slug		The post URL slug
 	 * @param bool $is_draft	Whether the post is a draft
 	 * @throws \InvalidArgumentException	Article date is invalid
 	 */
-	public function __construct(Blog $blog, $content, $slug, $is_draft = false){
+	public function __construct(\Blight\Interfaces\Blog $blog, $content, $slug, $is_draft = false){
 		$this->blog	= $blog;
 
 		$this->is_draft	= $is_draft;

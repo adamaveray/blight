@@ -1,5 +1,5 @@
 <?php
-$setup	= function(\Blight\Blog $blog){
+$setup	= function(\Blight\Interfaces\Blog $blog){
 	$file_system	= $blog->get_file_system();
 
 	// Create posts directory

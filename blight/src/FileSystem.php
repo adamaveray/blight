@@ -4,8 +4,8 @@ namespace Blight;
 /**
  * Provides utility helper methods for interacting with the local filesystem
  */
-class FileSystem {
-	/** @var \Blight\Blog */
+class FileSystem implements \Blight\Interfaces\FileSystem {
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 	/**
 	 * @var array	Files to be ignored while checking for empty directories
@@ -15,9 +15,9 @@ class FileSystem {
 	/**
 	 * Initialises the FileSystem manager
 	 *
-	 * @param Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 */
-	public function __construct(Blog $blog){
+	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 	}
 

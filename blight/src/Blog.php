@@ -4,10 +4,10 @@ namespace Blight;
 /**
  * Stores configuration data for the blog
  */
-class Blog {
+class Blog implements \Blight\Interfaces\Blog {
 	protected $config;
 
-	/** @var \Blight\FileSystem */
+	/** @var \Blight\Interfaces\FileSystem */
 	protected $file_system;
 
 	protected $root_path;
@@ -187,7 +187,7 @@ class Blog {
 	/**
 	 * Provides access throughout the application to a common instance of the FileSystem utility class
 	 *
-	 * @return \Blight\FileSystem	The common FileSystem object
+	 * @return \Blight\Interfaces\FileSystem	The common FileSystem object
 	 */
 	public function get_file_system(){
 		if(!isset($this->file_system)){

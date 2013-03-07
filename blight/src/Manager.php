@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * Handles all raw posts and provides basic sorting and processing functionality
  */
-class Manager {
+class Manager implements \Blight\Interfaces\Manager {
 	protected $blog;
 
 	protected $posts;
@@ -21,10 +21,10 @@ class Manager {
 	/**
 	 * Initialises the posts manager
 	 *
-	 * @param Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 * @throws \InvalidArgumentException	Posts directory cannot be opened
 	 */
-	public function __construct(Blog $blog){
+	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 
 		if(!is_dir($blog->get_path_posts())){
@@ -56,7 +56,7 @@ class Manager {
 	 * Converts a post file to a Post object
 	 *
 	 * @param string $raw_post	The path to a post file
-	 * @return \Blight\Post		The post built from the provided file
+	 * @return \Blight\Interfaces\Post		The post built from the provided file
 	 */
 	protected function build_post($raw_post){
 		$content	= $this->blog->get_file_system()->load_file($raw_post);
@@ -72,10 +72,10 @@ class Manager {
 	/**
 	 * Moves a post source file to a more-logical location. Moves files to YYYY/MM/YYYY-MM-DD-post.md
 	 *
-	 * @param \Blight\Post $post	The post to move
+	 * @param \Blight\Interfaces\Post $post	The post to move
 	 * @param string $current_path	The current path to the post's file
 	 */
-	protected function organise_post_file(Post $post, $current_path){
+	protected function organise_post_file(\Blight\Interfaces\Post $post, $current_path){
 		// Check for special headers
 		$has_date		= $post->has_meta('date');
 		$has_publish	= $post->has_meta('publish-now');

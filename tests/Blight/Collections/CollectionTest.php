@@ -4,7 +4,7 @@ namespace Blight\Collections;
 class CollectionTest extends \PHPUnit_Framework_TestCase {
 	protected static $class;
 
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
 	protected $collection;

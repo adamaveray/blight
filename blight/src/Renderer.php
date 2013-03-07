@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * Handles all generation and outputting of final static files created from posts
  */
-class Renderer {
+class Renderer implements \Blight\Interfaces\Renderer {
 	protected $blog;
 	protected $manager;
 
@@ -19,11 +19,11 @@ class Renderer {
 	/**
 	 * Initialises the output renderer
 	 *
-	 * @param \Blight\Blog $blog
-	 * @param \Blight\Manager $manager
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @param \Blight\Interfaces\Manager $manager
 	 * @throws \InvalidArgumentException	Web or template directories cannot be opened
 	 */
-	public function __construct(Blog $blog, Manager $manager){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager){
 		$this->blog		= $blog;
 		$this->manager	= $manager;
 
@@ -96,9 +96,9 @@ class Renderer {
 	/**
 	 * Generates and saves the static file for the given post
 	 *
-	 * @param Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Post $post	The post to generate the page for
 	 */
-	public function render_post(Post $post){
+	public function render_post(\Blight\Interfaces\Post $post){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
 		$this->render_template_to_file('post', $path, array(
@@ -116,7 +116,7 @@ class Renderer {
 		$output_path	= $this->blog->get_path_drafts_web();
 
 		foreach($drafts as $draft_post){
-			/** @var \Blight\Post $draft_post */
+			/** @var \Blight\Interfaces\Post $draft_post */
 			$path	= $output_path.$draft_post->get_slug().'.html';
 			$this->render_template_to_file('post', $path, array(
 				'post'			=> $draft_post,

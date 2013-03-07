@@ -2,7 +2,7 @@
 namespace Blight;
 
 class BlogTest extends \PHPUnit_Framework_TestCase {
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 	protected $root_path;
 	protected $config;
@@ -21,7 +21,7 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testConstruct(){
 		$blog	= new \Blight\Blog($this->config);
-		$this->assertInstanceOf('\Blight\Blog', $blog);
+		$this->assertInstanceOf('\Blight\Interfaces\Blog', $blog);
 	}
 
 	/**

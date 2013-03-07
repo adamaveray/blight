@@ -2,10 +2,10 @@
 namespace Blight;
 
 class TextProcessorTest extends \PHPUnit_Framework_TestCase {
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
-	/** @var \Blight\TextProcessor */
+	/** @var \Blight\Interfaces\TextProcessor */
 	protected $text_processor;
 
 	public function setUp(){

@@ -2,14 +2,14 @@
 namespace Blight;
 
 class FileSystemTest extends \PHPUnit_Framework_TestCase {
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
 	protected $file_dir;
 	protected $file_path;
 	protected $file_content;
 
-	/** @var \Blight\FileSystem */
+	/** @var \Blight\Interfaces\FileSystem */
 	protected $file_system;
 
 	public function setUp(){

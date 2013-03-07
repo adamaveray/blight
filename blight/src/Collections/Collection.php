@@ -2,7 +2,7 @@
 namespace Blight\Collections;
 
 abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
 	/** @var string $slug	The collection's URL slug */
@@ -15,10 +15,10 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 
 
 	/**
-	 * @param \Blight\Blog $blog	The Blog object to use throughout the instance
-	 * @param string $name			The collection instance's name
+	 * @param \Blight\Interfaces\Blog $blog	The Blog object to use throughout the instance
+	 * @param string $name					The collection instance's name
 	 */
-	public function __construct(\Blight\Blog $blog, $name){
+	public function __construct(\Blight\Interfaces\Blog $blog, $name){
 		$this->blog	= $blog;
 		$this->name	= $name;
 	}
@@ -66,8 +66,8 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 			throw new \InvalidArgumentException('Posts must be an array');
 		}
 		foreach($posts as $post){
-			if(!($post instanceof \Blight\Post)){
-				throw new \InvalidArgumentException('Posts must be instances of \Blight\Post');
+			if(!($post instanceof \Blight\Interfaces\Post)){
+				throw new \InvalidArgumentException('Posts must be instances of \Blight\Interfaces\Post');
 			}
 		}
 
@@ -78,9 +78,9 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * Adds a post to the collection's Posts.
 	 * Duplicates are not checked for
 	 *
-	 * @param \Blight\Post $post	The post to add
+	 * @param \Blight\Interfaces\Post $post	The post to add
 	 */
-	public function add_post(\Blight\Post $post){
+	public function add_post(\Blight\Interfaces\Post $post){
 		if(!isset($this->posts)){
 			$this->posts	= array();
 		}

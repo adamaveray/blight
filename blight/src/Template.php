@@ -1,7 +1,7 @@
 <?php
 namespace Blight;
 
-class Template {
+class Template implements \Blight\Interfaces\Template {
 	const TYPE_PHP	= 'php';
 	const TYPE_TWIG	= 'twig';
 
@@ -9,7 +9,7 @@ class Template {
 	static protected $twig_environment;
 
 
-	/** @var \Blight\Blog */
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 	protected $filename;
 	protected $type;
@@ -17,11 +17,11 @@ class Template {
 	/**
 	 * Initialises the template and confirms the template file exists
 	 *
-	 * @param \Blight\Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 * @param string $name			The name of the template to use
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function __construct(\Blight\Blog $blog, $name){
+	public function __construct(\Blight\Interfaces\Blog $blog, $name){
 		$this->blog	= $blog;
 
 		$this->locate_template($name);
@@ -54,8 +54,9 @@ class Template {
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
-	 * @return string	The rendered content from the template
-	 * @throws \RuntimeException	Template cannot be found
+	 * @return string				The rendered content from the template
+	 * @throws \InvalidArgumentException	Invalid params provided
+	 * @throws \RuntimeException			Template cannot be found
 	 */
 	public function render($params = null){
 		if(!isset($params)){
