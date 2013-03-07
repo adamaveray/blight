@@ -260,6 +260,23 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Post::get_tags
+	 */
+	public function testNoTagsGetTags(){
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2013-01-01
+
+Test content
+EOD;
+		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$tags	= $post->get_tags();
+		$this->assertTrue(is_array($tags));
+		$this->assertEquals(count($tags), 0);
+	}
+
+	/**
 	 * @covers \Blight\Post::get_category
 	 */
 	public function testGetCategory(){
@@ -267,6 +284,22 @@ EOD;
 		$this->assertInstanceOf('\Blight\Collections\Category', $category);
 
 		$this->assertEquals($category->get_name(), $this->content_category);
+	}
+
+	/**
+	 * @covers \Blight\Post::get_category
+	 */
+	public function testNoCategoryGetCategory(){
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2013-01-01
+
+Test content
+EOD;
+		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$category	= $post->get_category();
+		$this->assertNull($category);
 	}
 
 	/**

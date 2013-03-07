@@ -277,10 +277,15 @@ class Post implements \Blight\Interfaces\Post {
 	 * @return array	An array of Tag collections
 	 */
 	public function get_tags(){
-		if(!isset($this->tags) && $this->has_meta('tags')){
-			$this->tags	= array_map(function($item){
-				return new \Blight\Collections\Tag($this->blog, trim($item));
-			}, explode(',', $this->get_meta('tags')));
+		if(!isset($this->tags)){
+			if($this->has_meta('tags')){
+				$this->tags	= array_map(function($item){
+					return new \Blight\Collections\Tag($this->blog, trim($item));
+				}, explode(',', $this->get_meta('tags')));
+			} else {
+				// No tags
+				$this->tags	= array();
+			}
 		}
 
 		return $this->tags;
