@@ -12,6 +12,7 @@ class Post {
 	protected $date;
 	protected $content;
 	protected $metadata;
+	protected $year;
 	protected $tags;
 	protected $category;
 	protected $is_draft;
