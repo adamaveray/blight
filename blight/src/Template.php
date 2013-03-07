@@ -145,9 +145,9 @@ class Template {
 			)));
 
 			// Truncate filter
-			self::$twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html')), array(
+			self::$twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html'), array(
 				'is_safe'	=> array('html')
-			));
+			)));
 		}
 
 		return self::$twig_environment;
