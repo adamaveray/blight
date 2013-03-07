@@ -26,6 +26,7 @@ class Post {
 	 * @param Blog $blog
 	 * @param string $content	The raw Markdown content for the post
 	 * @param string $slug		The post URL slug
+	 * @param bool $is_draft	Whether the post is a draft
 	 * @throws \InvalidArgumentException	Article date is invalid
 	 */
 	public function __construct(Blog $blog, $content, $slug, $is_draft = false){
@@ -151,11 +152,6 @@ class Post {
 				// Draft - use current date
 				return new \DateTime();
 			} else {
-				echo PHP_EOL.PHP_EOL;
-				echo $this->get_slug();
-				echo PHP_EOL;
-				echo 'No Date'.PHP_EOL;
-				exit;
 				throw new \RuntimeException('Post does not have date set');
 			}
 		}
@@ -186,7 +182,7 @@ class Post {
 	/**
 	 * Gets a metadata value for the post
 	 *
-	 * @param $string name	The metadata to retrieve
+	 * @param string $name	The metadata to retrieve
 	 * @return mixed|null	The metadata value if set, or null
 	 */
 	public function get_meta($name){
@@ -213,8 +209,8 @@ class Post {
 	/**
 	 * Converts a metadata name to a standardised format, with punctuation, etc removed
 	 *
-	 * @param $name		The metadata name to convert
-	 * @return string	The converted name
+	 * @param string $name	The metadata name to convert
+	 * @return string		The converted name
 	 */
 	protected function normalise_meta_name($name){
 		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
