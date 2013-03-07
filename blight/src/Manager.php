@@ -22,13 +22,13 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * Initialises the posts manager
 	 *
 	 * @param \Blight\Interfaces\Blog $blog
-	 * @throws \InvalidArgumentException	Posts directory cannot be opened
+	 * @throws \RuntimeException	Posts directory cannot be opened
 	 */
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 
 		if(!is_dir($blog->get_path_posts())){
-			throw new \InvalidArgumentException('No directory given');
+			throw new \RuntimeException('Posts directory not found');
 		}
 	}
 
