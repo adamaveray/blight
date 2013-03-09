@@ -11,6 +11,27 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 		}
 	}
 
+	static public function tearDownAfterClass(){
+		self::deleteDir(__DIR__.'/files/web');
+	}
+
+	static protected function deleteDir($dir){
+		$files	= glob(rtrim($dir, '/').'/*');
+		if(!is_dir($dir)){
+			return;
+		}
+
+		foreach($files as $file){
+			if(is_dir($file)){
+				self::deleteDir($file);
+			} else {
+				unlink($file);
+			}
+		}
+
+		rmdir($dir);
+	}
+
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 	/** @var \Blight\Interfaces\Manager */
