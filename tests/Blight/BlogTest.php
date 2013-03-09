@@ -1,5 +1,5 @@
 <?php
-namespace Blight;
+namespace Blight\Tests;
 
 class BlogTest extends \PHPUnit_Framework_TestCase {
 	/** @var \Blight\Interfaces\Blog */

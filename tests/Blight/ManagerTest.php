@@ -1,5 +1,5 @@
 <?php
-namespace Blight;
+namespace Blight\Tests;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase {
 	protected static $posts_count		= 5;

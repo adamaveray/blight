@@ -1,5 +1,5 @@
 <?php
-namespace Blight;
+namespace Blight\Tests;
 
 require_once(__DIR__.'/mock/RendererTestManager.php');
 
@@ -37,7 +37,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
-	/** @var \Blight\Interfaces\Manager */
+	/** @var \Blight\Tests\Mock\RendererTestManager */
 	protected $manager;
 	/** @var \Blight\Renderer */
 	protected $renderer;
@@ -50,7 +50,7 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 		$test_config['paths']['templates']	= __DIR__.'/files/templates/';
 		$this->blog		= new \Blight\Blog($test_config);
 
-		$this->manager	= new \Blight\RendererTestManager($this->blog);
+		$this->manager	= new \Blight\Tests\Mock\RendererTestManager($this->blog);
 		$content	= <<<EOD
 Test Post
 =========

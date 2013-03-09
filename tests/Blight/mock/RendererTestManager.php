@@ -1,5 +1,5 @@
 <?php
-namespace Blight;
+namespace Blight\Tests\Mock;
 
 class RendererTestManager implements \Blight\Interfaces\Manager {
 	protected $blog;
