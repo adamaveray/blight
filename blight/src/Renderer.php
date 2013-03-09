@@ -212,7 +212,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	protected function render_collection(\Blight\Interfaces\Collection $collection, $collection_type, $page_title, $options = null){
 		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		), $options);
+		), (array)$options);
 
 		$pages	= $this->paginate_collection($collection, $options['per_page']);
 
@@ -288,7 +288,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	public function render_home($options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
-		), $options);
+		), (array)$options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -315,7 +315,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	public function render_feed($options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
-		), $options);
+		), (array)$options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
