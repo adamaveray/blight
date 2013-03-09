@@ -31,7 +31,8 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 
 	public function get_posts_by_tag(){
 		$posts	= $this->get_posts();
-		$tag	= new \Blight\Collections\Tag($this->blog, strtolower(str_replace(' ', '-', $posts[0]->get_meta('tag'))));
+		$tag_names	= array_map('trim', explode(',', $posts[0]->get_meta('tags')));
+		$tag	= new \Blight\Collections\Tag($this->blog, current($tag_names));
 		$tag->set_posts($posts);
 
 		return array($tag);
@@ -39,7 +40,7 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 
 	public function get_posts_by_category(){
 		$posts	= $this->get_posts();
-		$category	= new \Blight\Collections\Category($this->blog, strtolower(str_replace(' ', '-', $posts[0]->get_meta('category'))));
+		$category	= new \Blight\Collections\Category($this->blog, $posts[0]->get_meta('category'));
 		$category->set_posts($posts);
 
 		return array($category);
