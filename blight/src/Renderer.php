@@ -21,7 +21,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 *
 	 * @param \Blight\Interfaces\Blog $blog
 	 * @param \Blight\Interfaces\Manager $manager
-	 * @throws \InvalidArgumentException	Web or template directories cannot be opened
+	 * @throws \RuntimeException	Web or templates directory cannot be found
 	 */
 	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager){
 		$this->blog		= $blog;
@@ -35,7 +35,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			}
 		}
 		if(!is_dir($blog->get_path_templates())){
-			throw new \InvalidArgumentException('Templates directory cannot be found');
+			throw new \RuntimeException('Templates directory cannot be found');
 		}
 	}
 
