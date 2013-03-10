@@ -132,36 +132,6 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Post::get_slug
-	 */
-	public function testGetSlug(){
-		$this->assertEquals($this->content_slug, $this->post->get_slug());
-	}
-
-	/**
-	 * @covers \Blight\Post::get_date
-	 */
-	public function testGetDate(){
-		$this->assertEquals($this->content_date, $this->post->get_date());
-	}
-
-	/**
-	 * @covers \Blight\Post::set_date
-	 */
-	public function testSetDate(){
-		$date	= new \DateTime('now');
-		$this->post->set_date($date);
-		$this->assertEquals($date, $this->post->get_date());
-	}
-
-	/**
-	 * @covers \Blight\Post::get_content
-	 */
-	public function testGetContent(){
-		$this->assertEquals($this->content_text, $this->post->get_content());
-	}
-
-	/**
 	 * @covers \Blight\Post::get_metadata
 	 */
 	public function testGetMetadata(){
@@ -173,26 +143,6 @@ EOD;
 		);
 
 		$this->assertEquals($meta, $this->post->get_metadata());
-	}
-
-	/**
-	 * @covers \Blight\Post::get_meta
-	 */
-	public function testGetMeta(){
-		$this->assertEquals($this->content_metadata['Test Meta'], $this->post->get_meta('Test Meta'));
-		$this->assertEquals($this->content_metadata['Test Meta'], $this->post->get_meta('test-meta'));
-
-		// Non-existent
-		$this->assertNull($this->post->get_meta('nonexistent'));
-	}
-
-	/**
-	 * @covers \Blight\Post::has_meta
-	 */
-	public function testHasMeta(){
-		$this->assertTrue($this->post->has_meta('Test Meta'));
-		$this->assertTrue($this->post->has_meta('test-meta'));
-		$this->assertFalse($this->post->has_meta('nonexistent'));
 	}
 
 	/**
@@ -305,7 +255,7 @@ EOD;
 	/**
 	 * @covers \Blight\Post::is_draft
 	 */
-	public function test_is_draft(){
+	public function testIsDraft(){
 		$this->assertFalse($this->post->is_draft());
 
 		$post	= new \Blight\Post($this->blog, $this->content, $this->content_slug, true);
