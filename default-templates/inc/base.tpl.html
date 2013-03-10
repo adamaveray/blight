@@ -24,11 +24,11 @@
     {% if pagination is defined %}
 	<footer>
 		<ol class="pagination">
-            {% for page, url in pagination.pages %}
-                {% set current = (page == pagination.current) %}
-			<li{% if current %} class="current"{% endif %}>
-                {% if current %}
-					<span href="{{ url|e }}">{{ page|e }}</span>
+			{% for page, url in pagination %}
+				{% set is_current = (page == pagination._current) %}
+			<li{% if is_current %} class="current"{% endif %}>
+				{% if is_current %}
+					<span>{{ page|e }}</span>
 				{% else %}
                 	<a href="{{ url|e }}">{{ page|e }}</a>
 				{% endif %}

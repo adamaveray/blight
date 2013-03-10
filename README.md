@@ -120,9 +120,7 @@ For each of the different listing types, the page's `Collection` object itself w
 
 Additionally, if pagination is enabled in the `config.ini` file, the following variables are available:
 
-- **$pagination**: An array containing the pagination details. If this array is not set, pagination is disabled
-	- **$pagination['current']**: The current page number (1-indexed)
-	- **$pagination['pages']**: An array containing each page's details in the format `page_no => 'url'`
+- **$pagination**: A `Pagination` instance. If this parameter is not set, pagination is disabled
 
 
 ## Config

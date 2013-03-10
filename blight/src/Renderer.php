@@ -235,9 +235,9 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 *		array (
 	 * 			'path-to-page'	=> array(
 	 * 				'posts'	=> array(),
-	 * 				'pagination'	=> array(
-	 * 					'pages'		=> (array)[all pages]
-	 * 					'current'	=> (int)[current page]
+	 * 				\Pagination	=> (
+	 * 					get_items()		// All pages
+	 * 					get_position()	// Current page
 	 * 				)
 	 * 			)
 	 *		)
@@ -266,11 +266,8 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		for($page = 0; $page < $no_pages; $page++){
 			$url	= $collection->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 			$return_pages[$url]	= array(
-				'posts'	=> array_slice($posts, ($page-1)*$per_page, $per_page),
-				'pagination'	=> array(
-					'pages'		=> $pages,
-					'current'	=> $page+1
-				)
+				'posts'			=> array_slice($posts, ($page-1)*$per_page, $per_page),
+				'pagination'	=> new \Blight\Pagination($pages, $page+1)
 			);
 		}
 
