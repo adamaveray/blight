@@ -344,4 +344,24 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'posts'	=> $posts
 		));
 	}
+
+	/**
+	 * Generates and saves the static XML file for the blog's sitemap. Pages are retrieved from the
+	 * Manager set during class construction.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered document
+	 */
+	public function render_sitemap($options = null){
+		$options	= array_merge(array(
+		), (array)$options);
+
+		// Prepare posts
+		$pages	= $this->manager->get_pages();
+
+		$path	= $this->blog->get_path_www('sitemap.xml');
+
+		$this->render_template_to_file('sitemap', $path, array(
+			'pages'	=> $pages
+		));
+	}
 };

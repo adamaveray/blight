@@ -97,6 +97,11 @@ debug_output('Renderer initialised');
 	));
 	debug_output('Feed rendered');
 
+	// Render sitemap
+	$renderer->render_sitemap(array(
+	));
+	debug_output('Sitemap rendered');
+
 // Rendering completed
 
 $manager->cleanup_drafts();

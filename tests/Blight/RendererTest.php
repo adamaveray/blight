@@ -353,4 +353,24 @@ EOD;
 
 		$this->assertTrue(file_exists($path));
 	}
+
+	/**
+	 * @covers \Blight\Renderer::render_sitemap
+	 */
+	public function testRenderSitemap(){
+		$pages	= array(
+			array(
+				'name'	=> 'Test',
+				'url'	=> $this->blog->get_url('test')
+			)
+		);
+
+		$this->manager->set_mock_pages($pages);
+
+		$this->renderer->render_sitemap();
+
+		$path	= $this->blog->get_path_www('sitemap.xml');
+
+		$this->assertTrue(file_exists($path));
+	}
 };

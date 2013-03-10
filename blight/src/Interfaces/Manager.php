@@ -4,6 +4,8 @@ namespace Blight\Interfaces;
 interface Manager {
 	public function __construct(\Blight\Interfaces\Blog $blog);
 
+	public function get_pages();
+	
 	public function get_draft_posts();
 
 	public function get_posts();

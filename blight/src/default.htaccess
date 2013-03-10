@@ -14,4 +14,7 @@ AddDefaultCharset UTF-8
 
 	# Map feed
 	RewriteRule ^feed$ {%WEB_PATH%}/feed.xml [L,QSA]
+
+	# Map additional files
+	RewriteRule ^([\w-_]+)\.(\w+)$ {%WEB_PATH%}/$1.$2 [L,QSA]
 </IfModule>

@@ -7,6 +7,8 @@ namespace Blight;
 class Manager implements \Blight\Interfaces\Manager {
 	protected $blog;
 
+	protected $pages;
+
 	protected $posts;
 	protected $posts_by_year;
 	protected $posts_by_tag;
@@ -122,6 +124,22 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		$this->blog->get_file_system()->move_file($current_path, $new_path, !$post->is_draft());	// Don't clean up drafts
+	}
+
+	/**
+	 * Retrieves all pages found as arrays
+	 *
+	 * @return array	An array of pages
+	 */
+	public function get_pages(){
+		if(!isset($this->pages)){
+			$this->pages	= array();
+			$this->pages[]	=  array(
+				'name'	=> 'Home',
+				'url'	=> $this->blog->get_url()
+			);
+		}
+		return $this->pages;
 	}
 
 	/**
