@@ -37,6 +37,17 @@
 				<strong>Category:</strong> <a href="{{ category._url|e }}">{{ category._name|e|typo }}</a>
 			</p>
 		{% endif %}
+
+        {% if post_prev is defined or post_next is defined %}
+            <p class="neighbor_posts">
+            {% if post_prev is defined %}
+                <a rel="prev" href="{{ post_prev._permalink }}">← {{ post_prev.get_title(true) }}</a>
+            {% endif %}
+            {% if post_next is defined %}
+                <a rel="next" href="{{ post_next._permalink }}">{{ post_next.get_title(true) }} →</a>
+            {% endif %}
+            </p>
+        {% endif %}
 	</footer>
 </article>
 {% endblock %}
