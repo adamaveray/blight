@@ -97,14 +97,31 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * Generates and saves the static file for the given post
 	 *
 	 * @param \Blight\Interfaces\Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Post|null $prev	The adjacent previous/older post to the given post
+	 * @param \Blight\Interfaces\Post|null $next	The adjacent next/newer post to the given post
+	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Post
 	 */
-	public function render_post(\Blight\Interfaces\Post $post){
+	public function render_post(\Blight\Interfaces\Post $post, $prev = null, $next = null){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
-		$this->render_template_to_file('post', $path, array(
+		$params	= array(
 			'post'			=> $post,
 			'page_title'	=> $post->get_title()
-		));
+		);
+		if(isset($prev)){
+			if(!($prev instanceof \Blight\Interfaces\Post)){
+				throw new \InvalidArgumentException('Previous post must be instance of \Blight\Interfaces\Post');
+			}
+			$params['post_prev']	= $prev;
+		}
+		if(isset($next)){
+			if(!($next instanceof \Blight\Interfaces\Post)){
+				throw new \InvalidArgumentException('Next post must be instance of \Blight\Interfaces\Post');
+			}
+			$params['post_next']	= $next;
+		}
+
+		$this->render_template_to_file('post', $path, $params);
 	}
 
 	/**

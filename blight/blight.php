@@ -57,8 +57,12 @@ debug_output('Renderer initialised');
 	foreach($archive as $year){
 		/** @var \Blight\Collections\Year $year */
 		// Render posts
-		foreach($year as $post){
-			$renderer->render_post($post);
+		$posts		= $year->get_posts();
+		$no_posts	= count($posts);
+		for($i = 0; $i < $no_posts; $i++){
+			$prev	= (isset($posts[$i+1]) ? $posts[$i+1] : null);
+			$next	= (isset($posts[$i-1]) ? $posts[$i-1] : null);
+			$renderer->render_post($posts[$i], $prev, $next);
 		}
 		debug_output('Year "%s" posts rendered', $year->get_name());
 

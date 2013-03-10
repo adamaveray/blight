@@ -117,6 +117,27 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Renderer::render_post
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testInvalidRenderPost(){
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2013-02-01
+
+Test content
+EOD;
+		$rendered_content	= <<<EOD
+<p>Test content</p>
+
+EOD;
+
+		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$this->renderer->render_post($post, '(not a post)');
+	}
+
+	/**
 	 * @covers \Blight\Renderer::render_drafts
 	 */
 	public function testRenderDrafts(){
