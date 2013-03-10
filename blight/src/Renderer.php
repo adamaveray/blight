@@ -31,7 +31,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			try {
 				$this->blog->get_file_system()->create_dir($blog->get_path_www());
 			} catch(\Exception $e){
-				throw new \InvalidArgumentException('Output directory cannot be found');
+				throw new \RuntimeException('Output directory cannot be found');
 			}
 		}
 		if(!is_dir($blog->get_path_templates())){
