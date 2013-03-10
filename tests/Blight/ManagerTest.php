@@ -113,6 +113,19 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Manager::get_pages
+	 */
+	public function testGetPages(){
+		$pages	= $this->manager->get_pages();
+		$this->assertTrue(is_array($pages));
+		$this->assertEquals(count($pages), 1);
+		foreach($pages as $page){
+			$this->assertTrue(is_array($page));
+			$this->assertTrue(isset($page['url']));
+		}
+	}
+
+	/**
 	 * @covers \Blight\Manager::get_draft_posts
 	 */
 	public function testGetDraftPosts(){

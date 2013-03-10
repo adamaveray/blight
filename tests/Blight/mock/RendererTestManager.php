@@ -4,6 +4,7 @@ namespace Blight\Tests\Mock;
 class RendererTestManager implements \Blight\Interfaces\Manager {
 	protected $blog;
 	protected $mock_posts	= array();
+	protected $mock_pages	= array();
 
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
@@ -11,6 +12,13 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 
 	public function set_mock_posts($posts, $type){
 		$this->mock_posts[$type]	= $posts;
+	}
+	public function set_mock_pages($pages){
+		$this->mock_pages	= $pages;
+	}
+
+	public function get_pages(){
+		return $this->mock_pages;
 	}
 
 	public function get_draft_posts(){
