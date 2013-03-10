@@ -117,11 +117,10 @@ class Page implements \Blight\Interfaces\Page {
 
 	/**
 	 * @return \DateTime	The page date
-	 * @throws \RuntimeException	The page does not have a date set
 	 */
 	public function get_date(){
 		if(!isset($this->date)){
-			throw new \RuntimeException('Page does not have date set');
+			return new \DateTime();
 		}
 		return $this->date;
 	}
