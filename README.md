@@ -145,6 +145,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 
 ### Paths
 
+- **pages**: The path to the pages directory
 - **posts**: The path to the posts directory
 - **drafts**: The path to the drafts directory
 - **templates**: The path to the templates directory

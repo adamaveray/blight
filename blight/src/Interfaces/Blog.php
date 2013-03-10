@@ -12,6 +12,8 @@ interface Blog {
 
 	public function get_path_templates($append = '');
 
+	public function get_path_pages($append = '');
+
 	public function get_path_posts($append = '');
 
 	public function get_path_drafts($append = '');

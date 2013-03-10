@@ -82,6 +82,15 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Blog::get_path_pages
+	 */
+	public function testGetPathPages(){
+		$this->assertEquals($this->root_path.$this->config['paths']['pages'], $this->blog->get_path_pages());
+
+		$this->assertEquals($this->root_path.$this->config['paths']['pages'].'test', $this->blog->get_path_pages('test'));
+	}
+
+	/**
 	 * @covers \Blight\Blog::get_path_posts
 	 */
 	public function testGetPathPosts(){
