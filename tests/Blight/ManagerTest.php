@@ -206,6 +206,9 @@ EOD;
 	 */
 	public function testCleanupDrafts(){
 		$dir	= $this->blog->get_path_drafts_web();
+		if(!is_dir($dir)){
+			mkdir($dir);
+		}
 		file_put_contents($dir.'test.html', 'Test file');
 
 		$this->manager->cleanup_drafts();
