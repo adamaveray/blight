@@ -1,6 +1,15 @@
 Release Notes
 =============
 
+## 0.4
+
+_10 Mar 2013_
+
+- Added support for draft posts
+- Added unit tests
+- Created separate pagination class
+
+
 ## 0.3
 
 _5 Mar 2013_

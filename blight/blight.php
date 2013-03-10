@@ -1,7 +1,7 @@
 <?php
 /**
  * Blight
- * v0.3
+ * v0.4
  */
 namespace Blight;
 

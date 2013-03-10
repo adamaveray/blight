@@ -1,7 +1,7 @@
 Blight
 ======
 
-Blight is (another) Markdown-powered static blogging engine. It is a simple, light blog app with easy setup and administration.
+Blight is a Markdown-powered static blogging engine.
 
 
 ## Installation
@@ -122,6 +122,16 @@ Additionally, if pagination is enabled in the `config.ini` file, the following v
 
 - **$pagination**: A `Pagination` instance. If this parameter is not set, pagination is disabled
 
+### Post
+
+The **post** template displays individual posts on separate pages, where their permalinks will point to.
+
+The following variables are available to post pages:
+
+- **$post**: The Post instance for the current page
+- **$post_prev**: The previous/older post neighboring the current post, useful for adding next/prev post links. This value may not always be set.
+- **$post_next**: The next/newer post neighboring the current post. This value may not always be set.
+
 
 ## Config
 
@@ -136,8 +146,10 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 ### Paths
 
 - **posts**: The path to the posts directory
+- **drafts**: The path to the drafts directory
 - **templates**: The path to the templates directory
 - **web**: The path to output rendered files to
+- **drafts_web**: The path to output rendered draft post files to
 - **cache**: The path various cache files can be written to
 
 ### Limits
@@ -152,10 +164,3 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
                 titles are prefixed with a glyph)
 - **link_character**: The glyph to prefix linked posts with when the **linkblog** option is disabled
 - **post_character**: The glyph to prefix non-linked posts with when the **linkblog** option is enabled
-
-
-## Planned Features
-
-- Drafts
-- Basic web admin
-- Hooks
