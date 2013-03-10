@@ -4,6 +4,9 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
 	RewriteEngine on
 
+	# Map home page
+    RewriteRule ^$ {%WEB_PATH%}/index.html [L,QSA]
+
 	# Map individual posts
 	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.html -f
 	RewriteRule (.*) {%WEB_PATH%}/$1.html [L,QSA]
@@ -18,3 +21,7 @@ AddDefaultCharset UTF-8
 	# Map additional files
 	RewriteRule ^([\w-_]+)\.(\w+)$ {%WEB_PATH%}/$1.$2 [L,QSA]
 </IfModule>
+
+<ifmodule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript
+</ifmodule>
