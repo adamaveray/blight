@@ -95,6 +95,56 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Renderer::render_page
+	 */
+	public function testRenderPage(){
+		$content	= <<<EOD
+Test Page
+=========
+Date: 2013-02-01
+
+Test content
+EOD;
+
+		$page	= new \Blight\Page($this->blog, $content, 'test-page');
+
+		$this->renderer->render_page($page);
+
+		$path	= $this->blog->get_path_www($page->get_relative_permalink().'.html');
+
+		$this->assertTrue(file_exists($path));
+	}
+
+	/**
+	 * @covers \Blight\Renderer::render_pages
+	 */
+	public function testRenderPages(){
+		$content	= <<<EOD
+Test Page
+=========
+Date: 2013-02-01
+
+Test content
+EOD;
+
+		$pages	= array(
+			new \Blight\Page($this->blog, $content, 'test-1'),
+			new \Blight\Page($this->blog, $content, 'test-2')
+		);
+
+		$this->manager->set_mock_pages($pages);
+
+		$this->renderer->render_pages();
+
+		$path	= $this->blog->get_path_www();
+
+		foreach($pages as $page){
+			/** @var \Blight\Interfaces\Page $page */
+			$this->assertTrue(file_exists($path.$page->get_relative_permalink().'.html'));
+		}
+	}
+
+	/**
 	 * @covers \Blight\Renderer::render_post
 	 */
 	public function testRenderPost(){
@@ -360,11 +410,17 @@ EOD;
 	 * @covers \Blight\Renderer::render_sitemap
 	 */
 	public function testRenderSitemap(){
+		$content	= <<<EOD
+Test Page
+=========
+Date: 2013-02-01
+
+Test content
+EOD;
+
 		$pages	= array(
-			array(
-				'name'	=> 'Test',
-				'url'	=> $this->blog->get_url('test')
-			)
+			new \Blight\Page($this->blog, $content, 'test-1'),
+			new \Blight\Page($this->blog, $content, 'test-2')
 		);
 
 		$this->manager->set_mock_pages($pages);
