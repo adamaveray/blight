@@ -6,13 +6,13 @@ Blight is a Markdown-powered static blogging engine.
 
 ## Installation
 
-Copy the `config.ini` file and `blight/` directory alongside your website files directory. Then, copy the `index.php` file to the location you want the blog to be accessible on your site. Edit the `index.php` file ensuring the path in the `require()` line points to the `blight/` directory. Visiting the `index.php` page will set up the rest of the engine.
+Copy the `config.ini` file and `Blight.phar` directory alongside your website files directory. Then, copy the `index.php` file to the location you want the blog to be accessible on your site. Edit the `index.php` file ensuring the path in the `require()` line points to the `Blight.phar` file. Visiting the `index.php` page will set up the rest of the engine.
 
 After installation, your directory structure should look like the following:
 
 	config.ini
 
-	blight/
+	Blight.phar
 	
 	blog-data/
 		drafts/
