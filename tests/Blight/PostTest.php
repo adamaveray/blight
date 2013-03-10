@@ -98,7 +98,7 @@ EOD;
 	 * @covers \Blight\Post::get_title
 	 */
 	public function testGetTitle(){
-		$this->assertEquals($this->post->get_title(true), $this->content_title);
+		$this->assertEquals($this->content_title, $this->post->get_title(true));
 
 
 		// Test linkblogs
@@ -113,10 +113,10 @@ EOD;
 		$blog	= new \Blight\Blog($test_config);
 		// Non-linked post
 		$post	= new \Blight\Post($blog, $this->content, $this->content_slug);
-		$this->assertEquals($post->get_title(), $this->content_title);
+		$this->assertEquals($this->content_title, $post->get_title());
 		// Linked post
 		$post	= new \Blight\Post($blog, $this->linked_content, $this->content_slug);
-		$this->assertEquals($post->get_title(), $link_char.' '.$this->content_title);
+		$this->assertEquals($link_char.' '.$this->content_title, $post->get_title());
 
 		// Test linkblog
 		$post_char	= '*';
@@ -125,24 +125,24 @@ EOD;
 		$blog	= new \Blight\Blog($test_config);
 		// Non-linked post
 		$post	= new \Blight\Post($blog, $this->content, $this->content_slug);
-		$this->assertEquals($post->get_title(), $post_char.' '.$this->content_title);
+		$this->assertEquals($post_char.' '.$this->content_title, $post->get_title());
 		// Linked post
 		$post	= new \Blight\Post($blog, $this->linked_content, $this->content_slug);
-		$this->assertEquals($post->get_title(), $this->content_title);
+		$this->assertEquals($this->content_title, $post->get_title());
 	}
 
 	/**
 	 * @covers \Blight\Post::get_slug
 	 */
 	public function testGetSlug(){
-		$this->assertEquals($this->post->get_slug(), $this->content_slug);
+		$this->assertEquals($this->content_slug, $this->post->get_slug());
 	}
 
 	/**
 	 * @covers \Blight\Post::get_date
 	 */
 	public function testGetDate(){
-		$this->assertEquals($this->post->get_date(), $this->content_date);
+		$this->assertEquals($this->content_date, $this->post->get_date());
 	}
 
 	/**
@@ -151,14 +151,14 @@ EOD;
 	public function testSetDate(){
 		$date	= new \DateTime('now');
 		$this->post->set_date($date);
-		$this->assertEquals($this->post->get_date(), $date);
+		$this->assertEquals($date, $this->post->get_date());
 	}
 
 	/**
 	 * @covers \Blight\Post::get_content
 	 */
 	public function testGetContent(){
-		$this->assertEquals($this->post->get_content(), $this->content_text);
+		$this->assertEquals($this->content_text, $this->post->get_content());
 	}
 
 	/**
@@ -172,15 +172,15 @@ EOD;
 			'category'	=> $this->content_metadata['Category']
 		);
 
-		$this->assertEquals($this->post->get_metadata(), $meta);
+		$this->assertEquals($meta, $this->post->get_metadata());
 	}
 
 	/**
 	 * @covers \Blight\Post::get_meta
 	 */
 	public function testGetMeta(){
-		$this->assertEquals($this->post->get_meta('Test Meta'), $this->content_metadata['Test Meta']);
-		$this->assertEquals($this->post->get_meta('test-meta'), $this->content_metadata['Test Meta']);
+		$this->assertEquals($this->content_metadata['Test Meta'], $this->post->get_meta('Test Meta'));
+		$this->assertEquals($this->content_metadata['Test Meta'], $this->post->get_meta('test-meta'));
 
 		// Non-existent
 		$this->assertNull($this->post->get_meta('nonexistent'));
@@ -200,11 +200,11 @@ EOD;
 	 */
 	public function testGetLink(){
 		$url	= $this->blog->get_url($this->content_date->format('Y/m').'/'.$this->content_slug);
-		$this->assertEquals($this->post->get_link(), $url);
+		$this->assertEquals($url, $this->post->get_link());
 
 		// Test linked post
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
-		$this->assertEquals($post->get_link(), $this->linked_content_link);
+		$this->assertEquals($this->linked_content_link, $post->get_link());
 	}
 
 	/**
@@ -212,13 +212,13 @@ EOD;
 	 */
 	public function testGetPermalink(){
 		$url	= $this->blog->get_url($this->content_date->format('Y/m').'/'.$this->content_slug);
-		$this->assertEquals($this->post->get_permalink(), $url);
+		$this->assertEquals($url, $this->post->get_permalink());
 		$this->assertEquals($this->post->get_link(), $this->post->get_permalink());
 
 		// Test linked post
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
 		$url	= $this->blog->get_url($this->content_date->format('Y/m').'/'.$this->content_slug);
-		$this->assertEquals($post->get_permalink(), $url);
+		$this->assertEquals($url, $post->get_permalink());
 		$this->assertNotEquals($post->get_link(), $post->get_permalink());
 	}
 
@@ -227,12 +227,12 @@ EOD;
 	 */
 	public function testGetRelativePermalink(){
 		$url	= $this->content_date->format('Y/m').'/'.$this->content_slug;
-		$this->assertEquals($this->post->get_relative_permalink(), $url);
+		$this->assertEquals($url, $this->post->get_relative_permalink());
 
 		// Test linked post
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
 		$url	= $this->content_date->format('Y/m').'/'.$this->content_slug;
-		$this->assertEquals($post->get_relative_permalink(), $url);
+		$this->assertEquals($url, $post->get_relative_permalink());
 	}
 
 	/**
@@ -242,7 +242,7 @@ EOD;
 		$year	= $this->post->get_year();
 		$this->assertInstanceOf('\Blight\Collections\Year', $year);
 
-		$this->assertEquals($year->get_name(), $this->content_date->format('Y'));
+		$this->assertEquals($this->content_date->format('Y'), $year->get_name());
 	}
 
 	/**
@@ -251,7 +251,7 @@ EOD;
 	public function testGetTags(){
 		$tags	= $this->post->get_tags();
 		$this->assertTrue(is_array($tags));
-		$this->assertEquals(count($tags), count($this->content_tags));
+		$this->assertEquals(count($this->content_tags), count($tags));
 
 		foreach($tags as $tag){
 			$this->assertInstanceOf('\Blight\Collections\Tag', $tag);
@@ -273,7 +273,7 @@ EOD;
 		$post	= new \Blight\Post($this->blog, $content, 'test-post');
 		$tags	= $post->get_tags();
 		$this->assertTrue(is_array($tags));
-		$this->assertEquals(count($tags), 0);
+		$this->assertEquals(0, count($tags));
 	}
 
 	/**
@@ -283,7 +283,7 @@ EOD;
 		$category	= $this->post->get_category();
 		$this->assertInstanceOf('\Blight\Collections\Category', $category);
 
-		$this->assertEquals($category->get_name(), $this->content_category);
+		$this->assertEquals($this->content_category, $category->get_name());
 	}
 
 	/**

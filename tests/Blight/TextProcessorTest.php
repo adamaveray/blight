@@ -37,7 +37,7 @@ EOD;
 </ul>
 
 EOD;
-		$this->assertEquals($this->text_processor->process($raw), $processed);
+		$this->assertEquals($processed, $this->text_processor->process($raw));
 	}
 
 	/**
@@ -63,7 +63,7 @@ EOD;
 </ul>
 
 EOD;
-		$this->assertEquals($this->text_processor->process_markdown($raw), $processed);
+		$this->assertEquals($processed, $this->text_processor->process_markdown($raw));
 	}
 
 	/**
@@ -74,7 +74,7 @@ EOD;
 		$raw		= '<p>Test 123</p>';
 		$processed	= '<p>Test <span class="numbers">123</span></p>';
 
-		$this->assertEquals($this->text_processor->process_typography($raw), $processed);
+		$this->assertEquals($processed, $this->text_processor->process_typography($raw));
 	}
 
 	/**
@@ -83,20 +83,20 @@ EOD;
 	public function testTruncateHTML(){
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
 		$truncated	= '<p>Lorem...</p>';
-		$this->assertEquals($this->text_processor->truncate_html($original, 10), $truncated);
+		$this->assertEquals($truncated, $this->text_processor->truncate_html($original, 10));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
 		$truncated	= '<p>Lorem ipsum...</p>';
-		$this->assertEquals($this->text_processor->truncate_html($original, 20), $truncated);
+		$this->assertEquals($truncated, $this->text_processor->truncate_html($original, 20));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
 		$truncated	= '<p>Lorem ipsum dolor!</p>';
-		$this->assertEquals($this->text_processor->truncate_html($original, 20, '!'), $truncated);
+		$this->assertEquals($truncated, $this->text_processor->truncate_html($original, 20, '!'));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
-		$this->assertEquals($this->text_processor->truncate_html($original, 100), $original);
+		$this->assertEquals($original, $this->text_processor->truncate_html($original, 100));
 
 		$original	= '';
-		$this->assertEquals($this->text_processor->truncate_html($original, 100), $original);
+		$this->assertEquals($original, $this->text_processor->truncate_html($original, 100));
 	}
 };

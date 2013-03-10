@@ -60,12 +60,12 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testPHPRender(){
 		// No params
-		$this->assertEquals($this->template_php->render(), $this->template_content);
+		$this->assertEquals($this->template_content, $this->template_php->render());
 
 		// With params
-		$this->assertEquals($this->template_php->render(array(
+		$this->assertEquals(sprintf($this->template_content_variable, 'test'), $this->template_php->render(array(
 			'variable'	=> 'test'
-		)), sprintf($this->template_content_variable, 'test'));
+		)));
 	}
 
 	/**
@@ -73,12 +73,12 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testTwigRender(){
 		// No params
-		$this->assertEquals($this->template_twig->render(), $this->template_content);
+		$this->assertEquals($this->template_content, $this->template_twig->render());
 
 		// With params
-		$this->assertEquals($this->template_twig->render(array(
+		$this->assertEquals(sprintf($this->template_content_variable, 'test'), $this->template_twig->render(array(
 			'variable'	=> 'test'
-		)), sprintf($this->template_content_variable, 'test'));
+		)));
 	}
 
 	/**

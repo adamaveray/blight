@@ -144,7 +144,7 @@ EOD;
 	public function testGetPostsByYear(){
 		$archive	= $this->manager->get_posts_by_year();
 		$this->assertTrue(is_array($archive));
-		$this->assertEquals(count($archive), self::$collection_count_year);
+		$this->assertEquals(self::$collection_count_year, count($archive));
 		foreach($archive as $year){
 			$this->assertInstanceOf('\Blight\Collections\Year', $year);
 		}
@@ -156,7 +156,7 @@ EOD;
 	public function testGetPostsByTag(){
 		$tags	= $this->manager->get_posts_by_tag();
 		$this->assertTrue(is_array($tags));
-		$this->assertEquals(count($tags), self::$collection_count_tag);
+		$this->assertEquals(self::$collection_count_tag, count($tags));
 		foreach($tags as $tag){
 			$this->assertInstanceOf('\Blight\Collections\Tag', $tag);
 		}
@@ -168,7 +168,7 @@ EOD;
 	public function testGetPostsByCategory(){
 		$categories	= $this->manager->get_posts_by_category();
 		$this->assertTrue(is_array($categories));
-		$this->assertEquals(count($categories), self::$collection_count_category);
+		$this->assertEquals(self::$collection_count_category, count($categories));
 		foreach($categories as $category){
 			$this->assertInstanceOf('\Blight\Collections\Category', $category);
 		}
@@ -184,6 +184,6 @@ EOD;
 		$this->manager->cleanup_drafts();
 
 		// Directory should be empty
-		$this->assertEquals(count(glob($this->blog->get_path_drafts_web('*'))), 0);
+		$this->assertEquals(0, count(glob($this->blog->get_path_drafts_web('*'))));
 	}
 };

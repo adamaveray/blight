@@ -113,7 +113,7 @@ EOD;
 		$post	= new \Blight\Post($this->blog, $content, 'test-post');
 		$this->renderer->render_post($post);
 
-		$this->assertEquals(file_get_contents($this->blog->get_path_www($post->get_relative_permalink().'.html')), $rendered_content);
+		$this->assertEquals($rendered_content, file_get_contents($this->blog->get_path_www($post->get_relative_permalink().'.html')));
 	}
 
 	/**
@@ -140,7 +140,7 @@ EOD;
 		$output_dir	= $this->blog->get_path_drafts_web();
 		$files	= glob($output_dir.'*');
 
-		$this->assertEquals(count($files), count($posts));
+		$this->assertEquals(count($posts), count($files));
 
 		foreach($posts as $post){
 			// Check each post had file created with same slug
@@ -181,7 +181,7 @@ EOD;
 
 		$output_dir	= $this->blog->get_path_www().'archive/';
 		$files	= glob($output_dir.'*');
-		$this->assertEquals(count($files), count($date_counts));
+		$this->assertEquals(count($date_counts), count($files));
 	}
 
 	/**

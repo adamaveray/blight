@@ -48,7 +48,7 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testLoadFile(){
 		$this->assertTrue(file_exists($this->file_path));
-		$this->assertEquals($this->file_system->load_file($this->file_path), $this->file_content);
+		$this->assertEquals($this->file_content, $this->file_system->load_file($this->file_path));
 	}
 
 	/**
@@ -72,7 +72,7 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 		// Old file exists
 		$this->assertFileExists($this->file_path);
 		// New file content matches old
-		$this->assertEquals(file_get_contents($new_path), $this->file_content);
+		$this->assertEquals($this->file_content, file_get_contents($new_path));
 	}
 
 	/**
@@ -87,7 +87,7 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 		// Old file does not exist
 		$this->assertFalse(file_exists($this->file_path));
 		// New file content matches old
-		$this->assertEquals(file_get_contents($new_path), $this->file_content);
+		$this->assertEquals($this->file_content, file_get_contents($new_path));
 	}
 
 	/**
