@@ -187,9 +187,33 @@ EOD;
 	/**
 	 * @covers \Blight\Renderer::render_year
 	 */
-	/*public function testRenderYear(){
-		$this->renderer->render_year();
-	}*/
+	public function testRenderYear(){
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2012-02-01
+
+Test content
+EOD;
+
+		$posts	= array(
+			new \Blight\Post($this->blog, $content, 'test-1'),
+			new \Blight\Post($this->blog, $content, 'test-2'),
+			new \Blight\Post($this->blog, $content, 'test-3')
+		);
+
+		$this->manager->set_mock_posts($posts, 'posts');
+
+		$years	= $this->manager->get_posts_by_year();
+		foreach($years as $year){
+			if($year->get_name() == '2012'){
+				$this->renderer->render_year($year);
+				break;
+			}
+		}
+
+		$this->assertTrue(file_exists($this->blog->get_path_www().'archive/2012.html'));
+	}
 
 	/**
 	 * @covers \Blight\Renderer::render_tags

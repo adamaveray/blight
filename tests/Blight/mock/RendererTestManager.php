@@ -23,10 +23,19 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 
 	public function get_posts_by_year(){
 		$posts	= $this->get_posts();
-		$year	= new \Blight\Collections\Year($this->blog, $posts[0]->get_date()->format('Y'));
-		$year->set_posts($posts);
+		$years	= array();
 
-		return array($year);
+		foreach($posts as $post){
+			/** @var \Blight\Post $post  */
+			$y	= $post->get_date()->format('Y');
+			if(!isset($years[$y])){
+				$years[$y]	= new \Blight\Collections\Year($this->blog, $y);
+			}
+
+			$years[$y]->add_post($post);
+		}
+
+		return $years;
 	}
 
 	public function get_posts_by_tag(){
