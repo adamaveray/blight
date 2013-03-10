@@ -10,7 +10,7 @@ interface Collection {
 
 	public function set_posts($posts);
 
-	public function add_post(\Blight\Post $post);
+	public function add_post(\Blight\Interfaces\Post $post);
 
 	public function get_posts();
 };

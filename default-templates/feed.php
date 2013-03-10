@@ -1,15 +1,15 @@
 <?php
-/** @var \Blight\Blog $blog */
+/** @var \Blight\Interfaces\Blog $blog */
 
-function post_title(\Blight\Blog $blog, \Blight\Post $post, $title){
+function post_title(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Post $post, $title){
 	return $title;
 }
 
-function post_url(\Blight\Blog $blog, \Blight\Post $post, $url){
+function post_url(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Post $post, $url){
 	return $url;
 }
 
-function post_content(\Blight\Blog $blog, \Blight\Post $post, $content){
+function post_content(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Post $post, $content){
 	if($post->is_linked()){
 		// Append permalink link
 		$content	.= "\n\n".'<p><a href="'.$post->get_permalink().'">∞ Permalink</a></p>';
@@ -59,7 +59,7 @@ $channel	= $dom->createElement('channel');
 	));
 
 	foreach($posts as $post){
-		/** @var \Blight\Post $post */
+		/** @var \Blight\Interfaces\Post $post */
 		$item	= $dom->createElement('item');
 
 			create_node($dom, $item, 'title', post_title($blog, $post, $post->get_title()));

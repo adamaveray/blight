@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * Handles all generation and outputting of final static files created from posts
  */
-class Renderer {
+class Renderer implements \Blight\Interfaces\Renderer {
 	protected $blog;
 	protected $manager;
 
@@ -19,11 +19,11 @@ class Renderer {
 	/**
 	 * Initialises the output renderer
 	 *
-	 * @param \Blight\Blog $blog
-	 * @param \Blight\Manager $manager
-	 * @throws \InvalidArgumentException	Web or template directories cannot be opened
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @param \Blight\Interfaces\Manager $manager
+	 * @throws \RuntimeException	Web or templates directory cannot be found
 	 */
-	public function __construct(Blog $blog, Manager $manager){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager){
 		$this->blog		= $blog;
 		$this->manager	= $manager;
 
@@ -35,7 +35,7 @@ class Renderer {
 			}
 		}
 		if(!is_dir($blog->get_path_templates())){
-			throw new \InvalidArgumentException('Templates directory cannot be found');
+			throw new \RuntimeException('Templates directory cannot be found');
 		}
 	}
 
@@ -96,9 +96,9 @@ class Renderer {
 	/**
 	 * Generates and saves the static file for the given post
 	 *
-	 * @param Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Post $post	The post to generate the page for
 	 */
-	public function render_post(Post $post){
+	public function render_post(\Blight\Interfaces\Post $post){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
 		$this->render_template_to_file('post', $path, array(
@@ -116,7 +116,7 @@ class Renderer {
 		$output_path	= $this->blog->get_path_drafts_web();
 
 		foreach($drafts as $draft_post){
-			/** @var \Blight\Post $draft_post */
+			/** @var \Blight\Interfaces\Post $draft_post */
 			$path	= $output_path.$draft_post->get_slug().'.html';
 			$this->render_template_to_file('post', $path, array(
 				'post'			=> $draft_post,
@@ -212,7 +212,7 @@ class Renderer {
 	protected function render_collection(\Blight\Interfaces\Collection $collection, $collection_type, $page_title, $options = null){
 		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		), $options);
+		), (array)$options);
 
 		$pages	= $this->paginate_collection($collection, $options['per_page']);
 
@@ -288,7 +288,7 @@ class Renderer {
 	public function render_home($options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
-		), $options);
+		), (array)$options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -315,7 +315,7 @@ class Renderer {
 	public function render_feed($options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
-		), $options);
+		), (array)$options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
