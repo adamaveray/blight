@@ -347,6 +347,8 @@ EOD;
 			new \Blight\Post($this->blog, $content, 'test-3')
 		);
 
+		$this->manager->set_mock_posts($posts, 'posts');
+
 		$this->renderer->render_feed();
 
 		$path	= $this->blog->get_path_www('feed.xml');
