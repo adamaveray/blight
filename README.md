@@ -178,3 +178,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
                 titles are prefixed with a glyph)
 - **link_character**: The glyph to prefix linked posts with when the **linkblog** option is disabled
 - **post_character**: The glyph to prefix non-linked posts with when the **linkblog** option is enabled
+
+### Output
+
+- **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size

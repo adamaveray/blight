@@ -95,7 +95,12 @@ class Template implements \Blight\Interfaces\Template {
 		extract($params);
 		ob_start();
 		include($this->blog->get_path_templates($this->filename));
-		return ob_get_clean();
+		$output	= ob_get_clean();
+		if($this->blog->get('minify_html', 'output', false)){
+			$output	= $this->minify_html($output);
+		}
+
+		return $output;
 	}
 
 	/**
@@ -105,7 +110,22 @@ class Template implements \Blight\Interfaces\Template {
 	 * @return string		The rendered content from the template
 	 */
 	protected function render_twig($params){
-		return $this->get_twig_environment()->render($this->filename, $params);
+		$output	= $this->get_twig_environment()->render($this->filename, $params);
+		if($this->blog->get('minify_html', 'output', false)){
+			$output	= $this->minify_html($output);
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Minifies the provided HTML by removing whitespace, etc
+	 *
+	 * @param string $html	The raw HTML to minify
+	 * @return string		The minified HTML
+	 */
+	protected function minify_html($html){
+		return \MinifyHTML::minify($html);
 	}
 
 
