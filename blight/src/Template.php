@@ -117,9 +117,7 @@ class Template implements \Blight\Interfaces\Template {
 	protected function get_twig_environment(){
 		if(!isset(self::$twig_environment)){
 			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
-			self::$twig_environment	= new \Twig_Environment($loader, array(
-				'cache' => $this->blog->get_path_cache('twig/')
-			));
+			self::$twig_environment	= new \Twig_Environment($loader);
 
 			// Set up filters
 			$blog	= $this->blog;
