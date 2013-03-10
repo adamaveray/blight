@@ -1,7 +1,7 @@
 <?php
 namespace Blight\Interfaces;
 
-interface Post {
+interface Post extends \Blight\Interfaces\Page {
 	public function __construct(\Blight\Interfaces\Blog $blog, $content, $slug, $is_draft = false);
 
 	public function get_title($raw = false);
