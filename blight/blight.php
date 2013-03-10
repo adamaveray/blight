@@ -25,7 +25,7 @@ function debug_output($message){
 }
 
 // Initialise blog
-$root_path	= dirname(__DIR__).'/';
+$root_path	= str_replace('phar://', '', dirname(__DIR__)).'/';
 $config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
 	'root_path'	=> $root_path
 ));
