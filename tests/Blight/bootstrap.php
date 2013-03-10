@@ -15,6 +15,7 @@ $config	= array(
 	'description'	=> 'Test blog description',
 
 	'paths'	=> array(
+		'pages'			=> 'blog-data/pages/',
 		'posts'			=> 'blog-data/posts/',
 		'drafts'		=> 'blog-data/drafts/',
 		'templates'		=> 'blog-data/templates/',

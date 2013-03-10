@@ -94,6 +94,33 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	}
 
 	/**
+	 * Generates and saves the static file for the given page
+	 *
+	 * @param \Blight\Interfaces\Page $page	The page to generate an HTML page from
+	 */
+	public function render_page(\Blight\Interfaces\Page $page){
+		$path	= $this->blog->get_path_www($page->get_relative_permalink().'.html');
+
+		$this->render_template_to_file('page', $path, array(
+			'page'			=> $page,
+			'page_title'	=> $page->get_title()
+		));
+	}
+
+	/**
+	 * Generates and saves the static files for all pages. Pages are retrieved from the
+	 * Manager set during construction
+	 */
+	public function render_pages(){
+		$pages	= $this->manager->get_pages();
+
+		foreach($pages as $page){
+			/** @var \Blight\Interfaces\Page $page */
+			$this->render_page($page);
+		}
+	}
+
+	/**
 	 * Generates and saves the static file for the given post
 	 *
 	 * @param \Blight\Interfaces\Post $post	The post to generate the page for

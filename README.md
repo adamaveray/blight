@@ -16,6 +16,7 @@ After installation, your directory structure should look like the following:
 	
 	blog-data/
 		drafts/
+		pages/
 		posts/
 		templates/
 	
@@ -25,7 +26,7 @@ After installation, your directory structure should look like the following:
 		
 The paths to these directories are stored in the `config.ini` file, so to change the directory structure, simply update this file.
 
-The application will need write access to the `drafts/`, `posts/`, `templates/` and web directories.
+The application will need write access to the `drafts/`, `posts/`, `pages/`, `templates/` and web directories.
 
 
 ## Authoring
@@ -47,6 +48,10 @@ The title and content are standard Markdown. The headers section under the title
 Draft posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be displayed on the site itself.
 
 When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
+
+### Pages
+
+Simple pages in the same format as posts can be saved to the `pages/` directory, and will have a separate page generated in the public site area, but will not be listed along with posts.
 
 
 ### Special Headers
@@ -132,6 +137,14 @@ The following variables are available to post pages:
 - **$post_prev**: The previous/older post neighboring the current post, useful for adding next/prev post links. This value may not always be set.
 - **$post_next**: The next/newer post neighboring the current post. This value may not always be set.
 
+### Page
+
+The **page** template displays individual pages
+
+The following variables are available to page-pages:
+
+- **$page**: The Page instance for the current page
+
 
 ## Config
 
@@ -145,6 +158,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 
 ### Paths
 
+- **pages**: The path to the page source files directory
 - **posts**: The path to the posts directory
 - **drafts**: The path to the drafts directory
 - **templates**: The path to the templates directory

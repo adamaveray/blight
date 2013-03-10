@@ -35,6 +35,18 @@ class Manager implements \Blight\Interfaces\Manager {
 	}
 
 	/**
+	 * Locates all files within the pages directory
+	 *
+	 * @return array	A list of filenames for each page file found
+	 */
+	protected function get_raw_pages(){
+		$dir	= $this->blog->get_path_pages();
+		$files	= glob($dir.'*.*');
+
+		return $files;
+	}
+
+	/**
 	 * Locates all files within the posts directory
 	 *
 	 * @param bool $drafts	Whether to return only drafts or only published posts
@@ -127,18 +139,38 @@ class Manager implements \Blight\Interfaces\Manager {
 	}
 
 	/**
-	 * Retrieves all pages found as arrays
+	 * Retrieves all pages found as Page objects
 	 *
 	 * @return array	An array of pages
 	 */
 	public function get_pages(){
 		if(!isset($this->pages)){
-			$this->pages	= array();
-			$this->pages[]	=  array(
-				'name'	=> 'Home',
-				'url'	=> $this->blog->get_url()
-			);
+			$files	= $this->get_raw_pages();
+
+			$pages	= array();
+
+			foreach($files as $file){
+				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
+				if(!in_array($extension, $this->allowed_extensions)){
+					// Unknown filetype - ignore
+					continue;
+				}
+
+				$content	= $this->blog->get_file_system()->load_file($file);
+
+				// Create page object
+				try {
+					$page	= new \Blight\Page($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME));
+				} catch(\Exception $e){
+					continue;
+				}
+
+				$pages[]	= $page;
+			}
+
+			$this->pages	= $pages;
 		}
+
 		return $this->pages;
 	}
 
