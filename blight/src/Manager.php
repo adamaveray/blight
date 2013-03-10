@@ -4,13 +4,14 @@ namespace Blight;
 /**
  * Handles all raw posts and provides basic sorting and processing functionality
  */
-class Manager {
+class Manager implements \Blight\Interfaces\Manager {
 	protected $blog;
 
 	protected $posts;
 	protected $posts_by_year;
 	protected $posts_by_tag;
 	protected $posts_by_category;
+	protected $draft_posts;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -20,27 +21,33 @@ class Manager {
 	/**
 	 * Initialises the posts manager
 	 *
-	 * @param Blog $blog
-	 * @throws \InvalidArgumentException	Posts directory cannot be opened
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @throws \RuntimeException	Posts directory cannot be opened
 	 */
-	public function __construct(Blog $blog){
+	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 
 		if(!is_dir($blog->get_path_posts())){
-			throw new \InvalidArgumentException('No directory given');
+			throw new \RuntimeException('Posts directory not found');
 		}
 	}
 
 	/**
 	 * Locates all files within the posts directory
 	 *
+	 * @param bool $drafts	Whether to return only drafts or only published posts
 	 * @return array	A list of filenames for each post file found
 	 */
-	protected function get_raw_posts(){
-		$files	= array_merge(
-			glob($this->blog->get_path_posts('*.*')),		// Unsorted
-			glob($this->blog->get_path_posts('*/*/*.*'))	// Sorted (YYYY/DD/post.md)
-		);
+	protected function get_raw_posts($drafts = false){
+		$dir	= ($drafts ? $this->blog->get_path_drafts() : $this->blog->get_path_posts());
+		$files	= glob($dir.'*.*');
+
+		if(!$drafts){
+			$files	= array_merge(
+				$files,		// Unsorted
+				glob($dir.'*/*/*.*')	// Sorted (YYYY/DD/post.md)
+			);
+		}
 
 		return $files;
 	}
@@ -49,7 +56,7 @@ class Manager {
 	 * Converts a post file to a Post object
 	 *
 	 * @param string $raw_post	The path to a post file
-	 * @return \Blight\Post		The post built from the provided file
+	 * @return \Blight\Interfaces\Post		The post built from the provided file
 	 */
 	protected function build_post($raw_post){
 		$content	= $this->blog->get_file_system()->load_file($raw_post);
@@ -65,10 +72,46 @@ class Manager {
 	/**
 	 * Moves a post source file to a more-logical location. Moves files to YYYY/MM/YYYY-MM-DD-post.md
 	 *
-	 * @param \Blight\Post $post	The post to move
+	 * @param \Blight\Interfaces\Post $post	The post to move
 	 * @param string $current_path	The current path to the post's file
 	 */
-	protected function organise_post_file(Post $post, $current_path){
+	protected function organise_post_file(\Blight\Interfaces\Post $post, $current_path){
+		// Check for special headers
+		$has_date		= $post->has_meta('date');
+		$has_publish	= $post->has_meta('publish-now');
+		if(!$has_date || $has_publish){
+			$lines	= explode("\n", $this->blog->get_file_system()->load_file($current_path));
+
+			if($has_publish){
+				// Remove publish header
+				$count	= count($lines);
+				for($i = 2; $i < $count; $i++){
+					$line	= rtrim($lines[$i]);
+					if($line === ''){
+						// Reached end of header
+						break;
+					}
+
+					if(preg_match('/^publish[- ]now$/i', strtolower($line))){
+						// Found header
+						array_splice($lines, $i, 1);
+						break;
+					}
+				}
+			}
+
+			if(!$has_date && ($has_publish || !$post->is_draft())){
+				// Add date header
+				$now	= new \DateTime();
+				$post->set_date($now);
+				$date_line	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
+				array_splice($lines, 2, 0, $date_line);
+			}
+
+			// Update file
+			$this->blog->get_file_system()->create_file($current_path, implode("\n", $lines));
+		}
+
 		// Build filename
 		$new_path	= $post->get_relative_permalink().'.'.current($this->allowed_extensions);
 		$new_path	= $this->blog->get_path_posts(pathinfo($new_path, \PATHINFO_DIRNAME).'/'.$post->get_date()->format('Y-m-d').'-'.pathinfo($new_path, \PATHINFO_BASENAME));
@@ -78,7 +121,48 @@ class Manager {
 			return;
 		}
 
-		$this->blog->get_file_system()->move_file($current_path, $new_path, true);
+		$this->blog->get_file_system()->move_file($current_path, $new_path, !$post->is_draft());	// Don't clean up drafts
+	}
+
+	/**
+	 * Retrieves all draft posts found as Post objects
+	 *
+	 * @return array	An array of posts
+	 */
+	public function get_draft_posts(){
+		if(!isset($this->draft_posts)){
+			$files	= $this->get_raw_posts(true);
+			$posts	= array();
+
+			foreach($files as $file){
+				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
+				if(!in_array($extension, $this->allowed_extensions)){
+					// Unknown filetype - ignore
+					continue;
+				}
+
+				$content	= $this->blog->get_file_system()->load_file($file);
+
+				// Create post object
+				try {
+					$post	= new Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
+				} catch(\Exception $e){
+					continue;
+				}
+
+				if($post->has_meta('publish-now')){
+					// Publish post
+					$this->organise_post_file($post, $file);
+					continue;
+				}
+
+				$posts[]	= $post;
+			}
+
+			$this->draft_posts	= $posts;
+		}
+
+		return $this->draft_posts;
 	}
 
 	/**
@@ -159,11 +243,13 @@ class Manager {
 
 			// Group post by category
 			$category	= $post->get_category();
-			$slug		= $category->get_slug();
-			if(!isset($this->posts_by_category[$slug])){
-				$this->posts_by_category[$slug]	= $category;
+			if(isset($category)){
+				$slug		= $category->get_slug();
+				if(!isset($this->posts_by_category[$slug])){
+					$this->posts_by_category[$slug]	= $category;
+				}
+				$this->posts_by_category[$slug]->add_post($post);
 			}
-			$this->posts_by_category[$slug]->add_post($post);
 		}
 
 		ksort($this->posts_by_tag);
@@ -237,5 +323,32 @@ class Manager {
 		}
 
 		return $this->posts_by_category;
+	}
+
+	/**
+	 * Deletes any rendered drafts without an associated draft post
+	 */
+	public function cleanup_drafts(){
+		$posts_dir	= $this->blog->get_path_drafts();
+		$files	= glob($this->blog->get_path_drafts_web('*.html'));
+		foreach($files as $file){
+			$slug	= pathinfo($file, \PATHINFO_BASENAME);
+
+			$found	= false;
+			foreach($this->allowed_extensions as $ext){
+				if(file_exists($posts_dir.$slug.'.'.$ext)){
+					$found	= true;
+					break;
+				}
+			}
+
+			if($found){
+				// Post exists - ignore
+				continue;
+			}
+
+			// Post not found - remove
+			$this->blog->get_file_system()->delete_file($file);
+		}
 	}
 };

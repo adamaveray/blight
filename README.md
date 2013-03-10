@@ -1,7 +1,7 @@
 Blight
 ======
 
-Blight is (another) Markdown-powered static blogging engine. It is a simple, light blog app with easy setup and administration.
+Blight is a Markdown-powered static blogging engine.
 
 
 ## Installation
@@ -15,6 +15,7 @@ After installation, your directory structure should look like the following:
 	blight/
 	
 	blog-data/
+		drafts/
 		posts/
 		templates/
 	
@@ -24,12 +25,12 @@ After installation, your directory structure should look like the following:
 		
 The paths to these directories are stored in the `config.ini` file, so to change the directory structure, simply update this file.
 
-The application will need write access to the `posts/`, `templates/`, and the web directory.
+The application will need write access to the `drafts/`, `posts/`, `templates/` and web directories.
 
 
 ## Authoring
 
-New posts should be added to the `posts/` directory. The filename will become the post's URL slug, so for example a post with the file `test-post.md` will become `2013/02/test-post.md`.
+New posts should be added to the `drafts/` or `posts/` directories. The filename will become the post's URL slug, so for example a post with the file `test-post.md` will become `2013/02/test-post.md`.
 
 A new post should be formatted as follows:
 
@@ -40,6 +41,12 @@ A new post should be formatted as follows:
 	Content
 	
 The title and content are standard Markdown. The headers section under the title allows you to set a number of options and metadata for your post MultiMarkdown-style. Simply include the name of the header, a colon, spaces or tabs, and the value for that option. Parameters are case-insensitive.
+
+### Drafts
+
+Draft posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be displayed on the site itself.
+
+When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
 
 
 ### Special Headers
@@ -113,9 +120,17 @@ For each of the different listing types, the page's `Collection` object itself w
 
 Additionally, if pagination is enabled in the `config.ini` file, the following variables are available:
 
-- **$pagination**: An array containing the pagination details. If this array is not set, pagination is disabled
-	- **$pagination['current']**: The current page number (1-indexed)
-	- **$pagination['pages']**: An array containing each page's details in the format `page_no => 'url'`
+- **$pagination**: A `Pagination` instance. If this parameter is not set, pagination is disabled
+
+### Post
+
+The **post** template displays individual posts on separate pages, where their permalinks will point to.
+
+The following variables are available to post pages:
+
+- **$post**: The Post instance for the current page
+- **$post_prev**: The previous/older post neighboring the current post, useful for adding next/prev post links. This value may not always be set.
+- **$post_next**: The next/newer post neighboring the current post. This value may not always be set.
 
 
 ## Config
@@ -131,8 +146,10 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 ### Paths
 
 - **posts**: The path to the posts directory
+- **drafts**: The path to the drafts directory
 - **templates**: The path to the templates directory
 - **web**: The path to output rendered files to
+- **drafts_web**: The path to output rendered draft post files to
 - **cache**: The path various cache files can be written to
 
 ### Limits
@@ -147,10 +164,3 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
                 titles are prefixed with a glyph)
 - **link_character**: The glyph to prefix linked posts with when the **linkblog** option is disabled
 - **post_character**: The glyph to prefix non-linked posts with when the **linkblog** option is enabled
-
-
-## Planned Features
-
-- Drafts
-- Basic web admin
-- Hooks

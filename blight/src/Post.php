@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * A blog post
  */
-class Post {
+class Post implements \Blight\Interfaces\Post {
 	protected $blog;
 
 	protected $title;
@@ -12,8 +12,10 @@ class Post {
 	protected $date;
 	protected $content;
 	protected $metadata;
+	protected $year;
 	protected $tags;
 	protected $category;
+	protected $is_draft;
 
 	protected $link;
 	protected $permalink;
@@ -21,13 +23,16 @@ class Post {
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
 	 *
-	 * @param Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 * @param string $content	The raw Markdown content for the post
 	 * @param string $slug		The post URL slug
+	 * @param bool $is_draft	Whether the post is a draft
 	 * @throws \InvalidArgumentException	Article date is invalid
 	 */
-	public function __construct(Blog $blog, $content, $slug){
+	public function __construct(\Blight\Interfaces\Blog $blog, $content, $slug, $is_draft = false){
 		$this->blog	= $blog;
+
+		$this->is_draft	= $is_draft;
 
 		$data	= $this->parse_content($content);
 
@@ -35,15 +40,12 @@ class Post {
 		$this->content	= $data['content'];
 		$this->metadata	= $data['metadata'];
 
-		try {
-			if(!$this->has_meta('date')){
-				throw new \Exception();
+		if($this->has_meta('date')){
+			try {
+				$this->date	= new \DateTime($this->get_meta('date'));
+			} catch(\Exception $e){
+				throw new \InvalidArgumentException('Article date invalid');
 			}
-
-			$this->date	= new \DateTime($this->get_meta('date'));
-
-		} catch(\Exception $e){
-			throw new \InvalidArgumentException('Article date invalid');
 		}
 
 		$this->slug	= strtolower($slug);
@@ -114,11 +116,12 @@ class Post {
 	 * @return string	The post title
 	 */
 	public function get_title($raw = false){
+		$prepend	= '';
+		
 		if(!$raw){
 			$is_linkblog	= $this->blog->is_linkblog();
 			$is_linkpost	= $this->is_linked();
 
-			$prepend	= '';
 			if($is_linkblog && !$is_linkpost){
 				// Unlinked post - prepend glyph
 				$prepend	= $this->blog->get('post_character', 'linkblog', '★').' ';
@@ -141,9 +144,25 @@ class Post {
 
 	/**
 	 * @return \DateTime	The post date
+	 * @throws \RuntimeException	The post does not have a date set
 	 */
 	public function get_date(){
+		if(!isset($this->date)){
+			if($this->is_draft()){
+				// Draft - use current date
+				return new \DateTime();
+			} else {
+				throw new \RuntimeException('Post does not have date set');
+			}
+		}
 		return $this->date;
+	}
+
+	/**
+	 * @param \DateTime $date	The new date for the post
+	 */
+	public function set_date(\DateTime $date){
+		$this->date	= $date;
 	}
 
 	/**
@@ -163,7 +182,7 @@ class Post {
 	/**
 	 * Gets a metadata value for the post
 	 *
-	 * @param $string name	The metadata to retrieve
+	 * @param string $name	The metadata to retrieve
 	 * @return mixed|null	The metadata value if set, or null
 	 */
 	public function get_meta($name){
@@ -190,8 +209,8 @@ class Post {
 	/**
 	 * Converts a metadata name to a standardised format, with punctuation, etc removed
 	 *
-	 * @param $name		The metadata name to convert
-	 * @return string	The converted name
+	 * @param string $name	The metadata name to convert
+	 * @return string		The converted name
 	 */
 	protected function normalise_meta_name($name){
 		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
@@ -233,7 +252,7 @@ class Post {
 	 * @return string	The URL to the post without the prefixed site URL
 	 */
 	public function get_relative_permalink(){
-		return $this->date->format('Y/m').'/'.$this->slug;
+		return $this->get_date()->format('Y/m').'/'.$this->slug;
 	}
 
 	/**
@@ -258,10 +277,15 @@ class Post {
 	 * @return array	An array of Tag collections
 	 */
 	public function get_tags(){
-		if(!isset($this->tags) && $this->has_meta('tags')){
-			$this->tags	= array_map(function($item){
-				return new \Blight\Collections\Tag($this->blog, trim($item));
-			}, explode(',', $this->get_meta('tags')));
+		if(!isset($this->tags)){
+			if($this->has_meta('tags')){
+				$this->tags	= array_map(function($item){
+					return new \Blight\Collections\Tag($this->blog, trim($item));
+				}, explode(',', $this->get_meta('tags')));
+			} else {
+				// No tags
+				$this->tags	= array();
+			}
 		}
 
 		return $this->tags;
@@ -280,6 +304,13 @@ class Post {
 		}
 
 		return $this->category;
+	}
+
+	/**
+	 * @return bool	Whether the post is a draft
+	 */
+	public function is_draft(){
+		return (bool)$this->is_draft;
 	}
 
 	/**

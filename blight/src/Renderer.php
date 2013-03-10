@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * Handles all generation and outputting of final static files created from posts
  */
-class Renderer {
+class Renderer implements \Blight\Interfaces\Renderer {
 	protected $blog;
 	protected $manager;
 
@@ -19,11 +19,11 @@ class Renderer {
 	/**
 	 * Initialises the output renderer
 	 *
-	 * @param \Blight\Blog $blog
-	 * @param \Blight\Manager $manager
-	 * @throws \InvalidArgumentException	Web or template directories cannot be opened
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @param \Blight\Interfaces\Manager $manager
+	 * @throws \RuntimeException	Web or templates directory cannot be found
 	 */
-	public function __construct(Blog $blog, Manager $manager){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager){
 		$this->blog		= $blog;
 		$this->manager	= $manager;
 
@@ -35,7 +35,7 @@ class Renderer {
 			}
 		}
 		if(!is_dir($blog->get_path_templates())){
-			throw new \InvalidArgumentException('Templates directory cannot be found');
+			throw new \RuntimeException('Templates directory cannot be found');
 		}
 	}
 
@@ -96,15 +96,50 @@ class Renderer {
 	/**
 	 * Generates and saves the static file for the given post
 	 *
-	 * @param Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Post|null $prev	The adjacent previous/older post to the given post
+	 * @param \Blight\Interfaces\Post|null $next	The adjacent next/newer post to the given post
+	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Post
 	 */
-	public function render_post(Post $post){
+	public function render_post(\Blight\Interfaces\Post $post, $prev = null, $next = null){
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
-		$this->render_template_to_file('post', $path, array(
+		$params	= array(
 			'post'			=> $post,
 			'page_title'	=> $post->get_title()
-		));
+		);
+		if(isset($prev)){
+			if(!($prev instanceof \Blight\Interfaces\Post)){
+				throw new \InvalidArgumentException('Previous post must be instance of \Blight\Interfaces\Post');
+			}
+			$params['post_prev']	= $prev;
+		}
+		if(isset($next)){
+			if(!($next instanceof \Blight\Interfaces\Post)){
+				throw new \InvalidArgumentException('Next post must be instance of \Blight\Interfaces\Post');
+			}
+			$params['post_next']	= $next;
+		}
+
+		$this->render_template_to_file('post', $path, $params);
+	}
+
+	/**
+	 * Generates and saves the static files for all draft posts.
+	 */
+	public function render_drafts(){
+		$drafts	= $this->manager->get_draft_posts();
+
+		$output_path	= $this->blog->get_path_drafts_web();
+
+		foreach($drafts as $draft_post){
+			/** @var \Blight\Interfaces\Post $draft_post */
+			$path	= $output_path.$draft_post->get_slug().'.html';
+			$this->render_template_to_file('post', $path, array(
+				'post'			=> $draft_post,
+				'page_title'	=> $draft_post->get_title()
+			));
+		}
 	}
 
 	/**
@@ -194,7 +229,7 @@ class Renderer {
 	protected function render_collection(\Blight\Interfaces\Collection $collection, $collection_type, $page_title, $options = null){
 		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
-		), $options);
+		), (array)$options);
 
 		$pages	= $this->paginate_collection($collection, $options['per_page']);
 
@@ -217,9 +252,9 @@ class Renderer {
 	 *		array (
 	 * 			'path-to-page'	=> array(
 	 * 				'posts'	=> array(),
-	 * 				'pagination'	=> array(
-	 * 					'pages'		=> (array)[all pages]
-	 * 					'current'	=> (int)[current page]
+	 * 				\Pagination	=> (
+	 * 					get_items()		// All pages
+	 * 					get_position()	// Current page
 	 * 				)
 	 * 			)
 	 *		)
@@ -248,11 +283,8 @@ class Renderer {
 		for($page = 0; $page < $no_pages; $page++){
 			$url	= $collection->get_url().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 			$return_pages[$url]	= array(
-				'posts'	=> array_slice($posts, ($page-1)*$per_page, $per_page),
-				'pagination'	=> array(
-					'pages'		=> $pages,
-					'current'	=> $page+1
-				)
+				'posts'			=> array_slice($posts, ($page-1)*$per_page, $per_page),
+				'pagination'	=> new \Blight\Pagination($pages, $page+1)
 			);
 		}
 
@@ -270,7 +302,7 @@ class Renderer {
 	public function render_home($options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
-		), $options);
+		), (array)$options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();
@@ -297,7 +329,7 @@ class Renderer {
 	public function render_feed($options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
-		), $options);
+		), (array)$options);
 
 		// Prepare posts
 		$posts	= $this->manager->get_posts();

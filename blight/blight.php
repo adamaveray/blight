@@ -1,7 +1,7 @@
 <?php
 /**
  * Blight
- * v0.3
+ * v0.4
  */
 namespace Blight;
 
@@ -49,12 +49,20 @@ debug_output('Archive built');
 $renderer	= new Renderer($blog, $manager);
 debug_output('Renderer initialised');
 
+	// Render draft posts
+	$renderer->render_drafts();
+	debug_output('Drafts rendered');
+
 	// Render posts and archives
 	foreach($archive as $year){
 		/** @var \Blight\Collections\Year $year */
 		// Render posts
-		foreach($year as $post){
-			$renderer->render_post($post);
+		$posts		= $year->get_posts();
+		$no_posts	= count($posts);
+		for($i = 0; $i < $no_posts; $i++){
+			$prev	= (isset($posts[$i+1]) ? $posts[$i+1] : null);
+			$next	= (isset($posts[$i-1]) ? $posts[$i-1] : null);
+			$renderer->render_post($posts[$i], $prev, $next);
 		}
 		debug_output('Year "%s" posts rendered', $year->get_name());
 
@@ -90,6 +98,9 @@ debug_output('Renderer initialised');
 	debug_output('Feed rendered');
 
 // Rendering completed
+
+$manager->cleanup_drafts();
+
 debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
 debug_output('Peak Memory: '.floor(memory_get_usage()/1024).'KB');
 if(IS_CLI){

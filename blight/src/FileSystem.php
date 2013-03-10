@@ -4,8 +4,8 @@ namespace Blight;
 /**
  * Provides utility helper methods for interacting with the local filesystem
  */
-class FileSystem {
-	/** @var \Blight\Blog */
+class FileSystem implements \Blight\Interfaces\FileSystem {
+	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 	/**
 	 * @var array	Files to be ignored while checking for empty directories
@@ -15,9 +15,9 @@ class FileSystem {
 	/**
 	 * Initialises the FileSystem manager
 	 *
-	 * @param Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 */
-	public function __construct(Blog $blog){
+	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 	}
 
@@ -52,8 +52,10 @@ class FileSystem {
 	 * @throws \RuntimeException	The file cannot be read
 	 */
 	public function load_file($path){
-		$content	= file_get_contents($path);
-		if($content === false){
+		if(file_exists($path)){
+			$content	= file_get_contents($path);
+		}
+		if(!isset($content) || $content === false){
 			throw new \RuntimeException('Cannot read '.$path);
 		}
 
@@ -121,6 +123,7 @@ class FileSystem {
 	 * @see mkdir()
 	 */
 	public function create_dir($path, $mode = 0777, $recursive = true){
+		$path	= rtrim($path, '/');
 		if(is_dir($path)){
 			// Already exists
 			return;
@@ -145,6 +148,9 @@ class FileSystem {
 	 * @throws \RuntimeException	Cannot create target directory
 	 */
 	public function copy_dir($source_dir, $target_dir, $mode = 0777, $recursive = true){
+		$source_dir	= rtrim($source_dir, '/');
+		$target_dir	= rtrim($target_dir, '/');
+
 		if(!is_dir($source_dir)){
 			throw new \RuntimeException('Source dir does not exist');
 		}

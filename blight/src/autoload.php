@@ -15,7 +15,7 @@ spl_autoload_register(function($class){
 		$new_path	= $dir.'/'.$file.'/'.$file.'.php';
 
 		if(!file_exists($new_path)){
-			throw new \Exception('Class "'.$class.'" not found at '.$new_path);
+			return;
 		}
 
 		$path	= $new_path;

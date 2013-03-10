@@ -4,7 +4,7 @@ namespace Blight;
 /**
  * Provides utility helper methods for manipulating blocks of text
  */
-class TextProcessor {
+class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	protected $blog;
 
 	/** @var \phpTypograhy */
@@ -17,9 +17,9 @@ class TextProcessor {
 	/**
 	 * Initialises the processor
 	 *
-	 * @param Blog $blog
+	 * @param \Blight\Interfaces\Blog $blog
 	 */
-	public function __construct(Blog $blog){
+	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 	}
 

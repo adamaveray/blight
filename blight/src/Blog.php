@@ -4,10 +4,10 @@ namespace Blight;
 /**
  * Stores configuration data for the blog
  */
-class Blog {
+class Blog implements \Blight\Interfaces\Blog {
 	protected $config;
 
-	/** @var \Blight\FileSystem */
+	/** @var \Blight\Interfaces\FileSystem */
 	protected $file_system;
 
 	protected $root_path;
@@ -19,8 +19,13 @@ class Blog {
 	 * Processes all configuration settings for the blog
 	 *
 	 * @param array $config	An associative array of config settings
+	 * @throws \InvalidArgumentException	The config settings provided are incomplete
 	 */
 	public function __construct($config){
+		if(!is_array($config)){
+			throw new \InvalidArgumentException('Config must be provided as an array');
+		}
+
 		$this->root_path	= rtrim($config['root_path'], '/').'/';
 
 		$fields	= array(
@@ -28,21 +33,36 @@ class Blog {
 			'name'
 		);
 		foreach($fields as $field){
+			if(!isset($config[$field])){
+				throw new \InvalidArgumentException('Config is missing `'.$field.'`');
+			}
 			$this->{$field}	= $config[$field];
 		}
 
-		foreach($config['paths'] as $key => $path){
-			if($path[0] != '/'){
-				$config['paths'][$key]	= $this->get_path_root($path);
-			}
-			$config['paths'][$key]	= rtrim($config['paths'][$key], '/').'/';
+		if(!isset($config['paths'])){
+			throw new \InvalidArgumentException('Config is missing `paths`');
 		}
+
 		$this->paths	= array(
-			'www'		=> $config['paths']['web'],
-			'posts'		=> $config['paths']['posts'],
-			'templates'	=> $config['paths']['templates'],
-			'cache'		=> $config['paths']['cache']
+			'www'			=> 'web',
+			'drafts-web'	=> 'drafts-web',
+			'posts'			=> 'posts',
+			'drafts'		=> 'drafts',
+			'templates'		=> 'templates',
+			'cache'			=> 'cache'
 		);
+		foreach($this->paths as $key => $config_key){
+			if(!isset($config['paths'][$config_key])){
+				throw new \InvalidArgumentException('Config is missing path `'.$config_key.'`');
+			}
+
+			$path	= $config['paths'][$config_key];
+
+			if($path[0] != '/'){
+				$path	= $this->get_path_root($path);
+			}
+			$this->paths[$key]	= rtrim($path, '/').'/';
+		}
 
 		$this->config	= $config;
 	}
@@ -101,6 +121,28 @@ class Blog {
 	}
 
 	/**
+	 * Returns the path to the draft posts directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_drafts($append = ''){
+		return $this->paths['drafts'].$append;
+	}
+
+	/**
+	 * Returns the path to the rendered drafts HTML directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_drafts_web($append = ''){
+		return $this->paths['drafts-web'].$append;
+	}
+
+	/**
 	 * Returns the path to the web directory
 	 *
 	 * @param string $append	An additonal path fragment to append to the path
@@ -145,7 +187,7 @@ class Blog {
 	/**
 	 * Provides access throughout the application to a common instance of the FileSystem utility class
 	 *
-	 * @return \Blight\FileSystem	The common FileSystem object
+	 * @return \Blight\Interfaces\FileSystem	The common FileSystem object
 	 */
 	public function get_file_system(){
 		if(!isset($this->file_system)){
