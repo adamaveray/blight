@@ -50,6 +50,10 @@ $renderer	= new Renderer($blog, $manager);
 debug_output('Renderer initialised');
 
 	// Render draft posts
+	$renderer->render_pages();
+	debug_output('Pages rendered');
+
+	// Render draft posts
 	$renderer->render_drafts();
 	debug_output('Drafts rendered');
 
