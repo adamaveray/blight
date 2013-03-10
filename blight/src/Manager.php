@@ -41,7 +41,24 @@ class Manager implements \Blight\Interfaces\Manager {
 	 */
 	protected function get_raw_pages(){
 		$dir	= $this->blog->get_path_pages();
-		$files	= glob($dir.'*.*');
+		function get_sub_pages($dir){
+			$dir	= rtrim($dir, '/');
+
+			$files	= array();
+
+			$raw_files	= glob($dir.'/*');
+			foreach($raw_files as $file){
+				if(is_dir($file)){
+					$files	= array_merge($files, get_sub_pages($file));
+				} else {
+					$files[]	= $file;
+				}
+			}
+
+			return $files;
+		};
+
+		$files	= get_sub_pages($dir);
 
 		return $files;
 	}
@@ -146,6 +163,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	public function get_pages(){
 		if(!isset($this->pages)){
 			$files	= $this->get_raw_pages();
+			$dir	= $this->blog->get_path_pages();
 
 			$pages	= array();
 
@@ -160,7 +178,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 				// Create page object
 				try {
-					$page	= new \Blight\Page($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME));
+					$page	= new \Blight\Page($this->blog, $content, preg_replace('/^(.*?)\.\w+?$/', '$1', str_replace($dir, '', $file)));
 				} catch(\Exception $e){
 					continue;
 				}
