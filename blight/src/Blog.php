@@ -224,6 +224,28 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
+	 * @return bool	Whether the site has been fully installed
+	 */
+	public function is_installed(){
+		return false;
+
+		$root	= $this->get_path_root();
+		$dirs	= array(
+			$this->get_path_pages(),
+			$this->get_path_posts(),
+			$this->get_path_www()
+		);
+
+		foreach($dirs as $dir){
+			if(!is_dir($root.$dir)){
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
 	 * Retrieves settings from the blog configation
 	 *
 	 * @param string $parameter		The name of the parameter to retrieve

@@ -29,13 +29,23 @@ $root_path	= str_replace('phar://', '', dirname(__DIR__)).'/';
 $config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
 	'root_path'	=> $root_path
 ));
-$blog	= new Blog($config);
+try {
+	$blog	= new Blog($config);
+} catch(\Exception $e){
+	// Site not installed correctly
+}
 
 
 // Check install
-if(!is_dir($blog->get_path_posts())){
-	require('src/setup.php');
-	debug_output('Set up blog');
+if(!isset($blog) || !$blog->is_installed()){
+	if(isset($_SERVER['REQUEST_URI'])){
+		$controller	= new \Blight\Controllers\Install($blog);
+
+		$controller->get_page($_SERVER['REQUEST_URI']);
+	} else {
+		echo 'Blog not installed - view on web to install'.PHP_EOL;
+	}
+	exit;
 }
 
 
