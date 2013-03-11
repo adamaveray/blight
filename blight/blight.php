@@ -24,22 +24,12 @@ function debug_output($message){
 	echo $timestamp.'-'.$memstamp.': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
 }
 
-// Initialise blog
-$root_path	= str_replace('phar://', '', dirname(__DIR__)).'/';
-$config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
-	'root_path'	=> $root_path
-));
-try {
-	$blog	= new Blog($config);
-} catch(\Exception $e){
-	// Site not installed correctly
-}
-
-
-// Check install
-if(!isset($blog) || !$blog->is_installed()){
+$root_path		= str_replace('phar://', '', dirname(__DIR__)).'/';
+$config_file	= $root_path.'config.json';
+if(!file_exists($config_file)){
+	// Blog not installed
 	if(isset($_SERVER['REQUEST_URI'])){
-		$controller	= new \Blight\Controllers\Install($blog);
+		$controller	= new \Blight\Controllers\Install($root_path, $config_file);
 
 		$controller->get_page($_SERVER['REQUEST_URI']);
 	} else {
@@ -47,6 +37,12 @@ if(!isset($blog) || !$blog->is_installed()){
 	}
 	exit;
 }
+
+// Initialise blog
+$parser	= new \Blight\Config();
+$config	= $parser->parse(file_get_contents($config_file));
+$config['root_path']	= $root_path;
+$blog	= new Blog($config);
 
 
 // Load posts
