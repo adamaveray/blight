@@ -28,15 +28,18 @@ class Blog implements \Blight\Interfaces\Blog {
 
 		$this->root_path	= rtrim($config['root_path'], '/').'/';
 
+		if(!isset($config['site'])){
+			throw new \InvalidArgumentException('Config is missing `site`');
+		}
 		$fields	= array(
 			'url',
 			'name'
 		);
 		foreach($fields as $field){
-			if(!isset($config[$field])){
-				throw new \InvalidArgumentException('Config is missing `'.$field.'`');
+			if(!isset($config['site'][$field])){
+				throw new \InvalidArgumentException('Config is missing site setting `'.$field.'`');
 			}
-			$this->{$field}	= $config[$field];
+			$this->{$field}	= $config['site'][$field];
 		}
 
 		if(!isset($config['paths'])){
@@ -221,28 +224,6 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function is_linkblog(){
 		return (bool)$this->get('linkblog', 'linkblog', false);
-	}
-
-	/**
-	 * @return bool	Whether the site has been fully installed
-	 */
-	public function is_installed(){
-		return false;
-
-		$root	= $this->get_path_root();
-		$dirs	= array(
-			$this->get_path_pages(),
-			$this->get_path_posts(),
-			$this->get_path_www()
-		);
-
-		foreach($dirs as $dir){
-			if(!is_dir($root.$dir)){
-				return false;
-			}
-		}
-
-		return true;
 	}
 
 	/**
