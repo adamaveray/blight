@@ -3,17 +3,19 @@ namespace Blight\Controllers;
 
 class Install {
 	protected $root_path;
+	protected $app_path;
 	protected $template_dir;
 	
 	protected $url_base	= 'index.php?/install/';
 
 	protected $config_file;
 
-	public function __construct($root_path, $file){
+	public function __construct($root_path, $app_path, $file){
 		session_start();
 
 		$this->root_path	= $root_path;
-		$this->template_dir	= $this->root_path.'blight/src/views/install/';
+		$this->app_path		= $app_path;
+		$this->template_dir	= $this->app_path.'src/views/install/';
 
 		$this->config_file	= $file;
 	}
@@ -268,7 +270,7 @@ class Install {
 		}
 
 		// Copy .htaccess
-		$htaccess	= file_get_contents($this->root_path.'blight/src/default.htaccess');
+		$htaccess	= file_get_contents($this->app_path.'src/default.htaccess');
 
 		$web_dir		= explode('/', rtrim($config['paths']['web'],'/'));
 		$htaccess_dir	= $this->root_path.implode('/', array_slice($web_dir, 0, -1));

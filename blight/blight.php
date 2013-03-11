@@ -29,7 +29,7 @@ $config_file	= $root_path.'config.json';
 if(!file_exists($config_file)){
 	// Blog not installed
 	if(isset($_SERVER['REQUEST_URI'])){
-		$controller	= new \Blight\Controllers\Install($root_path, $config_file);
+		$controller	= new \Blight\Controllers\Install($root_path, __DIR__.'/', $config_file);
 
 		$controller->get_page($_SERVER['REQUEST_URI']);
 	} else {

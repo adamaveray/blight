@@ -11,6 +11,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	protected $file_system;
 
 	protected $root_path;
+	protected $app_path;
 	protected $url;
 	protected $name;
 	protected $paths;
@@ -99,7 +100,20 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @see get_root_path()
 	 */
 	public function get_path_app($append = ''){
-		return $this->get_path_root('blight/'.$append);
+		if(!isset($this->app_path)){
+			$dir	= __DIR__;
+			$path	= $this->get_path_root();
+			if(class_exists('\Phar') && \Phar::running()){
+				// Phar
+				$path	= \Phar::running();
+			} else {
+				// Directory
+				$stub	= explode('/', trim(str_replace($dir, '', $dir), '/'));
+				$path	.= current($stub);
+			}
+			$this->app_path	= $path.'/';
+		}
+		return $this->app_path.$append;
 	}
 
 	/**
@@ -189,7 +203,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string|null	The blog description if set, or null
 	 */
 	public function get_description(){
-		return isset($this->config['description']) ? $this->config['description'] : null;
+		return isset($this->config['site']['description']) ? $this->config['site']['description'] : null;
 	}
 
 	/**
