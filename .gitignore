@@ -4,3 +4,4 @@ www/.htaccess
 www/_blog/
 www/_drafts/
 Blight.phar
+config.json

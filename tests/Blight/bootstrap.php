@@ -10,9 +10,11 @@ global $config;
 $config	= array(
 	'root_path'	=>	$root_path,
 
-	'name'	=> 'Test Blog',
-	'url'	=> 'http://www.example.com/',
-	'description'	=> 'Test blog description',
+	'site'	=> array(
+		'name'	=> 'Test Blog',
+		'url'	=> 'http://www.example.com/',
+		'description'	=> 'Test blog description',
+	),
 
 	'paths'	=> array(
 		'pages'			=> 'blog-data/pages/',

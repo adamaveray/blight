@@ -4,20 +4,24 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
 	RewriteEngine on
 
-	# Map individual posts
-	RewriteCond %{DOCUMENT_ROOT}/_blog/$1.html -f
-	RewriteRule (.*) _blog/$1.html [L,QSA]
-
 	# Map indexes
-	RewriteCond %{DOCUMENT_ROOT}/_blog/$1/index.html -f
-	RewriteRule (.*) _blog/$1/index.html [L,QSA]
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1/index.html -f
+	RewriteRule (.*) {%WEB_PATH%}/$1/index.html [L]
+
+	# Map individual posts
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.html -f
+	RewriteRule (.*) {%WEB_PATH%}/$1.html [L]
 
 	# Map feed
-	RewriteRule ^feed$ _blog/feed.xml [L,QSA]
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/feed.xml -f
+	RewriteRule ^feed$ {%WEB_PATH%}/feed.xml [L]
 
 	# Map additional files
-	RewriteCond %{DOCUMENT_ROOT}/_blog/$1 -f
-	RewriteRule (.*) _blog/$1 [L,QSA]
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1 -f
+	RewriteRule (.*) {%WEB_PATH%}/$1 [L]
+
+	# Rebuild site
+	RewriteRule ^$ index.php [L]
 </IfModule>
 
 <ifmodule mod_deflate.c>

@@ -24,19 +24,31 @@ function debug_output($message){
 	echo $timestamp.'-'.$memstamp.': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
 }
 
-// Initialise blog
-$root_path	= str_replace('phar://', '', dirname(__DIR__)).'/';
-$config	= array_merge(parse_ini_file($root_path.'config.ini', true), array(
-	'root_path'	=> $root_path
-));
-$blog	= new Blog($config);
+$root_path		= str_replace('phar://', '', dirname(__DIR__)).'/';
+$config_file	= $root_path.'config.json';
+if(!file_exists($config_file) || isset($_COOKIE[\Blight\Controllers\Install::COOKIE_NAME])){
+	// Blog not installed
+	if(!isset($_SERVER['REQUEST_URI'])){
+		echo 'Blog not installed - view on web to install'.PHP_EOL;
+		exit;
+	}
 
+	$controller	= new \Blight\Controllers\Install($root_path, __DIR__.'/', $web_path.'/', $config_file);
 
-// Check install
-if(!is_dir($blog->get_path_posts())){
-	require('src/setup.php');
-	debug_output('Set up blog');
+	if(!isset($_COOKIE[\Blight\Controllers\Install::COOKIE_NAME])){
+		$controller->get_page($_SERVER['REQUEST_URI']);
+		exit;
+	}
+	
+	// Finished setup - teardown
+	$controller->teardown();
 }
+
+// Initialise blog
+$parser	= new \Blight\Config();
+$config	= $parser->unserialize(file_get_contents($config_file));
+$config['root_path']	= $root_path;
+$blog	= new Blog($config);
 
 
 // Load posts
