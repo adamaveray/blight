@@ -6,11 +6,11 @@ include('inc/header.php');?>
 	<ul>
 		<li>
 			<label for="input_author_name">Your Name</label>
-			<input name="author_name" id="input_author_name" required="required" />
+			<input name="author_name" id="input_author_name" required="required"<?php input_error('author_name', $errors);?> />
 		</li>
 		<li>
 			<label for="input_author_email">Your Email</label>
-			<input name="author_email" id="input_author_email" type="email" required="required" />
+			<input name="author_email" id="input_author_email" type="email" required="required"<?php input_error('author_email', $errors);?> />
 		</li>
 	</ul>
 

@@ -1,4 +1,10 @@
-<!DOCTYPE html>
+<?php
+function input_error($input_name, $errors){
+	if(isset($errors[$input_name]) && $errors[$input_name]){
+		echo ' class="invalid"';
+	}
+}
+?><!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
 <head>
 	<meta charset="utf-8">

@@ -118,7 +118,19 @@ class Install {
 		exit;
 	}
 
+	protected function valid_redirect($errors, $valid_url, $invalid_url){
+		if(count($errors) === 0){
+			$_SESSION['install_errors']	= null;
+			$this->redirect($valid_url);
+		} else {
+			$_SESSION['install_errors']	= $errors;
+			$this->redirect($invalid_url);
+		}
+	}
+
 	protected function render_view($path, $params){
+		$params['errors']	= isset($_SESSION['install_errors']) ? $_SESSION['install_errors'] : array();
+
 		extract($params);
 		ob_start();
 		include($this->template_dir.$path);
@@ -159,15 +171,21 @@ class Install {
 	}
 
 	protected function process_step_1($data){
-		if(isset($data['author_name'])){
+		$errors	= array();
+
+		if(isset($data['author_name']) && trim($data['author_name']) != ''){
 			$this->session_set('author/name', $data['author_name']);
+		} else {
+			$errors['author_name']	= true;
 		}
 
-		if(isset($data['author_email'])){
+		if(isset($data['author_email']) && filter_var($data['author_email'], \FILTER_VALIDATE_EMAIL)){
 			$this->session_set('author/email', $data['author_email']);
+		} else {
+			$errors['author_email']	= true;
 		}
 
-		$this->redirect('2');
+		$this->valid_redirect($errors, '2', '1');
 	}
 
 	public function page_step_2(){
@@ -179,8 +197,12 @@ class Install {
 	}
 
 	protected function process_step_2($data){
-		if(isset($data['site_name'])){
+		$errors	= array();
+
+		if(isset($data['site_name']) && trim($data['site_name']) != ''){
 			$this->session_set('site/name', $data['site_name']);
+		} else {
+			$errors['site_name']	= true;
 		}
 
 		if(isset($data['site_url'])){
@@ -188,10 +210,16 @@ class Install {
 			if(!preg_match('/^https?:\/\//', $url)){
 				$url	= 'http://'.$url;
 			}
+		}
+
+		if(isset($data['site_url']) && filter_var($data['site_url'], \FILTER_VALIDATE_URL)){
 			$this->session_set('site/url', $url);
+		} else {
+			$errors['site_url']	= true;
 		}
 
 		if(isset($data['site_description'])){
+			// Not required
 			$this->session_set('site/description', $data['site_description']);
 		}
 
@@ -212,7 +240,7 @@ class Install {
 			}
 		}
 
-		$this->redirect('3');
+		$this->valid_redirect($errors, '3', '2');
 	}
 
 	public function page_step_3(){
@@ -224,6 +252,8 @@ class Install {
 	}
 
 	protected function process_step_3($data){
+		$errors	= array();
+
 		$prefix	= 'path_';
 		$paths	= array(
 			'pages'			=> 'pages',
@@ -257,7 +287,7 @@ class Install {
 		}
 
 
-		$this->redirect('end');
+		$this->valid_redirect($errors, 'end', '3');
 	}
 
 	protected function copy_dir($source, $target){

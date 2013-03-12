@@ -7,15 +7,15 @@ include('inc/header.php');?>
 		<ul>
 			<li>
 				<label for="input_site_name">Site Name</label>
-				<input name="site_name" id="input_site_name" required="required" />
+				<input name="site_name" id="input_site_name" required="required"<?php input_error('site_name', $errors);?> />
 			</li>
 			<li>
 				<label for="input_site_url">Site URL</label>
-				<input name="site_url" id="input_site_url" type="url" value="http://<?php echo $_SERVER['HTTP_HOST'];?>" required />
+				<input name="site_url" id="input_site_url" type="url" value="http://<?php echo $_SERVER['HTTP_HOST'];?>" required="required"<?php input_error('site_url', $errors);?> />
 			</li>
 			<li class="full textarea">
 				<label for="input_site_description">Site Description</label>
-				<textarea name="site_description" id="input_site_description"></textarea>
+				<textarea name="site_description" id="input_site_description"<?php input_error('site_description', $errors);?>></textarea>
 			</li>
 		</ul>
 	</fieldset>
@@ -29,13 +29,13 @@ include('inc/header.php');?>
 			</li>
 			<li class="linkblog_enabled_options single">
                 <label for="input_linkblog_link_character">Link Character</label>
-                <input name="linkblog_link_character" id="input_linkblog_link_character" value="→" />
+                <input name="linkblog_link_character" id="input_linkblog_link_character" value="→"<?php input_error('linkblog_link_character', $errors);?> />
 
                 <p class="description">This character will be added before linked post titles</p>
 			</li>
 			<li class="linkblog_disabled_options single">
                 <label for="input_linkblog_post_character">Post Character</label>
-                <input name="linkblog_post_character" id="input_linkblog_post_character" value="★" />
+                <input name="linkblog_post_character" id="input_linkblog_post_character" value="★"<?php input_error('linkblog_post_character', $errors);?> />
 
                 <p class="description">This character will be added before non-linked post titles</p>
 			</li>
