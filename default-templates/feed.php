@@ -44,7 +44,6 @@ $dom	= new \DOMDocument('1.0', 'UTF-8');
 $root	= $dom->createElement('rss');
 $root->setAttribute('version', '2.0');
 $root->setAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
-//$root->setAttributeNS('xmlns:atom', 'http://www.w3.org/2005/Atom');
 
 $channel	= $dom->createElement('channel');
 
@@ -62,8 +61,8 @@ $channel	= $dom->createElement('channel');
 		/** @var \Blight\Interfaces\Post $post */
 		$item	= $dom->createElement('item');
 
-			feed_create_node($dom, $item, 'title', post_title($blog, $post, $post->get_title()));
-			feed_create_node($dom, $item, 'link', post_url($blog, $post, $post->get_link()));
+			feed_create_node($dom, $item, 'title', feed_post_title($blog, $post, $post->get_title()));
+			feed_create_node($dom, $item, 'link', feed_post_url($blog, $post, $post->get_link()));
 			feed_create_node($dom, $item, 'guid', $post->get_link(), array(
 				'isPermaLink'	=> 'false'
 			));

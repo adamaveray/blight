@@ -1,6 +1,17 @@
 Release Notes
 =============
 
+## 0.5
+
+_12 Mar 2013_
+
+- Added setup installer
+- Distributed as [Phar](http://www.php.net/manual/en/intro.phar.php)
+- Added support for pages
+- Added optional minification of rendered pages
+- Added generated sitemaps
+
+
 ## 0.4
 
 _10 Mar 2013_

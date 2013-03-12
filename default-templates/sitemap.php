@@ -53,8 +53,8 @@ $root->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
 // Create URLs
 foreach($pages as $page){
-//	$node	= sitemap_create_url($dom, $page->get_permalink(), $now);
-	$node	= sitemap_create_url($dom, $page['url'], $now);
+	/** @var \Blight\Interfaces\Page $page */
+	$node	= sitemap_create_url($dom, $page->get_permalink(), $page->get_date());
 	$root->appendChild($node);
 }
 

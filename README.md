@@ -6,11 +6,11 @@ Blight is a Markdown-powered static blogging engine.
 
 ## Installation
 
-Copy the `config.ini` file and `Blight.phar` directory alongside your website files directory. Then, copy the `index.php` file to the location you want the blog to be accessible on your site. Edit the `index.php` file ensuring the path in the `require()` line points to the `Blight.phar` file. Visiting the `index.php` page will set up the rest of the engine.
+Copy the `Blight.phar` file alongside your web directory. Then, copy the `index.php` file to the location you want the blog to be accessible on your site. Edit the `index.php` file ensuring the path in the `require()` line points to the `Blight.phar` file. Visiting the `index.php` page will walk through setting up the rest of the site.
 
 After installation, your directory structure should look like the following:
 
-	config.ini
+	config.json
 
 	Blight.phar
 	
@@ -24,14 +24,12 @@ After installation, your directory structure should look like the following:
 		.htaccess
 		index.php
 		
-The paths to these directories are stored in the `config.ini` file, so to change the directory structure, simply update this file.
-
-The application will need write access to the `drafts/`, `posts/`, `pages/`, `templates/` and web directories.
+The paths to these directories are stored in the `config.json` file, so to change the directory structure, simply update this file.
 
 
 ## Authoring
 
-New posts should be added to the `drafts/` or `posts/` directories. The filename will become the post's URL slug, so for example a post with the file `test-post.md` will become `2013/02/test-post.md`.
+New posts should be added to the `drafts/` or `posts/` directories. The filename will become the post's URL slug, so for example a post with the file `test-post.md` will become `2013/02/test-post`.
 
 A new post should be formatted as follows:
 
@@ -41,11 +39,11 @@ A new post should be formatted as follows:
 	
 	Content
 	
-The title and content are standard Markdown. The headers section under the title allows you to set a number of options and metadata for your post MultiMarkdown-style. Simply include the name of the header, a colon, spaces or tabs, and the value for that option. Parameters are case-insensitive.
+The title and content are standard Markdown. The headers section under the title allows you to set a number of options and metadata for your post MultiMarkdown-style. Parameters are case-insensitive.
 
 ### Drafts
 
-Draft posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be displayed on the site itself.
+Posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be listed on the site itself.
 
 When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
 
@@ -81,7 +79,7 @@ The simplest way to reload the site is to manually enter `index.php` into your a
 
 Alternatively, deleting the entire `{www}/_blogs/` directory will cause home page requests to again go through the PHP file.
 
-A site rebuild can also be triggered from the command line, by navigating to the directory the system is installed to, and running the command `php blight/blight.php`. The optional flag `-v` outputs additional information as the site is built.
+A site rebuild can also be triggered from the command line, by navigating to the directory the system is installed to, and running the command `php Blight.phar`. The optional flag `-v` outputs additional information as the site is built.
 
 Once the pages are built, the page will automatically reload showing the generated static home page. Rebuilding the site should take only a few seconds.
 
@@ -148,9 +146,9 @@ The following variables are available to page-pages:
 
 ## Config
 
-Additional fine-tuning of the site's behaviour can be made in the `config.ini` file. The file is in the [PHP configuration file](http://www.php.net/manual/en/function.parse-ini-file.php) format, with sections.
+Additional fine-tuning of the site's behaviour can be made in the `config.json` file.
 
-### Ungrouped
+### Site
 
 - **name**: The blog's name, used in the RSS feed and available in templates
 - **url**: The URL to the blog, including any directories if appropriate
@@ -182,3 +180,9 @@ Additional fine-tuning of the site's behaviour can be made in the `config.ini` f
 ### Output
 
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
+
+
+## Building
+
+Building the Phar from the source files is accomplished by running `php build.php` from the terminal.
+

@@ -282,6 +282,12 @@ class Install {
 			return $feedback;
 		}
 
+		if(!isset($config['output'])){
+			$config['output']	= array(
+				'minify_html'	=> false
+			);
+		}
+
 		// Write config file
 		$config_text	= $this->build_setup($config);
 		$result	= file_put_contents($this->config_file, $config_text);
