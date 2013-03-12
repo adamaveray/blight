@@ -2,11 +2,23 @@
 namespace Blight;
 
 class Config implements \Blight\Interfaces\Config {
-	public function parse($contents){
+	/**
+	 * Converts the config file text into values
+	 *
+	 * @param string $contents	The contents for the config file
+	 * @return array	An associative array of the config data
+	 */
+	public function unserialize($contents){
 		return json_decode($contents, true);
 	}
 
-	public function build($values){
+	/**
+	 * Converts the config data into a text format
+	 *
+	 * @param array $values	The config data to convert
+	 * @return string		The converted string config data
+	 */
+	public function serialize($values){
 		$options	= 0;
 		if(false && defined('\JSON_PRETTY_PRINT')){
 			$options	= \JSON_PRETTY_PRINT;
@@ -18,6 +30,12 @@ class Config implements \Blight\Interfaces\Config {
 		return $result;
 	}
 
+	/**
+	 * Formats minified JSON into a more easily human-read layout
+	 *
+	 * @param string $json	The raw, minified JSON data
+	 * @return string		The readable, spaced JSON string
+	 */
 	protected function pretty_print($json){
 		$output	= '';
 

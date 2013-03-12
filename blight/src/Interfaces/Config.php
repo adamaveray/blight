@@ -2,7 +2,7 @@
 namespace Blight\Interfaces;
 
 interface Config {
-	public function parse($contents);
+	public function serialize($contents);
 
-	public function build($values);
+	public function unserialize($values);
 };

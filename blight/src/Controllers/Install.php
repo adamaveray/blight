@@ -357,6 +357,6 @@ class Install {
 
 	protected function build_setup($config){
 		$parser	= new \Blight\Config();
-		return $parser->build($config);
+		return $parser->serialize($config);
 	}
 };

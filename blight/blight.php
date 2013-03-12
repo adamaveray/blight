@@ -40,7 +40,7 @@ if(!file_exists($config_file)){
 
 // Initialise blog
 $parser	= new \Blight\Config();
-$config	= $parser->parse(file_get_contents($config_file));
+$config	= $parser->unserialize(file_get_contents($config_file));
 $config['root_path']	= $root_path;
 $blog	= new Blog($config);
 
