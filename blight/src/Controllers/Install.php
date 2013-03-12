@@ -4,20 +4,45 @@ namespace Blight\Controllers;
 class Install {
 	protected $root_path;
 	protected $app_path;
+	protected $web_path;
 	protected $template_dir;
 	
 	protected $url_base	= 'index.php?/install/';
 
 	protected $config_file;
 
-	public function __construct($root_path, $app_path, $file){
+	public function __construct($root_path, $app_path, $web_path, $file){
 		session_start();
 
 		$this->root_path	= $root_path;
 		$this->app_path		= $app_path;
+		$this->web_path		= $web_path;
 		$this->template_dir	= $this->app_path.'src/views/install/';
 
 		$this->config_file	= $file;
+	}
+
+	public function setup(){
+		$dir	= $this->app_path.'src/views/';
+		$files	= array(
+			'_common/js/jquery-1.9.1.min.js'	=> 'js/jquery-1.9.1.min.js',
+			'install/js/install.js'		=> 'js/install.js',
+			'install/css/install.css'	=> 'css/install.css'
+		);
+
+		foreach($files as $source => $target){
+			$source	= $dir.$source;
+			$target	= $this->web_path.$target;
+			$target_dir	= dirname($target);
+
+			if(!is_dir($target_dir)){
+				mkdir($target_dir);
+			}
+			file_put_contents($target, file_get_contents($source));
+		}
+	}
+
+	public function teardown(){
 	}
 
 	protected function session_set($name, $value){
@@ -47,7 +72,9 @@ class Install {
 
 
 		if(!isset($fragments[0]) || $fragments[0] == ''){
-			// Clear session
+			// Start
+			$this->setup();
+
 			$_SESSION	= array();
 			$this->page_step_start();
 			return;
@@ -157,7 +184,11 @@ class Install {
 		}
 
 		if(isset($data['site_url'])){
-			$this->session_set('site/url', rtrim($data['site_url'], '/').'/');
+			$url	= rtrim($data['site_url'], '/').'/';
+			if(!preg_match('/^https?:\/\//', $url)){
+				$url	= 'http://'.$url;
+			}
+			$this->session_set('site/url', $url);
 		}
 
 		if(isset($data['site_description'])){
