@@ -26,16 +26,22 @@ function debug_output($message){
 
 $root_path		= str_replace('phar://', '', dirname(__DIR__)).'/';
 $config_file	= $root_path.'config.json';
-if(!file_exists($config_file)){
+if(!file_exists($config_file) || isset($_COOKIE[\Blight\Controllers\Install::COOKIE_NAME])){
 	// Blog not installed
-	if(isset($_SERVER['REQUEST_URI'])){
-		$controller	= new \Blight\Controllers\Install($root_path, __DIR__.'/', $web_path.'/', $config_file);
-
-		$controller->get_page($_SERVER['REQUEST_URI']);
-	} else {
+	if(!isset($_SERVER['REQUEST_URI'])){
 		echo 'Blog not installed - view on web to install'.PHP_EOL;
+		exit;
 	}
-	exit;
+
+	$controller	= new \Blight\Controllers\Install($root_path, __DIR__.'/', $web_path.'/', $config_file);
+
+	if(!isset($_COOKIE[\Blight\Controllers\Install::COOKIE_NAME])){
+		$controller->get_page($_SERVER['REQUEST_URI']);
+		exit;
+	}
+	
+	// Finished setup - teardown
+	$controller->teardown();
 }
 
 // Initialise blog

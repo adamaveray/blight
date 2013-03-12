@@ -2,6 +2,8 @@
 namespace Blight\Controllers;
 
 class Install {
+	const COOKIE_NAME	= 'blightinstall';
+
 	protected $root_path;
 	protected $app_path;
 	protected $web_path;
@@ -43,6 +45,17 @@ class Install {
 	}
 
 	public function teardown(){
+		setcookie(self::COOKIE_NAME, null, time()-3600, '/');
+
+		$root_dir	= rtrim($this->web_path,'/').'/';
+		$dirs	= array(
+			'js',
+			'css'
+		);
+
+		foreach($dirs as $dir){
+			$this->delete_dir($root_dir.$dir);
+		}
 	}
 
 	protected function session_set($name, $value){
@@ -137,6 +150,157 @@ class Install {
 		return ob_get_clean();
 	}
 
+	protected function copy_dir($source, $target){
+		$source	= rtrim($source, '/');
+		$target	= rtrim($target, '/');
+		if(!is_dir($source)){
+			throw new \RuntimeException('Source directory not found');
+		}
+		if(!is_dir($target)){
+			$result	= mkdir($target, 0777, true);
+			if(!$result){
+				throw new \RuntimeException('Target directory cannot be created');
+			}
+		}
+
+		$files	= glob($source.'/*');
+		foreach($files as $file){
+			$basename	= basename($file);
+			if(is_dir($file)){
+				$this->copy_dir($file, $target.'/'.$basename);
+			} else {
+				file_put_contents($target.'/'.$basename, file_get_contents($file));
+			}
+		}
+
+		return true;
+	}
+
+	protected function delete_dir($dir){
+		$dir	= rtrim($dir, '/');
+		if(!is_dir($dir)){
+			return;
+		}
+
+		$files	= glob($dir.'/*');
+		foreach($files as $file){
+			if(is_dir($file)){
+				$this->delete_dir($file);
+			} else {
+				unlink($file);
+			}
+		}
+
+		$files	= array('.DS_Store','.htaccess');
+		foreach($files as $file){
+			if(is_file($dir.'/'.$file)){
+				unlink($dir.'/'.$file);
+			}
+		}
+
+		rmdir($dir);
+	}
+
+	protected function run_install($config){
+		$feedback	= array();
+
+		// Make directories
+		$paths	= array(
+			'pages'			=> 'blog-data/pages',
+			'posts'			=> 'blog-data/posts',
+			'drafts'		=> 'blog-data/drafts',
+			'templates'		=> 'blog-data/templates',
+			'web'			=> 'www/_blog',
+			'drafts-web'	=> 'www/_drafts',
+			'cache'			=> 'cache',
+		);
+		if(!isset($config['paths'])){
+			$config['paths']	= array();
+		}
+		foreach($paths as $config_name => $dir){
+			$config['paths'][$config_name]	= $dir.'/';
+
+			$dir	= $this->root_path.$dir;
+			if(!is_dir($dir)){
+				$result	= mkdir($dir, 0777, true);
+				if(!$result){
+					// Cannot create directory
+					if(!isset($feedback['paths'])){
+						$feedback['paths']	= array();
+					}
+					$feedback['paths'][]	= $config['paths'][$config_name];
+				}
+			} elseif(!is_writable($dir)){
+				$result	= chmod($dir, 0777);
+				if(!$result){
+					// Cannot write to directory
+					$feedback['paths'][]	= $config['paths'][$config_name];
+				}
+			}
+		}
+
+		$template_dir	= $this->root_path.$config['paths']['templates'];
+
+		if(count(glob($template_dir.'*')) === 0){
+			// Set up default templates
+			try {
+				$result	= $this->copy_dir($this->root_path.'default-templates/', $template_dir);
+			} catch(\Exception $e){
+				$result	= false;
+			}
+			if(!$result){
+				return false;
+			}
+		}
+
+		// Copy .htaccess
+		$htaccess	= file_get_contents($this->app_path.'src/default.htaccess');
+
+		$web_dir		= explode('/', rtrim($config['paths']['web'],'/'));
+		$htaccess_dir	= $this->root_path.implode('/', array_slice($web_dir, 0, -1));
+
+		$common_www_dirs	= array('www', 'public_html', 'htdocs');
+		foreach($common_www_dirs as $dir){
+			if($web_dir[0] === $dir){
+				// Found - replace only instance at start
+				$web_dir	= array_slice($web_dir, 1);
+				break;
+			}
+		}
+		$web_dir	= implode('/', $web_dir);
+		$htaccess	= str_replace('{%WEB_PATH%}', rtrim($web_dir, '/'), $htaccess);
+		$htaccess_path	= rtrim($htaccess_dir,'/').'/.htaccess';
+
+		$result	= file_put_contents($htaccess_path, $htaccess);
+		if(!$result){
+			// Cannot write .htaccess
+			$feedback['file_htaccess']		= $htaccess;
+			$feedback['file_htaccess_path']	= $htaccess_path;
+		}
+
+		if(count($feedback) > 0){
+			return $feedback;
+		}
+
+		// Write config file
+		$config_text	= $this->build_setup($config);
+		$result	= file_put_contents($this->config_file, $config_text);
+		if(!$result){
+			$feedback['file_config']		= $config_text;
+			$feedback['file_config_path']	= $this->config_file;
+			return $feedback;
+		}
+
+		return true;
+	}
+
+	protected function build_setup($config){
+		$parser	= new \Blight\Config();
+		return $parser->serialize($config);
+	}
+
+
+	// Start
 	public function page_step_start(){
 		echo $this->render_view('start.php', array(
 			'title'			=> 'Install Blight',
@@ -144,24 +308,7 @@ class Install {
 		));
 	}
 
-	public function page_step_end(){
-		// Setup finished - save config
-		$result	= $this->run_install($_SESSION);
-		if(!$result){
-			// Could not save setup
-			$this->redirect('failure');
-		}
-
-		// Site setup
-
-		session_destroy();
-
-		echo $this->render_view('end.php', array(
-			'title'		=> 'Blight Installed',
-			'prev_url'	=> $this->url_base.'3'
-		));
-	}
-
+	// Step 1
 	public function page_step_1(){
 		echo $this->render_view('1.php', array(
 			'title'			=> 'About You',
@@ -188,6 +335,7 @@ class Install {
 		$this->valid_redirect($errors, '2', '1');
 	}
 
+	// Step 2
 	public function page_step_2(){
 		echo $this->render_view('2.php', array(
 			'title'			=> 'About Your Site',
@@ -240,123 +388,37 @@ class Install {
 			}
 		}
 
-		$this->valid_redirect($errors, '3', '2');
+		$this->valid_redirect($errors, 'end', '2');
 	}
 
-	public function page_step_3(){
-		echo $this->render_view('3.php', array(
-			'title'			=> 'Paths',
-			'target_url'	=> $this->url_base.'3',
-			'prev_url'		=> $this->url_base.'2'
+	// End
+	public function page_step_end(){
+		setcookie(self::COOKIE_NAME, '1', null, '/');
+
+		// Setup finished - save config
+		$result	= $this->run_install($_SESSION);
+		if($result !== true){
+			// Could not save setup
+			$this->page_step_end_failure($result);
+			return;
+		}
+
+		// Site setup
+
+		session_destroy();
+
+		echo $this->render_view('end.php', array(
+			'title'		=> 'Blight Installed',
+			'prev_url'	=> $this->url_base.'3'
 		));
 	}
 
-	protected function process_step_3($data){
-		$errors	= array();
-
-		$prefix	= 'path_';
-		$paths	= array(
-			'pages'			=> 'pages',
-			'posts'			=> 'posts',
-			'drafts'		=> 'drafts',
-			'templates'		=> 'templates',
-			'web'			=> 'web',
-			'drafts_web'	=> 'drafts-web',
-			'cache'			=> 'cache',
-		);
-		foreach($paths as $key => $name){
-			$key	= $prefix.$key;
-
-			$path	= rtrim($data[$key], '/');
-			if(!is_dir($this->root_path.$path)){
-				$result	= mkdir($this->root_path.$path, 0777, true);
-				if(!$result){
-					$errors[$key]	= 'Cannot create directory';
-					continue;
-				}
-			}
-			if(!is_writeable($this->root_path.$path)){
-				$result	= chmod($this->root_path.$path, 0777);
-				if(!$result){
-					$errors[$key]	= 'Cannot write to directory';
-					continue;
-				}
-			}
-
-			$this->session_set('paths/'.$name, $path.'/');
-		}
-
-
-		$this->valid_redirect($errors, 'end', '3');
-	}
-
-	protected function copy_dir($source, $target){
-		$source	= rtrim($source, '/');
-		$target	= rtrim($target, '/');
-		if(!is_dir($source)){
-			throw new \RuntimeException('Source directory not found');
-		}
-		if(!is_dir($target)){
-			$result	= mkdir($target, 0777, true);
-			if(!$result){
-				throw new \RuntimeException('Target directory cannot be created');
-			}
-		}
-
-		$files	= glob($source.'/*');
-		foreach($files as $file){
-			$basename	= basename($file);
-			if(is_dir($file)){
-				$this->copy_dir($file, $target.'/'.$basename);
-			} else {
-				file_put_contents($target.'/'.$basename, file_get_contents($file));
-			}
-		}
-	}
-
-	protected function run_install($config){
-		// Make directories
-		foreach($config['paths'] as $dir){
-			$dir	= $this->root_path.$dir;
-			if(!is_dir($dir)){
-				mkdir($dir, 0777, true);
-			}
-		}
-
-		$template_dir	= $this->root_path.$config['paths']['templates'];
-
-		if(count(glob($template_dir.'*')) === 0){
-			// Set up default templates
-			$this->copy_dir($this->root_path.'default-templates/', $template_dir);
-		}
-
-		// Copy .htaccess
-		$htaccess	= file_get_contents($this->app_path.'src/default.htaccess');
-
-		$web_dir		= explode('/', rtrim($config['paths']['web'],'/'));
-		$htaccess_dir	= $this->root_path.implode('/', array_slice($web_dir, 0, -1));
-
-		$common_www_dirs	= array('www', 'public_html', 'htdocs');
-		foreach($common_www_dirs as $dir){
-			if($web_dir[0] === $dir){
-				// Found - replace only instance at start
-				$web_dir	= array_slice($web_dir, 1);
-				break;
-			}
-		}
-		$web_dir	= implode('/', $web_dir);
-		$htaccess	= str_replace('{%WEB_PATH%}', rtrim($web_dir, '/'), $htaccess);
-
-		file_put_contents(rtrim($htaccess_dir,'/').'/.htaccess', $htaccess);
-
-		// Write config file
-		file_put_contents($this->config_file, $this->build_setup($_SESSION));
-
-		return true;
-	}
-
-	protected function build_setup($config){
-		$parser	= new \Blight\Config();
-		return $parser->serialize($config);
+	// End - Failure
+	public function page_step_end_failure($params){
+		echo $this->render_view('failure.php', array_merge(array(
+			'title'			=> 'Cannot Install Automatically',
+			'target_url'	=> $this->url_base.'end',
+			'prev_url'		=> $this->url_base.'2'
+		), $params));
 	}
 };
