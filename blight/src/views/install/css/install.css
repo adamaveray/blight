@@ -93,6 +93,10 @@ html {
 					margin-left:	0;
 				}
 
+				form li.hidden {
+					display:	none;
+				}
+
 				form .full {
 					float:	none;
 					margin-left:	0;
@@ -141,6 +145,11 @@ html {
 
 						-webkit-appearance:	none;
 					}
+
+						input.invalid {
+							border-color:	#ecaf48;
+							background:		#f8edd1;
+						}
 
 						input:valid:after,
 						input.valid:after {

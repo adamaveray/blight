@@ -1,4 +1,6 @@
-<?php include('inc/header.php');?>
+<?php
+$page_id	= 'user_settings';
+include('inc/header.php');?>
 
 <form method="post" action="<?php echo $target_url;?>">
 	<ul>
