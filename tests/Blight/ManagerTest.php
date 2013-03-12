@@ -2,6 +2,7 @@
 namespace Blight\Tests;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase {
+	protected static $pages_count		= 2;
 	protected static $posts_count		= 5;
 	protected static $drafts_count		= 3;
 	protected static $collection_count_year		= 2;
@@ -13,6 +14,13 @@ class ManagerTest extends \PHPUnit_Framework_TestCase {
 
 		$now	= new \DateTime();
 		$date	= $now->format('Y-m-d H:i:s');
+		$page_content	= <<<EOD
+Test Page
+=========
+Date: {DATE} 12:00:00
+
+Test content.
+EOD;
 		$post_content	= <<<EOD
 Test Post
 =========
@@ -28,6 +36,7 @@ EOD;
 		}
 
 		$dirs	= array(
+			'pages'			=> 'pages/',
 			'posts'			=> 'posts/',
 			'drafts'		=> 'drafts/',
 			'drafts_web'	=> 'drafts_web/'
@@ -37,6 +46,10 @@ EOD;
 			if(!is_dir($child_dir)){
 				mkdir($child_dir);
 			}
+		}
+
+		for($i = 0; $i < self::$pages_count; $i++){
+			file_put_contents($dir.$dirs['pages'].'test-page-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $page_content));
 		}
 
 		for($i = 0; $i < self::$posts_count; $i++){
@@ -55,6 +68,7 @@ EOD;
 	static public function tearDownAfterClass(){
 		function delete_dir($dir){
 			$dir	= rtrim($dir, '/');
+
 			foreach(glob($dir.'/*') as $file){
 				if(is_dir($file)){
 					delete_dir($file);
@@ -66,8 +80,8 @@ EOD;
 			rmdir($dir);
 		}
 
-		$dir	= __DIR__.'/files/posts/';
-		delete_dir($dir);
+		$dir	= __DIR__.'/files/';
+		delete_dir($dir.'posts/');
 	}
 
 	/** @var \Blight\Interfaces\Blog */
@@ -83,6 +97,7 @@ EOD;
 		$this->dir	= __DIR__.'/files/posts/';
 
 		$test_config	= $config;
+		$test_config['paths']['pages']		= $this->dir.'pages/';
 		$test_config['paths']['posts']		= $this->dir.'posts/';
 		$test_config['paths']['drafts']		= $this->dir.'drafts/';
 		$test_config['paths']['drafts_web']	= $this->dir.'drafts_web/';
@@ -110,6 +125,18 @@ EOD;
 		$blog	= new \Blight\Blog($test_config);
 
 		new \Blight\Manager($blog);
+	}
+
+	/**
+	 * @covers \Blight\Manager::get_pages
+	 */
+	public function testGetPages(){
+		$pages	= $this->manager->get_pages();
+		$this->assertTrue(is_array($pages));
+		$this->assertEquals(count($pages), self::$pages_count);
+		foreach($pages as $page){
+			$this->assertInstanceOf('\Blight\Interfaces\Page', $page);
+		}
 	}
 
 	/**
@@ -179,6 +206,9 @@ EOD;
 	 */
 	public function testCleanupDrafts(){
 		$dir	= $this->blog->get_path_drafts_web();
+		if(!is_dir($dir)){
+			mkdir($dir);
+		}
 		file_put_contents($dir.'test.html', 'Test file');
 
 		$this->manager->cleanup_drafts();

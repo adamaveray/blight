@@ -6,11 +6,12 @@ class Template implements \Blight\Interfaces\Template {
 	const TYPE_TWIG	= 'twig';
 
 	/** @var \Twig_Environment	The Twig environment to use across all templates */
-	static protected $twig_environment;
+	static protected $twig_environments	= array();
 
 
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
+	protected $dir;
 	protected $filename;
 	protected $type;
 
@@ -19,10 +20,13 @@ class Template implements \Blight\Interfaces\Template {
 	 *
 	 * @param \Blight\Interfaces\Blog $blog
 	 * @param string $name			The name of the template to use
+	 * @param string $dir			The directory to look for templates in
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, $name){
+	public function __construct(\Blight\Interfaces\Blog $blog, $name, $dir = null){
 		$this->blog	= $blog;
+
+		$this->dir	= (isset($dir) ? $dir : $blog->get_path_templates());
 
 		$this->locate_template($name);
 	}
@@ -34,7 +38,7 @@ class Template implements \Blight\Interfaces\Template {
 	 * @throws \RuntimeException	Template cannot be found
 	 */
 	protected function locate_template($name){
-		$template	= $this->blog->get_path_templates($name);
+		$template	= $this->dir.$name;
 
 		if(file_exists($template.'.php')){
 			$this->filename	= $name.'.php';
@@ -94,8 +98,13 @@ class Template implements \Blight\Interfaces\Template {
 
 		extract($params);
 		ob_start();
-		include($this->blog->get_path_templates($this->filename));
-		return ob_get_clean();
+		include($this->dir.$this->filename);
+		$output	= ob_get_clean();
+		if($this->blog->get('minify_html', 'output', false)){
+			$output	= $this->minify_html($output);
+		}
+
+		return $output;
 	}
 
 	/**
@@ -105,26 +114,42 @@ class Template implements \Blight\Interfaces\Template {
 	 * @return string		The rendered content from the template
 	 */
 	protected function render_twig($params){
-		return $this->get_twig_environment()->render($this->filename, $params);
+		$output	= $this->get_twig_environment($this->dir)->render($this->filename, $params);
+		if($this->blog->get('minify_html', 'output', false)){
+			$output	= $this->minify_html($output);
+		}
+
+		return $output;
+	}
+
+	/**
+	 * Minifies the provided HTML by removing whitespace, etc
+	 *
+	 * @param string $html	The raw HTML to minify
+	 * @return string		The minified HTML
+	 */
+	protected function minify_html($html){
+		return \MinifyHTML::minify($html);
 	}
 
 
 	/**
 	 * Retrieves the standardised Twig environment object, with the correct template and cache paths set
 	 *
+	 * @param string $dir	The template directory for the environment
 	 * @return \Twig_Environment	The Twig environment object
 	 */
-	protected function get_twig_environment(){
-		if(!isset(self::$twig_environment)){
-			$loader	= new \Twig_Loader_Filesystem($this->blog->get_path_templates());
-			self::$twig_environment	= new \Twig_Environment($loader);
+	protected function get_twig_environment($dir){
+		if(!isset(self::$twig_environments[$dir])){
+			$loader	= new \Twig_Loader_Filesystem($dir);
+			self::$twig_environments[$dir]	= new \Twig_Environment($loader);
 
 			// Set up filters
 			$blog	= $this->blog;
 			$text_processor	= new TextProcessor($this->blog);
 
 			// Markdown filter
-			self::$twig_environment->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
+			self::$twig_environments[$dir]->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
 				$filters	= array(
 					'markdown'		=> true,
 					'typography'	=> true
@@ -138,17 +163,17 @@ class Template implements \Blight\Interfaces\Template {
 			)));
 
 			// Typography filter
-			self::$twig_environment->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
+			self::$twig_environments[$dir]->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
 				'pre_escape'	=> 'html',
 				'is_safe'		=> array('html')
 			)));
 
 			// Truncate filter
-			self::$twig_environment->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html'), array(
+			self::$twig_environments[$dir]->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html'), array(
 				'is_safe'	=> array('html')
 			)));
 		}
 
-		return self::$twig_environment;
+		return self::$twig_environments[$dir];
 	}
 };

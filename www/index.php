@@ -1,6 +1,6 @@
 <?php
 $web_path	= __DIR__;
-require('../blight/blight.php');
+require('../Blight.phar');
 
 // Redirect to generated pages
 header('HTTP/1.1 302 Found');

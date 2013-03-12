@@ -7,6 +7,8 @@ namespace Blight;
 class Manager implements \Blight\Interfaces\Manager {
 	protected $blog;
 
+	protected $pages;
+
 	protected $posts;
 	protected $posts_by_year;
 	protected $posts_by_tag;
@@ -30,6 +32,35 @@ class Manager implements \Blight\Interfaces\Manager {
 		if(!is_dir($blog->get_path_posts())){
 			throw new \RuntimeException('Posts directory not found');
 		}
+	}
+
+	/**
+	 * Locates all files within the pages directory
+	 *
+	 * @return array	A list of filenames for each page file found
+	 */
+	protected function get_raw_pages(){
+		$dir	= $this->blog->get_path_pages();
+		function get_sub_pages($dir){
+			$dir	= rtrim($dir, '/');
+
+			$files	= array();
+
+			$raw_files	= glob($dir.'/*');
+			foreach($raw_files as $file){
+				if(is_dir($file)){
+					$files	= array_merge($files, get_sub_pages($file));
+				} else {
+					$files[]	= $file;
+				}
+			}
+
+			return $files;
+		};
+
+		$files	= get_sub_pages($dir);
+
+		return $files;
 	}
 
 	/**
@@ -122,6 +153,43 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		$this->blog->get_file_system()->move_file($current_path, $new_path, !$post->is_draft());	// Don't clean up drafts
+	}
+
+	/**
+	 * Retrieves all pages found as Page objects
+	 *
+	 * @return array	An array of pages
+	 */
+	public function get_pages(){
+		if(!isset($this->pages)){
+			$files	= $this->get_raw_pages();
+			$dir	= $this->blog->get_path_pages();
+
+			$pages	= array();
+
+			foreach($files as $file){
+				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
+				if(!in_array($extension, $this->allowed_extensions)){
+					// Unknown filetype - ignore
+					continue;
+				}
+
+				$content	= $this->blog->get_file_system()->load_file($file);
+
+				// Create page object
+				try {
+					$page	= new \Blight\Page($this->blog, $content, preg_replace('/^(.*?)\.\w+?$/', '$1', str_replace($dir, '', $file)));
+				} catch(\Exception $e){
+					continue;
+				}
+
+				$pages[]	= $page;
+			}
+
+			$this->pages	= $pages;
+		}
+
+		return $this->pages;
 	}
 
 	/**

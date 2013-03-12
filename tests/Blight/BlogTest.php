@@ -65,11 +65,11 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\Blog::get_path_app
 	 */
 	public function testGetPathApp(){
-		$path	= 'blight/';
+		$path	= 'Blight.phar/';
 
-		$this->assertEquals($this->root_path.$path, $this->blog->get_path_app());
+		$this->assertEquals('phar://'.$this->root_path.$path, $this->blog->get_path_app());
 
-		$this->assertEquals($this->root_path.$path.'test', $this->blog->get_path_app('test'));
+		$this->assertEquals('phar://'.$this->root_path.$path.'test', $this->blog->get_path_app('test'));
 	}
 
 	/**
@@ -79,6 +79,15 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->root_path.$this->config['paths']['templates'], $this->blog->get_path_templates());
 
 		$this->assertEquals($this->root_path.$this->config['paths']['templates'].'test', $this->blog->get_path_templates('test'));
+	}
+
+	/**
+	 * @covers \Blight\Blog::get_path_pages
+	 */
+	public function testGetPathPages(){
+		$this->assertEquals($this->root_path.$this->config['paths']['pages'], $this->blog->get_path_pages());
+
+		$this->assertEquals($this->root_path.$this->config['paths']['pages'].'test', $this->blog->get_path_pages('test'));
 	}
 
 	/**
@@ -121,30 +130,30 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\Blog::test_url
 	 */
 	public function testGetURL(){
-		$this->assertEquals($this->config['url'], $this->blog->get_url());
+		$this->assertEquals($this->config['site']['url'], $this->blog->get_url());
 
-		$this->assertEquals($this->config['url'].'test', $this->blog->get_url('test'));
+		$this->assertEquals($this->config['site']['url'].'test', $this->blog->get_url('test'));
 	}
 
 	/**
 	 * @covers \Blight\Blog::get_name
 	 */
 	public function testGetName(){
-		$this->assertEquals($this->config['name'], $this->blog->get_name());
+		$this->assertEquals($this->config['site']['name'], $this->blog->get_name());
 	}
 
 	/**
 	 * @covers \Blight\Blog::get_description
 	 */
 	public function testGetDescription(){
-		$this->assertEquals($this->config['description'], $this->blog->get_description());
+		$this->assertEquals($this->config['site']['description'], $this->blog->get_description());
 	}
 
 	/**
 	 * @covers \Blight\Blog::get_feed_url
 	 */
 	public function testGetFeedUrl(){
-		$this->assertEquals($this->config['url'].'feed', $this->blog->get_feed_url());
+		$this->assertEquals($this->config['site']['url'].'feed', $this->blog->get_feed_url());
 	}
 
 	/**
@@ -186,9 +195,9 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testGet(){
 		// Test existing, non-grouped
-		$this->assertEquals($this->config['description'], $this->blog->get('description'));
-		$this->assertEquals($this->config['description'], $this->blog->get('description', null));
-		$this->assertEquals($this->config['description'], $this->blog->get('description', null, '(notfound)'));
+		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path'));
+		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', null));
+		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', null, '(notfound)'));
 
 		// Test non-existing, non-grouped
 		$this->assertNull($this->blog->get('nonexistent'));

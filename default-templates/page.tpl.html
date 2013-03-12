@@ -1,0 +1,9 @@
+{% extends "inc/base.tpl.html" %}
+
+{% block content %}
+<header>
+    <h1>{{ page._title|e|typo }}</h1>
+</header>
+
+{{ page._content|md }}
+{% endblock %}

@@ -4,17 +4,20 @@ date_default_timezone_set('UTC');
 global $root_path;
 $root_path	= realpath(__DIR__.'/../../').'/';
 
-require($root_path.'/blight/src/autoload.php');
+require('phar://'.$root_path.'Blight.phar/src/autoload.php');
 
 global $config;
 $config	= array(
 	'root_path'	=>	$root_path,
 
-	'name'	=> 'Test Blog',
-	'url'	=> 'http://www.example.com/',
-	'description'	=> 'Test blog description',
+	'site'	=> array(
+		'name'	=> 'Test Blog',
+		'url'	=> 'http://www.example.com/',
+		'description'	=> 'Test blog description',
+	),
 
 	'paths'	=> array(
+		'pages'			=> 'blog-data/pages/',
 		'posts'			=> 'blog-data/posts/',
 		'drafts'		=> 'blog-data/drafts/',
 		'templates'		=> 'blog-data/templates/',

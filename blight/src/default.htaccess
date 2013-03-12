@@ -4,14 +4,26 @@ AddDefaultCharset UTF-8
 <IfModule mod_rewrite.c>
 	RewriteEngine on
 
-	# Map individual posts
-	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.html -f
-	RewriteRule (.*) {%WEB_PATH%}/$1.html [L,QSA]
-
 	# Map indexes
 	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1/index.html -f
-	RewriteRule (.*) {%WEB_PATH%}/$1/index.html [L,QSA]
+	RewriteRule (.*) {%WEB_PATH%}/$1/index.html [L]
+
+	# Map individual posts
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.html -f
+	RewriteRule (.*) {%WEB_PATH%}/$1.html [L]
 
 	# Map feed
-	RewriteRule ^feed$ {%WEB_PATH%}/feed.xml [L,QSA]
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/feed.xml -f
+	RewriteRule ^feed$ {%WEB_PATH%}/feed.xml [L]
+
+	# Map additional files
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1 -f
+	RewriteRule (.*) {%WEB_PATH%}/$1 [L]
+
+	# Rebuild site
+	RewriteRule ^$ index.php [L]
 </IfModule>
+
+<ifmodule mod_deflate.c>
+	AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript
+</ifmodule>

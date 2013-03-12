@@ -31,7 +31,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			try {
 				$this->blog->get_file_system()->create_dir($blog->get_path_www());
 			} catch(\Exception $e){
-				throw new \InvalidArgumentException('Output directory cannot be found');
+				throw new \RuntimeException('Output directory cannot be found');
 			}
 		}
 		if(!is_dir($blog->get_path_templates())){
@@ -91,6 +91,33 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 */
 	protected function render_template_to_file($template_name, $output_path, $params = null){
 		$this->write($output_path, $this->render_template($template_name, $params));
+	}
+
+	/**
+	 * Generates and saves the static file for the given page
+	 *
+	 * @param \Blight\Interfaces\Page $page	The page to generate an HTML page from
+	 */
+	public function render_page(\Blight\Interfaces\Page $page){
+		$path	= $this->blog->get_path_www($page->get_relative_permalink().'.html');
+
+		$this->render_template_to_file('page', $path, array(
+			'page'			=> $page,
+			'page_title'	=> $page->get_title()
+		));
+	}
+
+	/**
+	 * Generates and saves the static files for all pages. Pages are retrieved from the
+	 * Manager set during construction
+	 */
+	public function render_pages(){
+		$pages	= $this->manager->get_pages();
+
+		foreach($pages as $page){
+			/** @var \Blight\Interfaces\Page $page */
+			$this->render_page($page);
+		}
 	}
 
 	/**
@@ -342,6 +369,26 @@ class Renderer implements \Blight\Interfaces\Renderer {
 
 		$this->render_template_to_file('feed', $path, array(
 			'posts'	=> $posts
+		));
+	}
+
+	/**
+	 * Generates and saves the static XML file for the blog's sitemap. Pages are retrieved from the
+	 * Manager set during class construction.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered document
+	 */
+	public function render_sitemap($options = null){
+		$options	= array_merge(array(
+		), (array)$options);
+
+		// Prepare posts
+		$pages	= $this->manager->get_pages();
+
+		$path	= $this->blog->get_path_www('sitemap.xml');
+
+		$this->render_template_to_file('sitemap', $path, array(
+			'pages'	=> $pages
 		));
 	}
 };
