@@ -5,38 +5,42 @@
 		<ul>
 			<li>
 				<label for="input_site_name">Site Name</label>
-				<input name="site_name" id="input_site_name" />
+				<input name="site_name" id="input_site_name" required="required" />
 			</li>
 			<li>
 				<label for="input_site_url">Site URL</label>
-				<input name="site_url" id="input_site_url" type="url" value="http://<?php echo $_SERVER['HTTP_HOST'];?>" />
+				<input name="site_url" id="input_site_url" type="url" value="http://<?php echo $_SERVER['HTTP_HOST'];?>" required />
 			</li>
-			<li>
+			<li class="full textarea">
 				<label for="input_site_description">Site Description</label>
 				<textarea name="site_description" id="input_site_description"></textarea>
 			</li>
 		</ul>
 	</fieldset>
-	<fieldset>
+	<fieldset id="linkblog_options">
 		<ul>
-			<li>
-				<label for="input_linkblog">Linkblog</label>
-				<input name="linkblog" id="input_linkblog" type="checkbox" />
+			<li class="full checkbox">
+                <input name="linkblog" id="input_linkblog" type="checkbox" />
+                <label for="input_linkblog">Is Linkblog</label>
+
+				<p class="description">Linkblogs feature linked posts as the majority of posts.</p>
 			</li>
-			<li>
-				<p>If not linkblog</p>
-				<label for="input_linkblog_link_character">Link Character</label>
-				<input name="linkblog_link_character" id="input_linkblog_link_character" value="→" />
+			<li class="linkblog_enabled_options single">
+                <label for="input_linkblog_link_character">Link Character</label>
+                <input name="linkblog_link_character" id="input_linkblog_link_character" value="→" />
+
+                <p class="description">This character will be added before linked post titles</p>
 			</li>
-			<li>
-				<p>If linkblog</p>
-				<label for="input_linkblog_post_character">Post Character</label>
-				<input name="linkblog_post_character" id="input_linkblog_post_character" value="★" />
+			<li class="linkblog_disabled_options single">
+                <label for="input_linkblog_post_character">Post Character</label>
+                <input name="linkblog_post_character" id="input_linkblog_post_character" value="★" />
+
+                <p class="description">This character will be added before non-linked post titles</p>
 			</li>
 		</ul>
 	</fieldset>
 
-	<button type="submit">Continue</button>
+	<button class="continue" type="submit">Continue</button>
 </form>
 
 <?php include('inc/footer.php');?>

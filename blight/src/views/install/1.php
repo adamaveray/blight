@@ -4,15 +4,15 @@
 	<ul>
 		<li>
 			<label for="input_author_name">Your Name</label>
-			<input name="author_name" id="input_author_name" />
+			<input name="author_name" id="input_author_name" required="required" />
 		</li>
 		<li>
 			<label for="input_author_email">Your Email</label>
-			<input name="author_email" id="input_author_email" type="email" />
+			<input name="author_email" id="input_author_email" type="email" required="required" />
 		</li>
 	</ul>
 
-	<button type="submit">Continue</button>
+	<button class="continue" type="submit">Continue</button>
 </form>
 
 <?php include('inc/footer.php');?>

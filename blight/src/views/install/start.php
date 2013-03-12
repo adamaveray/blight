@@ -1,5 +1,7 @@
-<?php include('inc/header.php');?>
+<?php
+$page_id	= 'start';
+include('inc/header.php');?>
 
-<a href="<?php echo $target_url;?>">Begin</a>
+<a class="continue start" href="<?php echo $target_url;?>">Begin</a>
 
 <?php include('inc/footer.php');?>

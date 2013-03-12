@@ -30,10 +30,14 @@
 			<li>
 				<label for="input_path_web">Web</label>
 				<input name="path_web" id="input_path_web" value="www/_blog/" />
+
+				<p class="description">Where to write the rendered site to, which should be accessible via the web.</p>
 			</li>
 			<li>
 				<label for="input_path_drafts_web">Web Drafts</label>
 				<input name="path_drafts_web" id="input_path_drafts_web" value="www/_drafts/" />
+
+				<p class="description">Where to write rendered drafts to. If the directory is accessible via web, anyone will have access to drafts.</p>
 			</li>
 		</ul>
 	</fieldset>
@@ -46,7 +50,7 @@
 		</ul>
 	</fieldset>
 
-	<button type="submit">Continue</button>
+	<button class="continue" type="submit">Continue</button>
 </form>
 
 <?php include('inc/footer.php');?>
