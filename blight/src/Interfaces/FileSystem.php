@@ -14,7 +14,7 @@ interface FileSystem {
 
 	public function delete_file($path, $cleanup = false);
 
-	public function create_dir($path, $mode = 0777, $recursive = true);
+	public function create_dir($path, $mode = 0755, $recursive = true);
 
-	public function copy_dir($source_dir, $target_dir, $mode = 0777, $recursive = true);
+	public function copy_dir($source_dir, $target_dir, $mode = 0755, $recursive = true);
 };

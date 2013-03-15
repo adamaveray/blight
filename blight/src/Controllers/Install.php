@@ -157,7 +157,7 @@ class Install {
 			throw new \RuntimeException('Source directory not found');
 		}
 		if(!is_dir($target)){
-			$result	= mkdir($target, 0777, true);
+			$result	= mkdir($target, 0755, true);
 			if(!$result){
 				throw new \RuntimeException('Target directory cannot be created');
 			}
@@ -222,7 +222,7 @@ class Install {
 
 			$dir	= $this->root_path.$dir;
 			if(!is_dir($dir)){
-				$result	= mkdir($dir, 0777, true);
+				$result	= mkdir($dir, 0755, true);
 				if(!$result){
 					// Cannot create directory
 					if(!isset($feedback['paths'])){
@@ -231,7 +231,7 @@ class Install {
 					$feedback['paths'][]	= $config['paths'][$config_name];
 				}
 			} elseif(!is_writable($dir)){
-				$result	= chmod($dir, 0777);
+				$result	= chmod($dir, 0755);
 				if(!$result){
 					// Cannot write to directory
 					$feedback['paths'][]	= $config['paths'][$config_name];

@@ -31,7 +31,7 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	public function create_file($path, $content){
 		$dir	= pathinfo($path, \PATHINFO_DIRNAME);
 		if(!is_dir($dir)){
-			$result	= mkdir($dir, 0777, true);
+			$result	= mkdir($dir, 0755, true);
 
 			if($result === false){
 				throw new \RuntimeException('Cannot create directory for '.$path);
@@ -122,7 +122,7 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @throws \RuntimeException	Cannot create the directory
 	 * @see mkdir()
 	 */
-	public function create_dir($path, $mode = 0777, $recursive = true){
+	public function create_dir($path, $mode = 0755, $recursive = true){
 		$path	= rtrim($path, '/');
 		if(is_dir($path)){
 			// Already exists
@@ -147,7 +147,7 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @throws \RuntimeException	Source directory does not exist
 	 * @throws \RuntimeException	Cannot create target directory
 	 */
-	public function copy_dir($source_dir, $target_dir, $mode = 0777, $recursive = true){
+	public function copy_dir($source_dir, $target_dir, $mode = 0755, $recursive = true){
 		$source_dir	= rtrim($source_dir, '/');
 		$target_dir	= rtrim($target_dir, '/');
 
