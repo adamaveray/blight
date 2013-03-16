@@ -253,13 +253,6 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * @return string	The line ending
-	 */
-	public function get_eol(){
-		return "\n";
-	}
-
-	/**
 	 * @return bool	Whether the blog is a linkblog
 	 */
 	public function is_linkblog(){

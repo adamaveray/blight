@@ -36,8 +36,6 @@ interface Blog {
 
 	public function get_package_manager();
 
-	public function get_eol();
-
 	public function is_linkblog();
 
 	public function do_hook($hook, $params = null);

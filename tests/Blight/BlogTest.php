@@ -166,13 +166,6 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_eol
-	 */
-	public function testGetEOL(){
-		$this->assertEquals("\n", $this->blog->get_eol());
-	}
-
-	/**
 	 * @covers \Blight\Blog::is_linkblog
 	 */
 	public function testIsLinkblog(){

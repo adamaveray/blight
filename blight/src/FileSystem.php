@@ -48,15 +48,19 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * Retrieves a file's contents
 	 *
 	 * @param string $path		The file to be read
+	 * @param bool $normalise_line_endings	Whether to normalise line endings to the value set in the provided Blog instance
 	 * @return string	The content from the file
 	 * @throws \RuntimeException	The file cannot be read
 	 */
-	public function load_file($path){
+	public function load_file($path, $normalise_line_endings = true){
 		if(file_exists($path)){
 			$content	= file_get_contents($path);
 		}
 		if(!isset($content) || $content === false){
 			throw new \RuntimeException('Cannot read '.$path);
+		}
+		if($normalise_line_endings){
+			$content	= preg_replace('/\R/', "\n", $content);
 		}
 
 		return $content;

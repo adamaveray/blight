@@ -6,7 +6,7 @@ interface FileSystem {
 
 	public function create_file($path, $content);
 
-	public function load_file($path);
+	public function load_file($path, $normalise_file_endings = true);
 
 	public function move_file($old_path, $new_path, $cleanup = false);
 
