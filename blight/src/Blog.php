@@ -50,7 +50,7 @@ class Blog implements \Blight\Interfaces\Blog {
 		$this->paths	= array(
 			'www'			=> 'web',
 			'drafts-web'	=> 'drafts-web',
-			'pagen'			=> 'pages',
+			'pages'			=> 'pages',
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
 			'templates'		=> 'templates',
@@ -128,14 +128,14 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * Returns the path to the pagen directory
+	 * Returns the path to the pages directory
 	 *
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
 	public function get_path_pages($append = ''){
-		return $this->paths['pagen'].$append;
+		return $this->paths['pages'].$append;
 	}
 
 	/**
