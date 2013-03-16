@@ -263,6 +263,24 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Post::is_being_published
+	 */
+	public function testIsBeingPublished(){
+		$this->assertFalse($this->post->is_being_published());
+	}
+
+	/**
+	 * @covers \Blight\Post::set_being_published
+	 */
+	public function testSetBeingPublished(){
+		$this->assertFalse($this->post->is_being_published());
+		$this->post->set_being_published(true);
+		$this->assertTrue($this->post->is_being_published());
+		$this->post->set_being_published(false);
+		$this->assertFalse($this->post->is_being_published());
+	}
+
+	/**
 	 * @covers \Blight\Post::is_linked
 	 */
 	public function testIsLinked(){

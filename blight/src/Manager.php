@@ -110,8 +110,11 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @param \Blight\Interfaces\Post $post	The post to move
 	 * @param string $current_path	The current path to the post's file
+	 * @return bool	Whether the post file was moved to be published
 	 */
 	protected function organise_post_file(\Blight\Interfaces\Post $post, $current_path){
+		$will_publish	= false;
+
 		// Check for special headers
 		$has_date		= $post->has_meta('date');
 		$has_publish	= $post->has_meta('publish-now');
@@ -153,12 +156,16 @@ class Manager implements \Blight\Interfaces\Manager {
 		$new_path	= $this->blog->get_path_posts(pathinfo($new_path, \PATHINFO_DIRNAME).'/'.$post->get_date()->format('Y-m-d').'-'.pathinfo($new_path, \PATHINFO_BASENAME));
 
 		if($current_path == $new_path){
-			// Already moved
-			return;
+			// Already moved and published
+			return false;
 		}
 
+		// Move file
 		$is_draft_dir	= (strstr($current_path, $this->blog->get_path_drafts()) !== false);
 		$this->blog->get_file_system()->move_file($current_path, $new_path, !$is_draft_dir);	// Don't clean up drafts
+
+		// Moved - publishing
+		return true;
 	}
 
 	/**
@@ -265,7 +272,8 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 
 				// Organise source file
-				$this->organise_post_file($post, $file);
+				$will_publish	= $this->organise_post_file($post, $file);
+				$post->set_being_published($will_publish);
 
 				$posts[]	= $post;
 			}

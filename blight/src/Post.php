@@ -10,6 +10,7 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	protected $category;
 	protected $is_draft;
 	protected $link;
+	protected $is_being_published;
 
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
@@ -157,6 +158,20 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 		}
 
 		return $this->category;
+	}
+
+	/**
+	 * @return bool	Whether the post is being published during this build
+	 */
+	public function is_being_published(){
+		return (bool)$this->is_being_published;
+	}
+
+	/**
+	 * @param bool $is_being_published	Whether the post is being published during this build
+	 */
+	public function set_being_published($is_being_published){
+		$this->is_being_published	= (bool)$is_being_published;
 	}
 
 	/**
