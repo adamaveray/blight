@@ -129,6 +129,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Post
 	 */
 	public function render_post(\Blight\Interfaces\Post $post, $prev = null, $next = null){
+		if($post->is_being_published()){
+			$this->blog->do_hook('will_publish_post', array(
+				'post'	=> $post
+			));
+		}
+
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
 		$params	= array(
@@ -149,6 +155,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		}
 
 		$this->render_template_to_file('post', $path, $params);
+
+		if($post->is_being_published()){
+			$this->blog->do_hook('did_publish_post', array(
+				'post'	=> $post
+			));
+		}
 	}
 
 	/**
