@@ -23,4 +23,6 @@ interface Renderer {
 	public function render_home($options = null);
 
 	public function render_feed($options = null);
+
+	public function render_sitemap($options = null);
 };
