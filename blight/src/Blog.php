@@ -54,6 +54,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
 			'templates'		=> 'templates',
+			'plugins'		=> 'plugins',
 			'cache'			=> 'cache'
 		);
 		foreach($this->paths as $key => $config_key){
@@ -125,6 +126,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function get_path_templates($append = ''){
 		return $this->paths['templates'].$append;
+	}
+
+	/**
+	 * Returns the path to the plugins directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_plugins($append = ''){
+		return $this->paths['plugins'].$append;
 	}
 
 	/**
