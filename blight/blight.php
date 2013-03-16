@@ -116,11 +116,11 @@ debug_output('Renderer initialised');
 	));
 	debug_output('Home rendered');
 
-	// Render feed
-	$renderer->render_feed(array(
+	// Render feeds
+	$renderer->render_feeds(array(
 		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
 	));
-	debug_output('Feed rendered');
+	debug_output('Feeds rendered');
 
 	// Render sitemap
 	$renderer->render_sitemap(array(
