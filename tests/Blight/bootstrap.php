@@ -33,6 +33,10 @@ $config	= array(
 		'feed'	=> 20
 	),
 
+	'posts'	=> array(
+		'allow_txt'	=> false
+	),
+
 	'linkblog'	=> array(
 		'linkblog'	=> false,
 		'link_character'	=> '→',

@@ -289,10 +289,19 @@ class Install {
 		}
 
 		if(!isset($config['output'])){
-			$config['output']	= array(
-				'minify_html'	=> false
-			);
+			$config['output']	= array();
 		}
+		$config['output']	= array_merge(array(
+			'minify_html'	=> false
+		), $config['output']);
+
+		if(!isset($config['posts'])){
+			$config['posts']	= array();
+		}
+		$config['posts']	= array_merge(array(
+			'allow_txt'	=> true
+		), $config['posts']);
+
 
 		// Write config file
 		$config_text	= $this->build_setup($config);

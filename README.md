@@ -182,6 +182,10 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 - **link_character**: The glyph to prefix linked posts with when the **linkblog** option is disabled
 - **post_character**: The glyph to prefix non-linked posts with when the **linkblog** option is enabled
 
+### Posts
+
+- **allow_txt**: Whether to process Markdown post files with the file extension `.txt`
+
 ### Output
 
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
