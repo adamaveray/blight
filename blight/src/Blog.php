@@ -276,9 +276,11 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * 		do_hook('hook_name', array(
 	 * 			'param'	=> &$value
 	 *  	));
+	 *
+	 * @see \Blight\PackageManager::do_hook
 	 */
-	public function do_hook($name, $params = null){
-		return $this->get_package_manager()->do_hook($name, $params);
+	public function do_hook($hook, $params = null){
+		$this->get_package_manager()->do_hook($hook, $params);
 	}
 
 	/**

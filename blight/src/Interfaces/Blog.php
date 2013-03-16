@@ -40,5 +40,7 @@ interface Blog {
 
 	public function is_linkblog();
 
+	public function do_hook($hook, $params = null);
+
 	public function get($parameter, $group = null, $default = null);
 };
