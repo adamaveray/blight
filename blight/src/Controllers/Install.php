@@ -59,10 +59,13 @@ class Install {
 		}
 	}
 
-	protected function session_set($name, $value){
+	protected function session_set_config($name, $value){
 		$name	= explode('/', $name);
 		$levels	= count($name);
-		$array	= &$_SESSION;
+		if(!isset($_SESSION['config'])){
+			$_SESSION['config']	= array();
+		}
+		$array	= &$_SESSION['config'];
 
 		for($i = 0; $i < $levels; $i++){
 			$level	= $name[$i];
@@ -135,6 +138,7 @@ class Install {
 	protected function valid_redirect($errors, $valid_url, $invalid_url){
 		if(count($errors) === 0){
 			$_SESSION['install_errors']	= null;
+			unset($_SESSION['install_errors']);
 			$this->redirect($valid_url);
 		} else {
 			$_SESSION['install_errors']	= $errors;
@@ -343,13 +347,13 @@ class Install {
 		$errors	= array();
 
 		if(isset($data['author_name']) && trim($data['author_name']) != ''){
-			$this->session_set('author/name', $data['author_name']);
+			$this->session_set_config('author/name', $data['author_name']);
 		} else {
 			$errors['author_name']	= true;
 		}
 
 		if(isset($data['author_email']) && filter_var($data['author_email'], \FILTER_VALIDATE_EMAIL)){
-			$this->session_set('author/email', $data['author_email']);
+			$this->session_set_config('author/email', $data['author_email']);
 		} else {
 			$errors['author_email']	= true;
 		}
@@ -370,7 +374,7 @@ class Install {
 		$errors	= array();
 
 		if(isset($data['site_name']) && trim($data['site_name']) != ''){
-			$this->session_set('site/name', $data['site_name']);
+			$this->session_set_config('site/name', $data['site_name']);
 		} else {
 			$errors['site_name']	= true;
 		}
@@ -383,14 +387,14 @@ class Install {
 		}
 
 		if(isset($data['site_url']) && filter_var($data['site_url'], \FILTER_VALIDATE_URL)){
-			$this->session_set('site/url', $url);
+			$this->session_set_config('site/url', $url);
 		} else {
 			$errors['site_url']	= true;
 		}
 
 		if(isset($data['site_description'])){
 			// Not required
-			$this->session_set('site/description', $data['site_description']);
+			$this->session_set_config('site/description', $data['site_description']);
 		}
 
 
@@ -398,18 +402,18 @@ class Install {
 		if(isset($data['linkblog'])){
 			$linkblog	= (bool)$data['linkblog'];
 		}
-		$this->session_set('linkblog/linkblog', $linkblog);
+		$this->session_set_config('linkblog/linkblog', $linkblog);
 
 		if($linkblog){
 			if(isset($data['linkblog_post_character'])){
-				$this->session_set('linkblog/post_character', $data['linkblog_post_character']);
+				$this->session_set_config('linkblog/post_character', $data['linkblog_post_character']);
 			}
 		} else {
 			if(isset($data['linkblog_link_character'])){
-				$this->session_set('linkblog/link_character', $data['linkblog_link_character']);
+				$this->session_set_config('linkblog/link_character', $data['linkblog_link_character']);
 			}
 		}
-		$this->session_set('linkblog/link_directory', null);
+		$this->session_set_config('linkblog/link_directory', null);
 
 		$this->valid_redirect($errors, 'end', '2');
 	}
@@ -419,7 +423,7 @@ class Install {
 		setcookie(self::COOKIE_NAME, '1', null, '/');
 
 		// Setup finished - save config
-		$result	= $this->run_install($_SESSION);
+		$result	= $this->run_install($_SESSION['config']);
 		if($result !== true){
 			// Could not save setup
 			$this->page_step_end_failure($result);
