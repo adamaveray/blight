@@ -51,10 +51,6 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 				continue;
 			}
 
-			if(!$is_phar){
-				continue;
-			}
-
 			$package_name	= basename($dir);
 
 			if($is_phar){
