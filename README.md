@@ -181,6 +181,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
                 titles are prefixed with a glyph)
 - **link_character**: The glyph to prefix linked posts with when the **linkblog** option is disabled
 - **post_character**: The glyph to prefix non-linked posts with when the **linkblog** option is enabled
+- **link_directory**: An optional directory to put linked posts in (eg: `2013/02/post` → `linked/2013/02/post`)
 
 ### Posts
 

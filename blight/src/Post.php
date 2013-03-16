@@ -106,7 +106,16 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	 * @return string	The URL to the post without the prefixed site URL
 	 */
 	public function get_relative_permalink(){
-		return $this->get_date()->format('Y/m').'/'.$this->slug;
+		$permalink	= $this->get_date()->format('Y/m').'/'.$this->slug;
+
+		if($this->is_linked()){
+			$prefix	= $this->blog->get('link_directory', 'linkblog');
+			if(isset($prefix)){
+				$permalink	= rtrim($prefix,'/').'/'.$permalink;
+			}
+		}
+
+		return $permalink;
 	}
 
 	/**

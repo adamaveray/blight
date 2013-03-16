@@ -409,6 +409,7 @@ class Install {
 				$this->session_set('linkblog/link_character', $data['linkblog_link_character']);
 			}
 		}
+		$this->session_set('linkblog/link_directory', null);
 
 		$this->valid_redirect($errors, 'end', '2');
 	}
