@@ -10,6 +10,9 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\FileSystem */
 	protected $file_system;
 
+	/** @var \Blight\Interfaces\PackageManager */
+	protected $package_manager;
+
 	protected $root_path;
 	protected $app_path;
 	protected $url;
@@ -54,6 +57,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
 			'templates'		=> 'templates',
+			'plugins'		=> 'plugins',
 			'cache'			=> 'cache'
 		);
 		foreach($this->paths as $key => $config_key){
@@ -125,6 +129,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function get_path_templates($append = ''){
 		return $this->paths['templates'].$append;
+	}
+
+	/**
+	 * Returns the path to the plugins directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_plugins($append = ''){
+		return $this->paths['plugins'].$append;
 	}
 
 	/**
@@ -227,6 +242,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
+	 * @return \Blight\Interfaces\PackageManager
+	 */
+	public function get_package_manager(){
+		if(!isset($this->package_manager)){
+			$this->package_manager	= new \Blight\PackageManager($this);
+		}
+
+		return $this->package_manager;
+	}
+
+	/**
 	 * @return string	The line ending
 	 */
 	public function get_eol(){
@@ -238,6 +264,21 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function is_linkblog(){
 		return (bool)$this->get('linkblog', 'linkblog', false);
+	}
+
+	/**
+	 * Runs a hook through plugins
+	 *
+	 * @param string $hook	The name of the hook to run
+	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
+	 *
+	 * 		$value	= 1;
+	 * 		do_hook('hook_name', array(
+	 * 			'param'	=> &$value
+	 *  	));
+	 */
+	public function do_hook($name, $params = null){
+		return $this->get_package_manager()->do_hook($name, $params);
 	}
 
 	/**

@@ -210,6 +210,7 @@ class Install {
 			'posts'			=> 'blog-data/posts',
 			'drafts'		=> 'blog-data/drafts',
 			'templates'		=> 'blog-data/templates',
+			'plugins'		=> 'blog-data/plugins',
 			'web'			=> 'www/_blog',
 			'drafts-web'	=> 'www/_drafts',
 			'cache'			=> 'cache',
