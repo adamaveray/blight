@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+## 0.6
+
+_16 Mar 2013_
+
+- [Plugins](PLUGINS.md)
+- Added draft publishing directory
+- Added RSS-only posts support
+- Added RSS feeds for categories and posts
+- Added optional .txt file parsing
+- Added config setting to render linked posts to separate directory
+
+
 ## 0.5
 
 _12 Mar 2013_
