@@ -249,9 +249,13 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all posts found as Post objects
 	 *
-	 * @return array	An array of posts
+	 * @param array $filters	Any filters to apply
+	 * 		array(
+	 * 			'rss'	=> (bool|string)	// Whether to include RSS-only posts. Providing `'only'` will return only RSS-only posts
+	 * 		)
+	 * @return array			An array of posts
 	 */
-	public function get_posts(){
+	public function get_posts($filters = null){
 		if(!isset($this->posts)){
 			$files	= $this->get_raw_posts();
 
@@ -291,7 +295,28 @@ class Manager implements \Blight\Interfaces\Manager {
 			$this->posts	= $posts;
 		}
 
-		return $this->posts;
+		$filters	= array_merge(array(
+			'rss'	=> false
+		), (array)$filters);
+
+		$posts	= array();
+		foreach($this->posts as $post){
+			/** @var \Blight\Interfaces\Post $post */
+			if($filters['rss'] !== true){
+				$is_rss_only	= $post->get_meta('rss-only');
+				if($filters['rss'] === 'only' && !$is_rss_only){
+					// Only allow RSS-only posts, post is not RSS-only
+					continue;
+				} elseif(!$filters['rss'] && $is_rss_only){
+					// Do not allow RSS-only posts, post is RSS-only
+					continue;
+				}
+			}
+
+			$posts[]	= $post;
+		}
+
+		return $posts;
 	}
 
 	/**

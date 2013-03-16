@@ -371,7 +371,9 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		), (array)$options);
 
 		// Prepare posts
-		$posts	= $this->manager->get_posts();
+		$posts	= $this->manager->get_posts(array(
+			'rss'	=> true
+		));
 
 		if($options['limit'] > 0){
 			$posts	= array_slice($posts, 0, $options['limit']);
