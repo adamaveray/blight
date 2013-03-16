@@ -3,6 +3,7 @@ namespace Blight\Controllers;
 
 class Install {
 	const COOKIE_NAME	= 'blightinstall';
+	const DRAFT_PUBLISH_DIR	= '_publish';
 
 	protected $root_path;
 	protected $app_path;
@@ -239,6 +240,10 @@ class Install {
 				}
 			}
 		}
+
+		// Create drafts publish dir
+		$drafts_dir	= $this->root_path.$config['paths']['drafts'];
+		mkdir($drafts_dir.self::DRAFT_PUBLISH_DIR, 0755, true);
 
 		$template_dir	= $this->root_path.$config['paths']['templates'];
 

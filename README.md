@@ -16,6 +16,7 @@ After installation, your directory structure should look like the following:
 	
 	blog-data/
 		drafts/
+			_publish/
 		pages/
 		posts/
 		templates/
@@ -45,7 +46,7 @@ The title and content are standard Markdown. The headers section under the title
 
 Posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be listed on the site itself.
 
-When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
+When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild. Alternatively, move the post to the `_publish/` directory in the drafts directory, and it will be published on rebuild.
 
 ### Pages
 

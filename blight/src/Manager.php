@@ -5,6 +5,8 @@ namespace Blight;
  * Handles all raw posts and provides basic sorting and processing functionality
  */
 class Manager implements \Blight\Interfaces\Manager {
+	const DRAFT_PUBLISH_DIR	= '_publish/';
+
 	protected $blog;
 
 	protected $pages;
@@ -74,9 +76,12 @@ class Manager implements \Blight\Interfaces\Manager {
 		$files	= glob($dir.'*.*');
 
 		if(!$drafts){
+			$draft_publish_dir	= $this->blog->get_path_drafts(self::DRAFT_PUBLISH_DIR);
+
 			$files	= array_merge(
 				$files,		// Unsorted
-				glob($dir.'*/*/*.*')	// Sorted (YYYY/DD/post.md)
+				glob($dir.'*/*/*.*'),	// Sorted (YYYY/DD/post.md)
+				glob($draft_publish_dir.'*.*')	// Ready-to-publish drafts
 			);
 		}
 
@@ -152,7 +157,8 @@ class Manager implements \Blight\Interfaces\Manager {
 			return;
 		}
 
-		$this->blog->get_file_system()->move_file($current_path, $new_path, !$post->is_draft());	// Don't clean up drafts
+		$is_draft_dir	= (strstr($current_path, $this->blog->get_path_drafts()) !== false);
+		$this->blog->get_file_system()->move_file($current_path, $new_path, !$is_draft_dir);	// Don't clean up drafts
 	}
 
 	/**
@@ -219,8 +225,8 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 
 				if($post->has_meta('publish-now')){
-					// Publish post
-					$this->organise_post_file($post, $file);
+					// Move to publish directory
+					$this->blog->get_file_system()->move_file($file, str_replace($this->blog->get_path_drafts(), $this->blog->get_path_drafts(self::DRAFT_PUBLISH_DIR), $file));
 					continue;
 				}
 
