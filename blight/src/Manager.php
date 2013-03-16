@@ -158,8 +158,8 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		// Build filename
-		$new_path	= $post->get_relative_permalink().'.'.$this->post_extension;
-		$new_path	= $this->blog->get_path_posts(pathinfo($new_path, \PATHINFO_DIRNAME).'/'.$post->get_date()->format('Y-m-d').'-'.pathinfo($new_path, \PATHINFO_BASENAME));
+		$new_path	= $post->get_date()->format('Y/m/Y-m-d').'-'.$post->get_slug().'.'.$this->post_extension;
+		$new_path	= $this->blog->get_path_posts($new_path);
 
 		if($current_path == $new_path){
 			// Already moved and published
