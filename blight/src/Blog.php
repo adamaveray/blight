@@ -267,6 +267,21 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
+	 * Runs a hook through plugins
+	 *
+	 * @param string $hook	The name of the hook to run
+	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
+	 *
+	 * 		$value	= 1;
+	 * 		do_hook('hook_name', array(
+	 * 			'param'	=> &$value
+	 *  	));
+	 */
+	public function do_hook($name, $params = null){
+		return $this->get_package_manager()->do_hook($name, $params);
+	}
+
+	/**
 	 * Retrieves settings from the blog configation
 	 *
 	 * @param string $parameter		The name of the parameter to retrieve

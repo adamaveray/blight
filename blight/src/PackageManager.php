@@ -3,6 +3,7 @@ namespace Blight;
 
 class PackageManager implements \Blight\Interfaces\PackageManager {
 	const MANIFEST_FILE	= 'package.json';
+	const HOOK_FUNCTION_PREFIX	= 'hook_';
 
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
@@ -89,5 +90,28 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	protected function parse_manifest($content){
 		$parser	= new \Blight\Config();
 		return $parser->unserialize($content);
+	}
+
+	/**
+	 * Runs a hook through plugins
+	 *
+	 * @param string $hook	The name of the hook to run
+	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
+	 *
+	 * 		$value	= 1;
+	 * 		do_hook('hook_name', array(
+	 * 			'param'	=> &$value
+	 *  	));
+	 */
+	public function do_hook($hook, $params = null){
+		$callback_name	= static::HOOK_FUNCTION_PREFIX.$hook;
+
+		foreach($this->plugins as $plugin){
+			// Run hook
+			$callback	= array($plugin, $callback_name);
+			if(is_callable($callback)){
+				call_user_func($callback, $params);
+			}
+		}
 	}
 };
