@@ -212,6 +212,33 @@ EOD;
 	/**
 	 * @covers \Blight\Post::get_tags
 	 */
+	public function testDuplicateGetTags(){
+		$raw_tags	= array(
+			'Tag 1',
+			'Tag 2',
+			'Tag 3',
+			'Tag 1'	// Duplicate;
+		);
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2013/02/01
+Tags: {TAGS}
+
+Test post
+EOD;
+
+		$post	= new \Blight\Post($this->blog, str_replace('{TAGS}', implode(',', $raw_tags), $content), 'test-post');
+		$tags	= $post->get_tags();
+		$this->assertTrue(is_array($tags));
+		$this->assertNotEquals(count($raw_tags), count($tags));
+		$this->assertEquals(count($raw_tags)-1, count($tags));
+
+	}
+
+	/**
+	 * @covers \Blight\Post::get_tags
+	 */
 	public function testNoTagsGetTags(){
 		$content	= <<<EOD
 Test Post

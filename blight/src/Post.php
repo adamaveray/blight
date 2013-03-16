@@ -133,9 +133,10 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	public function get_tags(){
 		if(!isset($this->tags)){
 			if($this->has_meta('tags')){
+				$tags	= array_map('trim', explode(',', $this->get_meta('tags')));
 				$this->tags	= array_map(function($item){
-					return new \Blight\Collections\Tag($this->blog, trim($item));
-				}, explode(',', $this->get_meta('tags')));
+					return new \Blight\Collections\Tag($this->blog, $item);
+				}, array_unique($tags));
 			} else {
 				// No tags
 				$this->tags	= array();
