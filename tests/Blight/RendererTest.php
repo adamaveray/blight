@@ -380,9 +380,9 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_feed
+	 * @covers \Blight\Renderer::render_feeds
 	 */
-	public function testRenderFeed(){
+	public function testRenderFeeds(){
 		$content	= <<<EOD
 Test Post
 =========
@@ -399,7 +399,9 @@ EOD;
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$this->renderer->render_feed();
+		$this->renderer->render_feeds(array(
+			'subfeeds'	=> false
+		));
 
 		$path	= $this->blog->get_path_www('feed.xml');
 

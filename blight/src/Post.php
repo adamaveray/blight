@@ -10,6 +10,7 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	protected $category;
 	protected $is_draft;
 	protected $link;
+	protected $is_being_published;
 
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
@@ -105,7 +106,16 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	 * @return string	The URL to the post without the prefixed site URL
 	 */
 	public function get_relative_permalink(){
-		return $this->get_date()->format('Y/m').'/'.$this->slug;
+		$permalink	= $this->get_date()->format('Y/m').'/'.$this->slug;
+
+		if($this->is_linked()){
+			$prefix	= $this->blog->get('link_directory', 'linkblog');
+			if(isset($prefix)){
+				$permalink	= rtrim($prefix,'/').'/'.$permalink;
+			}
+		}
+
+		return $permalink;
 	}
 
 	/**
@@ -132,9 +142,10 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	public function get_tags(){
 		if(!isset($this->tags)){
 			if($this->has_meta('tags')){
+				$tags	= array_map('trim', explode(',', $this->get_meta('tags')));
 				$this->tags	= array_map(function($item){
-					return new \Blight\Collections\Tag($this->blog, trim($item));
-				}, explode(',', $this->get_meta('tags')));
+					return new \Blight\Collections\Tag($this->blog, $item);
+				}, array_unique($tags));
 			} else {
 				// No tags
 				$this->tags	= array();
@@ -157,6 +168,20 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 		}
 
 		return $this->category;
+	}
+
+	/**
+	 * @return bool	Whether the post is being published during this build
+	 */
+	public function is_being_published(){
+		return (bool)$this->is_being_published;
+	}
+
+	/**
+	 * @param bool $is_being_published	Whether the post is being published during this build
+	 */
+	public function set_being_published($is_being_published){
+		$this->is_being_published	= (bool)$is_being_published;
 	}
 
 	/**

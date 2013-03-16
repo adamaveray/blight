@@ -12,13 +12,16 @@ AddDefaultCharset UTF-8
 	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.html -f
 	RewriteRule (.*) {%WEB_PATH%}/$1.html [L]
 
-	# Map feed
-	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/feed.xml -f
-	RewriteRule ^feed$ {%WEB_PATH%}/feed.xml [L]
+	# Map feeds
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1.xml -f
+	RewriteRule ^(.*)$ {%WEB_PATH%}/$1.xml [L]
 
 	# Map additional files
 	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/$1 -f
 	RewriteRule (.*) {%WEB_PATH%}/$1 [L]
+
+	# Handle trailing slash
+	RewriteRule ^(.+)/$ /$1 [R=301,L]
 
 	# Rebuild site
 	RewriteRule ^$ index.php [L]

@@ -5,6 +5,8 @@ namespace Blight;
  * Handles all raw posts and provides basic sorting and processing functionality
  */
 class Manager implements \Blight\Interfaces\Manager {
+	const DRAFT_PUBLISH_DIR	= '_publish/';
+
 	protected $blog;
 
 	protected $pages;
@@ -14,6 +16,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected $posts_by_tag;
 	protected $posts_by_category;
 	protected $draft_posts;
+	protected $post_extension;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -32,6 +35,11 @@ class Manager implements \Blight\Interfaces\Manager {
 		if(!is_dir($blog->get_path_posts())){
 			throw new \RuntimeException('Posts directory not found');
 		}
+
+		if($blog->get('allow_txt', 'posts', false)){
+			$this->allowed_extensions[]	= 'txt';
+		}
+		$this->post_extension	= ltrim($blog->get('default_extension', 'posts', current($this->allowed_extensions)), '.');
 	}
 
 	/**
@@ -74,9 +82,12 @@ class Manager implements \Blight\Interfaces\Manager {
 		$files	= glob($dir.'*.*');
 
 		if(!$drafts){
+			$draft_publish_dir	= $this->blog->get_path_drafts(self::DRAFT_PUBLISH_DIR);
+
 			$files	= array_merge(
 				$files,		// Unsorted
-				glob($dir.'*/*/*.*')	// Sorted (YYYY/DD/post.md)
+				glob($dir.'*/*/*.*'),	// Sorted (YYYY/DD/post.md)
+				glob($draft_publish_dir.'*.*')	// Ready-to-publish drafts
 			);
 		}
 
@@ -105,6 +116,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @param \Blight\Interfaces\Post $post	The post to move
 	 * @param string $current_path	The current path to the post's file
+	 * @return bool	Whether the post file was moved to be published
 	 */
 	protected function organise_post_file(\Blight\Interfaces\Post $post, $current_path){
 		// Check for special headers
@@ -144,15 +156,20 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		// Build filename
-		$new_path	= $post->get_relative_permalink().'.'.current($this->allowed_extensions);
-		$new_path	= $this->blog->get_path_posts(pathinfo($new_path, \PATHINFO_DIRNAME).'/'.$post->get_date()->format('Y-m-d').'-'.pathinfo($new_path, \PATHINFO_BASENAME));
+		$new_path	= $post->get_date()->format('Y/m/Y-m-d').'-'.$post->get_slug().'.'.$this->post_extension;
+		$new_path	= $this->blog->get_path_posts($new_path);
 
 		if($current_path == $new_path){
-			// Already moved
-			return;
+			// Already moved and published
+			return false;
 		}
 
-		$this->blog->get_file_system()->move_file($current_path, $new_path, !$post->is_draft());	// Don't clean up drafts
+		// Move file
+		$is_draft_dir	= (strstr($current_path, $this->blog->get_path_drafts()) !== false);
+		$this->blog->get_file_system()->move_file($current_path, $new_path, !$is_draft_dir);	// Don't clean up drafts
+
+		// Moved - publishing
+		return true;
 	}
 
 	/**
@@ -219,8 +236,8 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 
 				if($post->has_meta('publish-now')){
-					// Publish post
-					$this->organise_post_file($post, $file);
+					// Move to publish directory
+					$this->blog->get_file_system()->move_file($file, str_replace($this->blog->get_path_drafts(), $this->blog->get_path_drafts(self::DRAFT_PUBLISH_DIR), $file));
 					continue;
 				}
 
@@ -236,10 +253,18 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all posts found as Post objects
 	 *
-	 * @return array	An array of posts
+	 * @param array $filters	Any filters to apply
+	 * 		array(
+	 * 			'rss'	=> (bool|string)	// Whether to include RSS-only posts. Providing `'only'` will return only RSS-only posts
+	 * 		)
+	 * @return array			An array of posts
 	 */
-	public function get_posts(){
+	public function get_posts($filters = null){
 		if(!isset($this->posts)){
+			// Update drafts first
+			$this->get_draft_posts();
+
+			// Load files
 			$files	= $this->get_raw_posts();
 
 			$posts	= array();
@@ -259,7 +284,8 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 
 				// Organise source file
-				$this->organise_post_file($post, $file);
+				$will_publish	= $this->organise_post_file($post, $file);
+				$post->set_being_published($will_publish);
 
 				$posts[]	= $post;
 			}
@@ -277,7 +303,28 @@ class Manager implements \Blight\Interfaces\Manager {
 			$this->posts	= $posts;
 		}
 
-		return $this->posts;
+		$filters	= array_merge(array(
+			'rss'	=> false
+		), (array)$filters);
+
+		$posts	= array();
+		foreach($this->posts as $post){
+			/** @var \Blight\Interfaces\Post $post */
+			if($filters['rss'] !== true){
+				$is_rss_only	= $post->get_meta('rss-only');
+				if($filters['rss'] === 'only' && !$is_rss_only){
+					// Only allow RSS-only posts, post is not RSS-only
+					continue;
+				} elseif(!$filters['rss'] && $is_rss_only){
+					// Do not allow RSS-only posts, post is RSS-only
+					continue;
+				}
+			}
+
+			$posts[]	= $post;
+		}
+
+		return $posts;
 	}
 
 	/**

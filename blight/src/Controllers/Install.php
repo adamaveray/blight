@@ -3,6 +3,7 @@ namespace Blight\Controllers;
 
 class Install {
 	const COOKIE_NAME	= 'blightinstall';
+	const DRAFT_PUBLISH_DIR	= '_publish';
 
 	protected $root_path;
 	protected $app_path;
@@ -58,10 +59,13 @@ class Install {
 		}
 	}
 
-	protected function session_set($name, $value){
+	protected function session_set_config($name, $value){
 		$name	= explode('/', $name);
 		$levels	= count($name);
-		$array	= &$_SESSION;
+		if(!isset($_SESSION['config'])){
+			$_SESSION['config']	= array();
+		}
+		$array	= &$_SESSION['config'];
 
 		for($i = 0; $i < $levels; $i++){
 			$level	= $name[$i];
@@ -134,6 +138,7 @@ class Install {
 	protected function valid_redirect($errors, $valid_url, $invalid_url){
 		if(count($errors) === 0){
 			$_SESSION['install_errors']	= null;
+			unset($_SESSION['install_errors']);
 			$this->redirect($valid_url);
 		} else {
 			$_SESSION['install_errors']	= $errors;
@@ -157,7 +162,7 @@ class Install {
 			throw new \RuntimeException('Source directory not found');
 		}
 		if(!is_dir($target)){
-			$result	= mkdir($target, 0777, true);
+			$result	= mkdir($target, 0755, true);
 			if(!$result){
 				throw new \RuntimeException('Target directory cannot be created');
 			}
@@ -210,6 +215,7 @@ class Install {
 			'posts'			=> 'blog-data/posts',
 			'drafts'		=> 'blog-data/drafts',
 			'templates'		=> 'blog-data/templates',
+			'plugins'		=> 'blog-data/plugins',
 			'web'			=> 'www/_blog',
 			'drafts-web'	=> 'www/_drafts',
 			'cache'			=> 'cache',
@@ -222,7 +228,7 @@ class Install {
 
 			$dir	= $this->root_path.$dir;
 			if(!is_dir($dir)){
-				$result	= mkdir($dir, 0777, true);
+				$result	= mkdir($dir, 0755, true);
 				if(!$result){
 					// Cannot create directory
 					if(!isset($feedback['paths'])){
@@ -231,13 +237,17 @@ class Install {
 					$feedback['paths'][]	= $config['paths'][$config_name];
 				}
 			} elseif(!is_writable($dir)){
-				$result	= chmod($dir, 0777);
+				$result	= chmod($dir, 0755);
 				if(!$result){
 					// Cannot write to directory
 					$feedback['paths'][]	= $config['paths'][$config_name];
 				}
 			}
 		}
+
+		// Create drafts publish dir
+		$drafts_dir	= $this->root_path.$config['paths']['drafts'];
+		mkdir($drafts_dir.self::DRAFT_PUBLISH_DIR, 0755, true);
 
 		$template_dir	= $this->root_path.$config['paths']['templates'];
 
@@ -283,10 +293,20 @@ class Install {
 		}
 
 		if(!isset($config['output'])){
-			$config['output']	= array(
-				'minify_html'	=> false
-			);
+			$config['output']	= array();
 		}
+		$config['output']	= array_merge(array(
+			'minify_html'	=> false
+		), $config['output']);
+
+		if(!isset($config['posts'])){
+			$config['posts']	= array();
+		}
+		$config['posts']	= array_merge(array(
+			'default_extension'	=> 'md',
+			'allow_txt'	=> false
+		), $config['posts']);
+
 
 		// Write config file
 		$config_text	= $this->build_setup($config);
@@ -327,13 +347,13 @@ class Install {
 		$errors	= array();
 
 		if(isset($data['author_name']) && trim($data['author_name']) != ''){
-			$this->session_set('author/name', $data['author_name']);
+			$this->session_set_config('author/name', $data['author_name']);
 		} else {
 			$errors['author_name']	= true;
 		}
 
 		if(isset($data['author_email']) && filter_var($data['author_email'], \FILTER_VALIDATE_EMAIL)){
-			$this->session_set('author/email', $data['author_email']);
+			$this->session_set_config('author/email', $data['author_email']);
 		} else {
 			$errors['author_email']	= true;
 		}
@@ -354,7 +374,7 @@ class Install {
 		$errors	= array();
 
 		if(isset($data['site_name']) && trim($data['site_name']) != ''){
-			$this->session_set('site/name', $data['site_name']);
+			$this->session_set_config('site/name', $data['site_name']);
 		} else {
 			$errors['site_name']	= true;
 		}
@@ -367,14 +387,14 @@ class Install {
 		}
 
 		if(isset($data['site_url']) && filter_var($data['site_url'], \FILTER_VALIDATE_URL)){
-			$this->session_set('site/url', $url);
+			$this->session_set_config('site/url', $url);
 		} else {
 			$errors['site_url']	= true;
 		}
 
 		if(isset($data['site_description'])){
 			// Not required
-			$this->session_set('site/description', $data['site_description']);
+			$this->session_set_config('site/description', $data['site_description']);
 		}
 
 
@@ -382,17 +402,18 @@ class Install {
 		if(isset($data['linkblog'])){
 			$linkblog	= (bool)$data['linkblog'];
 		}
-		$this->session_set('linkblog/linkblog', $linkblog);
+		$this->session_set_config('linkblog/linkblog', $linkblog);
 
 		if($linkblog){
 			if(isset($data['linkblog_post_character'])){
-				$this->session_set('linkblog/post_character', $data['linkblog_post_character']);
+				$this->session_set_config('linkblog/post_character', $data['linkblog_post_character']);
 			}
 		} else {
 			if(isset($data['linkblog_link_character'])){
-				$this->session_set('linkblog/link_character', $data['linkblog_link_character']);
+				$this->session_set_config('linkblog/link_character', $data['linkblog_link_character']);
 			}
 		}
+		$this->session_set_config('linkblog/link_directory', null);
 
 		$this->valid_redirect($errors, 'end', '2');
 	}
@@ -402,7 +423,7 @@ class Install {
 		setcookie(self::COOKIE_NAME, '1', null, '/');
 
 		// Setup finished - save config
-		$result	= $this->run_install($_SESSION);
+		$result	= $this->run_install($_SESSION['config']);
 		if($result !== true){
 			// Could not save setup
 			$this->page_step_end_failure($result);

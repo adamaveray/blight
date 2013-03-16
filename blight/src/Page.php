@@ -50,7 +50,7 @@ class Page implements \Blight\Interfaces\Page {
 	 * @see parse_metadata()
 	 */
 	protected function parse_content($content){
-		$lines	= explode($this->blog->get_eol(), $content);
+		$lines	= explode("\n", $content);
 
 		$title	= array_shift($lines);
 		if(!preg_match('/^(\={3,})$/', rtrim(array_shift($lines)))){
@@ -59,7 +59,7 @@ class Page implements \Blight\Interfaces\Page {
 
 		$metadata	= $this->parse_metadata($lines);
 
-		$content	= trim(implode($this->blog->get_eol(), $lines));
+		$content	= trim(implode("\n", $lines));
 
 		return array(
 			'title'		=> $title,
@@ -77,7 +77,7 @@ class Page implements \Blight\Interfaces\Page {
 	 */
 	protected function parse_metadata(&$lines){
 		if(!is_array($lines)){
-			$lines	= explode($this->blog->get_eol(), $lines);
+			$lines	= explode("\n", $lines);
 		}
 
 		$metadata	= array();

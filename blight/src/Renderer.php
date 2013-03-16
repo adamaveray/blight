@@ -129,6 +129,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Post
 	 */
 	public function render_post(\Blight\Interfaces\Post $post, $prev = null, $next = null){
+		if($post->is_being_published()){
+			$this->blog->do_hook('will_publish_post', array(
+				'post'	=> $post
+			));
+		}
+
 		$path	= $this->blog->get_path_www($post->get_relative_permalink().'.html');
 
 		$params	= array(
@@ -149,6 +155,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		}
 
 		$this->render_template_to_file('post', $path, $params);
+
+		if($post->is_being_published()){
+			$this->blog->do_hook('did_publish_post', array(
+				'post'	=> $post
+			));
+		}
 	}
 
 	/**
@@ -346,26 +358,67 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	}
 
 	/**
-	 * Generates and saves the static XML file for the blog RSS feed. Posts are retrieved from the
+	 * Generates and saves the static XML file for the blog RSS feeds. Posts are retrieved from the
 	 * Manager set during class construction.
 	 *
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
+	 * 		in 'limit':		The number of posts to include. 0 includes all posts [Default: 20]
+	 * 		bool 'subfeed':	Whether to generate feeds for categories and tags [Default: true]
+	 */
+	public function render_feeds($options = null){
+		$options	= array_merge(array(
+			'limit'	=> 20,
+			'subfeeds'	=> true
+		), (array)$options);
+
+		// Main site feed
+		$this->render_feed('feed', $this->manager->get_posts(array(
+			'rss'	=> true
+		)), $options);
+
+
+		if($options['subfeeds']){
+			// Category feeds
+			$categories	= $this->manager->get_posts_by_category();
+			foreach($categories as $category){
+				/** @var \Blight\Interfaces\Collection $category */
+				$this->render_feed('category/'.$category->get_slug(), $category->get_posts(), $options);
+			}
+
+			// Tag feeds
+			$tags	= $this->manager->get_posts_by_tag();
+			foreach($tags as $tag){
+				/** @var \Blight\Interfaces\Collection $tag */
+				$this->render_feed('tag/'.$tag->get_slug(), $tag->get_posts(), $options);
+			}
+		}
+	}
+
+	/**
+	 * Generates and saves the static XML file for an RSS feed.
+	 *
+	 * @param string $path	The path to save the XML file to
+	 * @param array $posts	An array of \Blight\Interfaces\Post objects
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
 	 */
-	public function render_feed($options = null){
+	protected function render_feed($path, $posts, $options = null){
 		$options	= array_merge(array(
 			'limit'	=> 20
 		), (array)$options);
 
 		// Prepare posts
-		$posts	= $this->manager->get_posts();
+		$posts	= $this->manager->get_posts(array(
+			'rss'	=> true
+		));
 
 		if($options['limit'] > 0){
 			$posts	= array_slice($posts, 0, $options['limit']);
 		}
 
-		$path	= $this->blog->get_path_www('feed.xml');
+		$path	= $this->blog->get_path_www($path.'.xml');
 
 		$this->render_template_to_file('feed', $path, array(
 			'posts'	=> $posts

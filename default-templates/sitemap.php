@@ -2,7 +2,7 @@
 /** @var \Blight\Interfaces\Blog $blog */
 /** @var array $pages */
 
-
+if(!function_exists('sitemap_create_node')){
 function sitemap_create_node(\DOMDocument $document, $node_name, $content, $attributes = null, $callback = null){
 	$node	= $document->createElement($node_name);
 	if(is_array($attributes)){
@@ -18,7 +18,6 @@ function sitemap_create_node(\DOMDocument $document, $node_name, $content, $attr
 	}
 	return $node;
 }
-
 
 function sitemap_create_url(\DOMDocument $document, $url, $last_modified = null, $params = null){
 	$params	= array_merge(array(
@@ -41,6 +40,7 @@ function sitemap_create_url(\DOMDocument $document, $url, $last_modified = null,
 		}
 
 	return $url_node;
+}
 }
 
 $now	= new \DateTime();

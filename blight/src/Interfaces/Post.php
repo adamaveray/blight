@@ -12,6 +12,10 @@ interface Post extends \Blight\Interfaces\Page {
 
 	public function get_category();
 
+	public function is_being_published();
+
+	public function set_being_published($is_being_published);
+
 	public function is_draft();
 
 	public function is_linked();

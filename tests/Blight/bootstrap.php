@@ -21,6 +21,7 @@ $config	= array(
 		'posts'			=> 'blog-data/posts/',
 		'drafts'		=> 'blog-data/drafts/',
 		'templates'		=> 'blog-data/templates/',
+		'plugins'		=> 'blog-data/plugins/',
 		'web'			=> 'www/_blog/',
 		'drafts-web'	=> 'www/_drafts/',
 		'cache'			=> 'cache/'
@@ -30,6 +31,11 @@ $config	= array(
 		'page'	=> 10,
 		'home'	=> 20,
 		'feed'	=> 20
+	),
+
+	'posts'	=> array(
+		'default_extension'	=> 'md',
+		'allow_txt'	=> false
 	),
 
 	'linkblog'	=> array(

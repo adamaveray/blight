@@ -25,7 +25,7 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 		return $this->mock_posts['drafts'];
 	}
 
-	public function get_posts(){
+	public function get_posts($filters = null){
 		return $this->mock_posts['posts'];
 	}
 

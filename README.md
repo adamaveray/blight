@@ -16,9 +16,11 @@ After installation, your directory structure should look like the following:
 	
 	blog-data/
 		drafts/
+			_publish/
 		pages/
 		posts/
 		templates/
+		plugins/
 	
 	www/
 		.htaccess
@@ -45,7 +47,7 @@ The title and content are standard Markdown. The headers section under the title
 
 Posts saved to the `drafts/` directory will have preview HTML pages generated, but will not be listed on the site itself.
 
-When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild.
+When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild. Alternatively, move the post to the `_publish/` directory in the drafts directory, and it will be published on rebuild.
 
 ### Pages
 
@@ -69,6 +71,10 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 - **Category**: A category to group the post under. Similar to _tags_, it should be written in a human-readable format, as a URL-friendly versions will be generated automatically.
 
 	`Category: General`
+
+- **RSS Only**: Only display the post in RSS feeds. It will not appear on any rendered HTML files, but will still have a standalone post HTML file generated.
+
+	`RSS Only`
 
 
 ### Publishing
@@ -176,10 +182,21 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
                 titles are prefixed with a glyph)
 - **link_character**: The glyph to prefix linked posts with when the **linkblog** option is disabled
 - **post_character**: The glyph to prefix non-linked posts with when the **linkblog** option is enabled
+- **link_directory**: An optional directory to put linked posts in (eg: `2013/02/post` → `linked/2013/02/post`)
+
+### Posts
+
+- **default_extension**: The primary file extension to use for posts
+- **allow_txt**: Whether to process Markdown post files with the file extension `.txt`
 
 ### Output
 
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
+
+
+## Plugins
+
+Plugins can be installed to extend the platform. View [the plugins documentation](PLUGINS.md) for more information.
 
 
 ## Building

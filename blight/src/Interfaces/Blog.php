@@ -12,6 +12,8 @@ interface Blog {
 
 	public function get_path_templates($append = '');
 
+	public function get_path_plugins($append = '');
+
 	public function get_path_pages($append = '');
 
 	public function get_path_posts($append = '');
@@ -32,9 +34,11 @@ interface Blog {
 
 	public function get_file_system();
 
-	public function get_eol();
+	public function get_package_manager();
 
 	public function is_linkblog();
+
+	public function do_hook($hook, $params = null);
 
 	public function get($parameter, $group = null, $default = null);
 };

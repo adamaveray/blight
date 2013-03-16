@@ -8,7 +8,7 @@ interface Manager {
 	
 	public function get_draft_posts();
 
-	public function get_posts();
+	public function get_posts($filters = null);
 
 	public function get_posts_by_year();
 

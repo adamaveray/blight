@@ -1,7 +1,7 @@
 <?php
 /**
  * Blight
- * v0.5
+ * v0.6
  */
 namespace Blight;
 
@@ -61,7 +61,7 @@ debug_output('Archive built');
 $renderer	= new Renderer($blog, $manager);
 debug_output('Renderer initialised');
 
-	// Render draft posts
+	// Render pages
 	$renderer->render_pages();
 	debug_output('Pages rendered');
 
@@ -89,6 +89,15 @@ debug_output('Renderer initialised');
 		debug_output('Year "%s" archive rendered', $year->get_name());
 	}
 
+	// Render RSS-only posts
+	$posts	= $manager->get_posts(array(
+		'rss'	=> true
+	));
+	foreach($posts as $post){
+		$renderer->render_post($post);
+	}
+	debug_output('RSS-only posts renderered');
+
 	// Render tag pages
 	$renderer->render_tags(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
@@ -107,11 +116,11 @@ debug_output('Renderer initialised');
 	));
 	debug_output('Home rendered');
 
-	// Render feed
-	$renderer->render_feed(array(
+	// Render feeds
+	$renderer->render_feeds(array(
 		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
 	));
-	debug_output('Feed rendered');
+	debug_output('Feeds rendered');
 
 	// Render sitemap
 	$renderer->render_sitemap(array(

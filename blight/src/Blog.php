@@ -10,6 +10,9 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\FileSystem */
 	protected $file_system;
 
+	/** @var \Blight\Interfaces\PackageManager */
+	protected $package_manager;
+
 	protected $root_path;
 	protected $app_path;
 	protected $url;
@@ -50,10 +53,11 @@ class Blog implements \Blight\Interfaces\Blog {
 		$this->paths	= array(
 			'www'			=> 'web',
 			'drafts-web'	=> 'drafts-web',
-			'pagen'			=> 'pages',
+			'pages'			=> 'pages',
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
 			'templates'		=> 'templates',
+			'plugins'		=> 'plugins',
 			'cache'			=> 'cache'
 		);
 		foreach($this->paths as $key => $config_key){
@@ -128,14 +132,25 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * Returns the path to the pagen directory
+	 * Returns the path to the plugins directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_plugins($append = ''){
+		return $this->paths['plugins'].$append;
+	}
+
+	/**
+	 * Returns the path to the pages directory
 	 *
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
 	public function get_path_pages($append = ''){
-		return $this->paths['pagen'].$append;
+		return $this->paths['pages'].$append;
 	}
 
 	/**
@@ -227,10 +242,14 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * @return string	The line ending
+	 * @return \Blight\Interfaces\PackageManager
 	 */
-	public function get_eol(){
-		return "\n";
+	public function get_package_manager(){
+		if(!isset($this->package_manager)){
+			$this->package_manager	= new \Blight\PackageManager($this);
+		}
+
+		return $this->package_manager;
 	}
 
 	/**
@@ -238,6 +257,23 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function is_linkblog(){
 		return (bool)$this->get('linkblog', 'linkblog', false);
+	}
+
+	/**
+	 * Runs a hook through plugins
+	 *
+	 * @param string $hook	The name of the hook to run
+	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
+	 *
+	 * 		$value	= 1;
+	 * 		do_hook('hook_name', array(
+	 * 			'param'	=> &$value
+	 *  	));
+	 *
+	 * @see \Blight\PackageManager::do_hook
+	 */
+	public function do_hook($hook, $params = null){
+		$this->get_package_manager()->do_hook($hook, $params);
 	}
 
 	/**
