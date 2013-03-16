@@ -1,6 +1,6 @@
 <?php
 /** @var \Blight\Interfaces\Blog $blog */
-
+if(!function_exists('feed_post_title')){
 function feed_post_title(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Post $post, $title){
 	return $title;
 }
@@ -17,9 +17,9 @@ function feed_post_content(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Pos
 
 	return $content;
 }
+}
 
-
-
+if(!function_exists('feed_create_node')){
 function feed_create_node(\DOMDocument $document, \DOMElement $parent, $node_name, $content, $attributes = null, $callback = null){
 	$node	= $document->createElement($node_name);
 	if(is_array($attributes)){
@@ -34,6 +34,7 @@ function feed_create_node(\DOMDocument $document, \DOMElement $parent, $node_nam
 		$node->appendChild($document->createTextNode($content));
 	}
 	$parent->appendChild($node);
+}
 }
 
 $now	= new \DateTime();
