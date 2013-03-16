@@ -300,7 +300,7 @@ class Install {
 		}
 		$config['posts']	= array_merge(array(
 			'default_extension'	=> 'md',
-			'allow_txt'	=> true
+			'allow_txt'	=> false
 		), $config['posts']);
 
 
