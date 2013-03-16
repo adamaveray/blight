@@ -200,6 +200,16 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Blog::get_package_manager
+	 */
+	public function testGetPackageManager(){
+		$this->assertInstanceOf('\Blight\PackageManager', $this->blog->get_package_manager());
+
+		// Should be same instance
+		$this->assertEquals($this->blog->get_package_manager(), $this->blog->get_package_manager());
+	}
+
+	/**
 	 * @covers \Blight\Blog::get
 	 */
 	public function testGet(){

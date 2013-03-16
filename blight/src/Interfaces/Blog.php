@@ -34,6 +34,8 @@ interface Blog {
 
 	public function get_file_system();
 
+	public function get_package_manager();
+
 	public function get_eol();
 
 	public function is_linkblog();

@@ -10,6 +10,9 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\FileSystem */
 	protected $file_system;
 
+	/** @var \Blight\Interfaces\PackageManager */
+	protected $package_manager;
+
 	protected $root_path;
 	protected $app_path;
 	protected $url;
@@ -236,6 +239,17 @@ class Blog implements \Blight\Interfaces\Blog {
 		}
 
 		return $this->file_system;
+	}
+
+	/**
+	 * @return \Blight\Interfaces\PackageManager
+	 */
+	public function get_package_manager(){
+		if(!isset($this->package_manager)){
+			$this->package_manager	= new \Blight\PackageManager($this);
+		}
+
+		return $this->package_manager;
 	}
 
 	/**
