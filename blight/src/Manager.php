@@ -119,8 +119,6 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * @return bool	Whether the post file was moved to be published
 	 */
 	protected function organise_post_file(\Blight\Interfaces\Post $post, $current_path){
-		$will_publish	= false;
-
 		// Check for special headers
 		$has_date		= $post->has_meta('date');
 		$has_publish	= $post->has_meta('publish-now');
@@ -263,6 +261,10 @@ class Manager implements \Blight\Interfaces\Manager {
 	 */
 	public function get_posts($filters = null){
 		if(!isset($this->posts)){
+			// Update drafts first
+			$this->get_draft_posts();
+
+			// Load files
 			$files	= $this->get_raw_posts();
 
 			$posts	= array();
