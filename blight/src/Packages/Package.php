@@ -9,10 +9,16 @@ abstract class Package implements \Blight\Interfaces\Packages\Package {
 	/** @var array $config */
 	protected $config;
 
+	protected $path;
+
 	final public function __construct(\Blight\Interfaces\Blog $blog, $config = null){
 		$this->blog	= $blog;
 
 		$this->config	= $this->load_config($config);
+
+		if(isset($this->config['path'])){
+			$this->path	= $this->config['path'];
+		}
 
 		$this->setup();
 	}

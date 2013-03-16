@@ -27,12 +27,18 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 		$packages		= array();
 		$packge_dirs	= glob(rtrim($dir,'/').'/*');
 		foreach($packge_dirs as $dir){
-			if(!is_dir($dir)){
+			$is_phar	= (pathinfo($dir, \PATHINFO_EXTENSION) == 'phar');
+			if(!$is_phar && !is_dir($dir)){
 				// Not a valid plugin
 				continue;
 			}
 
 			$package_name	= basename($dir);
+
+			if($is_phar){
+				$package_name	= substr($package_name, 0, -1*strlen('.phar'));
+				$dir	= 'phar://'.$dir;
+			}
 
 			try {
 				$plugin	= $this->initialise_package($package_name, $dir);
@@ -56,6 +62,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * @throws \RuntimeException	Package does not implement \Blight\Interfaces\Packages\Package
 	 */
 	protected function initialise_package($name, $directory){
+		$directory	= rtrim($directory, '/');
 		$package_initialiser	= $directory.'/'.$name.'.php';
 		$package_manifest		= $directory.'/'.self::MANIFEST_FILE;
 
@@ -70,6 +77,8 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 		), $this->parse_manifest($this->blog->get_file_system()->load_file($package_manifest)));
 
 		$class	= rtrim($config['namespace'], '\\').'\\'.$name;
+
+		$config['path']	= $directory.'/';
 
 		// Initialise plugin
 		include($package_initialiser);
