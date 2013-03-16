@@ -8,6 +8,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
+	protected $packages;
 	protected $plugins;
 
 	/**
@@ -16,20 +17,41 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 
-		$this->plugins	= $this->load_packages($blog->get_path_plugins());
+		$packages	= $this->load_packages($blog->get_path_plugins());
+		$this->packages	= $packages['package'];
+		$this->plugins	= $packages['plugin'];
 	}
 
 	/**
 	 * @param string $dir	The directory to load plugins from
-	 * @return array		An array of
+	 * @return array		An multidimensional array of packages
+	 *
+	 * 		array(
+	 * 			'packages'	=> array(Package, ...)	// All packages
+	 * 			'plugins'	=> ...,	// Plugins only
+	 * 		)
 	 */
 	protected function load_packages($dir){
-		$packages		= array();
+		$packages	= array();
+
+		$package_types	= array(
+			'package'	=> '\Blight\Interfaces\Packages\Package',
+			'plugin'	=> '\Blight\Interfaces\Packages\Plugin'
+		);
+
+		foreach($package_types as $type => $interface){
+			$packages[$type]	= array();
+		}
+
 		$packge_dirs	= glob(rtrim($dir,'/').'/*');
 		foreach($packge_dirs as $dir){
 			$is_phar	= (pathinfo($dir, \PATHINFO_EXTENSION) == 'phar');
 			if(!$is_phar && !is_dir($dir)){
 				// Not a valid plugin
+				continue;
+			}
+
+			if(!$is_phar){
 				continue;
 			}
 
@@ -41,12 +63,19 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 			}
 
 			try {
-				$plugin	= $this->initialise_package($package_name, $dir);
+				$package	= $this->initialise_package($package_name, $dir);
 			} catch(\Exception $e){
 				continue;
 			}
 
-			$packages[$package_name]	= $plugin;
+			// Group package
+			foreach($package_types as $type => $interface){
+				if(!($package instanceof $interface)){
+					continue;
+				}
+
+				$packages[$type][$package_name]	= $package;
+			}
 		}
 
 		return $packages;

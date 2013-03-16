@@ -17,7 +17,7 @@ The package can contain any number of supporting files, however must contain a P
 
 This file must contain a class of the same name, extending `\Blight\Packages\Package`. The file should implement whichever of the following interfaces are appropriate:
 
-- `\Blight\Packages\Plugin`: A standard, generic plugin
+- `\Blight\Interfaces\Packages\Plugin`: Plugin hooks will be called on the class
 
 
 ### Hooks
