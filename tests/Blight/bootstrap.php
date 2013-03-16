@@ -34,6 +34,7 @@ $config	= array(
 	),
 
 	'posts'	=> array(
+		'default_extension'	=> 'md',
 		'allow_txt'	=> false
 	),
 

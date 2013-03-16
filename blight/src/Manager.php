@@ -16,6 +16,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected $posts_by_tag;
 	protected $posts_by_category;
 	protected $draft_posts;
+	protected $post_extension;
 
 	/**
 	 * @var array The extensions of files to consider posts
@@ -38,6 +39,7 @@ class Manager implements \Blight\Interfaces\Manager {
 		if($blog->get('allow_txt', 'posts', false)){
 			$this->allowed_extensions[]	= 'txt';
 		}
+		$this->post_extension	= ltrim($blog->get('default_extension', 'posts', current($this->allowed_extensions)), '.');
 	}
 
 	/**
@@ -156,7 +158,7 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		// Build filename
-		$new_path	= $post->get_relative_permalink().'.'.current($this->allowed_extensions);
+		$new_path	= $post->get_relative_permalink().'.'.$this->post_extension;
 		$new_path	= $this->blog->get_path_posts(pathinfo($new_path, \PATHINFO_DIRNAME).'/'.$post->get_date()->format('Y-m-d').'-'.pathinfo($new_path, \PATHINFO_BASENAME));
 
 		if($current_path == $new_path){

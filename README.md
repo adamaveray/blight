@@ -184,6 +184,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 
 ### Posts
 
+- **default_extension**: The primary file extension to use for posts
 - **allow_txt**: Whether to process Markdown post files with the file extension `.txt`
 
 ### Output
