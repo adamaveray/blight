@@ -1,5 +1,5 @@
-Packages
-========
+Plugins
+=======
 
 Blight supports plugins in a simple package format.
 
@@ -15,10 +15,9 @@ A basic package is structured as follows:
 
 The package can contain any number of supporting files, however must contain a PHP file with the same name as the package.
 
-This file must contain a class of the same name, than extends from one of the following packages:
+This file must contain a class of the same name, extending `\Blight\Packages\Package`. The file should implement whichever of the following interfaces are appropriate:
 
-- `\Blight\Packages\Package`
-- `\Blight\Packages\Plugin`
+- `\Blight\Packages\Plugin`: A standard, generic plugin
 
 
 ### Package Execution
@@ -31,7 +30,7 @@ Packages cannot override the `__construct()` method, and instead should implemen
 	<?php
 	namespace \Example;
 
-	class ExamplePlugin extends \Blight\Packages\Plugin {
+	class ExamplePlugin extends \Blight\Packages\Packages implements \Blight\Interfaces\Packages\Plugin {
 		public function setup(){
 			// Prepare plugin
 		}
