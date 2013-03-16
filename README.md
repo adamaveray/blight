@@ -20,6 +20,7 @@ After installation, your directory structure should look like the following:
 		pages/
 		posts/
 		templates/
+		plugins/
 	
 	www/
 		.htaccess
@@ -191,6 +192,11 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 ### Output
 
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
+
+
+## Plugins
+
+Plugins can be installed to extend the platform. View [the plugins documentation](PLUGINS.md) for more information.
 
 
 ## Building
