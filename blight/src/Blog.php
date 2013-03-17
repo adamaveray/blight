@@ -13,6 +13,10 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\PackageManager */
 	protected $package_manager;
 
+	/** @var \Blight\Interfaces\Packages\Plugin */
+	protected $plugin;
+
+
 	protected $root_path;
 	protected $app_path;
 	protected $url;
@@ -250,6 +254,17 @@ class Blog implements \Blight\Interfaces\Blog {
 		}
 
 		return $this->package_manager;
+	}
+
+	/**
+	 * @return \Blight\Interfaces\Packages\Theme
+	 */
+	public function get_theme(){
+		if(!isset($this->theme)){
+			$this->theme	= $this->get_package_manager()->get_theme($this->get('name', 'theme'));
+		}
+
+		return $this->theme;
 	}
 
 	/**
