@@ -96,7 +96,7 @@ debug_output('Renderer initialised');
 	foreach($posts as $post){
 		$renderer->render_post($post);
 	}
-	debug_output('RSS-only posts renderered');
+	debug_output('RSS-only posts rendered');
 
 	// Render tag pages
 	$renderer->render_tags(array(
@@ -131,6 +131,7 @@ debug_output('Renderer initialised');
 
 // Copy theme assets
 $renderer->update_assets();
+debug_output('Theme assets updated');
 
 // Remove old draft files
 $manager->cleanup_drafts();
