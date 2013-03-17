@@ -168,6 +168,9 @@ class Manager implements \Blight\Interfaces\Manager {
 		$is_draft_dir	= (strstr($current_path, $this->blog->get_path_drafts()) !== false);
 		$this->blog->get_file_system()->move_file($current_path, $new_path, !$is_draft_dir);	// Don't clean up drafts
 
+		// Update modification time
+		touch($new_path);
+
 		// Moved - publishing
 		return true;
 	}

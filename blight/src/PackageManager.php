@@ -98,10 +98,12 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 
 		// Parse manifest
 		$config	= \Blight\Utilities::array_multi_merge(array(
-			'namespace'	=> '\\'
+			'package'	=> array(
+				'namespace'	=> '\\'
+			)
 		), $this->parse_manifest($this->blog->get_file_system()->load_file($package_manifest)));
 
-		$class	= rtrim($config['namespace'], '\\').'\\'.$name;
+		$class	= rtrim($config['package']['namespace'], '\\').'\\'.$name;
 
 		$config['path']	= $directory.'/';
 
@@ -124,6 +126,30 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	protected function parse_manifest($content){
 		$parser	= new \Blight\Config();
 		return $parser->unserialize($content);
+	}
+
+	/**
+	 * @param string $theme_name	The name of the theme to retrieve
+	 * @return \Blight\Interfaces\Packages\Theme
+	 * @throws \RuntimeException	Theme not found
+	 * @throws \RuntimeException	Invalid theme package
+	 */
+	public function get_theme($theme_name){
+		$path	= $this->blog->get_path_themes($theme_name.'.phar');
+		if(!file_exists($path)){
+			throw new \RuntimeException('Theme `'.$theme_name.'` not found');
+		}
+
+		$is_phar	= (pathinfo($path, \PATHINFO_EXTENSION) == 'phar');
+		if($is_phar){
+			$path	= 'phar://'.$path;
+		}
+		$theme	= $this->initialise_package($theme_name, $path);
+		if(!($theme instanceof \Blight\Interfaces\Packages\Theme)){
+			throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Packages\Theme');
+		}
+
+		return $theme;
 	}
 
 	/**

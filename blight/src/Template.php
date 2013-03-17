@@ -11,6 +11,8 @@ class Template implements \Blight\Interfaces\Template {
 
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
+	/** @var \Blight\Interfaces\Packages\Theme */
+	protected $theme;
 	protected $dir;
 	protected $filename;
 	protected $type;
@@ -23,10 +25,11 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param string $dir			The directory to look for templates in
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, $name, $dir = null){
-		$this->blog	= $blog;
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Packages\Theme $theme, $name, $dir = null){
+		$this->blog		= $blog;
+		$this->theme	= $theme;
 
-		$this->dir	= (isset($dir) ? $dir : $blog->get_path_templates());
+		$this->dir	= (isset($dir) ? $dir : $theme->get_path_templates());
 
 		$this->locate_template($name);
 	}

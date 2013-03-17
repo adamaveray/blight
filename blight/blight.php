@@ -58,7 +58,7 @@ $archive	= $manager->get_posts_by_year();
 debug_output('Archive built');
 
 // Begin rendering
-$renderer	= new Renderer($blog, $manager);
+$renderer	= new Renderer($blog, $manager, $blog->get_theme());
 debug_output('Renderer initialised');
 
 	// Render pages
@@ -127,8 +127,12 @@ debug_output('Renderer initialised');
 	));
 	debug_output('Sitemap rendered');
 
-// Rendering completed
+	// Rendering completed
 
+// Copy theme assets
+$renderer->update_assets();
+
+// Remove old draft files
 $manager->cleanup_drafts();
 
 debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');

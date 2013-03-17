@@ -95,59 +95,9 @@ Once the pages are built, the page will automatically reload showing the generat
 When published, original post Markdown files will be organised into date folders, such as `posts/2013/02/2013-02-02-post.md`. To make changes to a previous post, just locate the post in these date folders, make any changes, and trigger a rebuild of the site.
 
 
-## Templates
+## Themes
 
-Templates are written using [Twig](http://twig.sensiolabs.org), or alternatively can be written in regular PHP, and are contained in the `blog-data/templates/` directory. All templates must exist for the site to generate correctly.
-
-The following variables are available to both PHP and Twig templates:
-
-- **$blog**: An instance of the Blog class, providing access to site-wide URLs and other config settings.
-- **$text**: An instance of the TextProcessor class, for converting raw posts to Markdown, etc
-- **$archives**: An array of the years posts exist for
-
-Twig templates have the following filters available:
-
-- **md**: Converts the provided Markdown text into HTML
-- **typo**: Performs a number of typographical enhancements on the provided text, such as converting quotes to curly quotes
-- **truncate**(length = 100, ending = '...'): Truncates the provided HTML to a certain length.
-
-Specific templates exist for individual pages, and have specific variables available to them:
-
-### List
-
-The **list** template handles pages with a collection of posts, excluding the home page. Archive pages for each year, pages for each tag, and pages for each category are generated using this template.
-
-The following variables are available to list pages:
-
-- **$posts**: An array containing posts for the current page
-
-For each of the different listing types, the page's `Collection` object itself will also be provided:
-
-- Year archive pages: **$year**
-- Tag pages: **$tag**
-- Collection pages: **$collection**
-
-Additionally, if pagination is enabled in the `config.ini` file, the following variables are available:
-
-- **$pagination**: A `Pagination` instance. If this parameter is not set, pagination is disabled
-
-### Post
-
-The **post** template displays individual posts on separate pages, where their permalinks will point to.
-
-The following variables are available to post pages:
-
-- **$post**: The Post instance for the current page
-- **$post_prev**: The previous/older post neighboring the current post, useful for adding next/prev post links. This value may not always be set.
-- **$post_next**: The next/newer post neighboring the current post. This value may not always be set.
-
-### Page
-
-The **page** template displays individual pages
-
-The following variables are available to page-pages:
-
-- **$page**: The Page instance for the current page
+The blog's appearence can be customised through themes. View [the themes documentation](THEMES.md) for more information.
 
 
 ## Config
@@ -160,12 +110,16 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 - **url**: The URL to the blog, including any directories if appropriate
 - **description**: The blog's description, used in the RSS feed and available in templates
 
+### Theme
+
+- **name**: The name of the theme to render the site with
+
 ### Paths
 
 - **pages**: The path to the page source files directory
 - **posts**: The path to the posts directory
 - **drafts**: The path to the drafts directory
-- **templates**: The path to the templates directory
+- **themes**: The path to the themes directory
 - **web**: The path to output rendered files to
 - **drafts_web**: The path to output rendered draft post files to
 - **cache**: The path various cache files can be written to

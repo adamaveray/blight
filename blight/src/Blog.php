@@ -13,6 +13,10 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\PackageManager */
 	protected $package_manager;
 
+	/** @var \Blight\Interfaces\Packages\Plugin */
+	protected $plugin;
+
+
 	protected $root_path;
 	protected $app_path;
 	protected $url;
@@ -56,7 +60,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			'pages'			=> 'pages',
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
-			'templates'		=> 'templates',
+			'themes'		=> 'themes',
 			'plugins'		=> 'plugins',
 			'cache'			=> 'cache'
 		);
@@ -121,14 +125,14 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * Returns the path to the templates directory
+	 * Returns the path to the themes directory
 	 *
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_templates($append = ''){
-		return $this->paths['templates'].$append;
+	public function get_path_themes($append = ''){
+		return $this->paths['themes'].$append;
 	}
 
 	/**
@@ -250,6 +254,17 @@ class Blog implements \Blight\Interfaces\Blog {
 		}
 
 		return $this->package_manager;
+	}
+
+	/**
+	 * @return \Blight\Interfaces\Packages\Theme
+	 */
+	public function get_theme(){
+		if(!isset($this->theme)){
+			$this->theme	= $this->get_package_manager()->get_theme($this->get('name', 'theme'));
+		}
+
+		return $this->theme;
 	}
 
 	/**

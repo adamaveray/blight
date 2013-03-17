@@ -7,12 +7,16 @@ namespace Blight;
 class Renderer implements \Blight\Interfaces\Renderer {
 	protected $blog;
 	protected $manager;
+	protected $theme;
 
 	protected $output_dir;
 	protected $template_dir;
 	protected $posts;
 
-	protected $templates	= array();
+	protected $inbuilt_templates	= array(
+		'feed'		=> 'src/views/templates/',
+		'sitemap'	=> 'src/views/templates/'
+	);
 
 	protected $twig_environment;
 
@@ -23,9 +27,10 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @param \Blight\Interfaces\Manager $manager
 	 * @throws \RuntimeException	Web or templates directory cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager, \Blight\Interfaces\Packages\Theme $theme){
 		$this->blog		= $blog;
 		$this->manager	= $manager;
+		$this->theme	= $theme;
 
 		if(!is_dir($blog->get_path_www())){
 			try {
@@ -34,8 +39,9 @@ class Renderer implements \Blight\Interfaces\Renderer {
 				throw new \RuntimeException('Output directory cannot be found');
 			}
 		}
-		if(!is_dir($blog->get_path_templates())){
-			throw new \RuntimeException('Templates directory cannot be found');
+
+		foreach($this->inbuilt_templates as $name => &$path){
+			$path	= $this->blog->get_path_app($path);
 		}
 	}
 
@@ -54,13 +60,18 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'categories'	=> $this->manager->get_posts_by_category()
 		), (array)$params);
 
-		// Check if template cached
-		if(!isset($this->templates[$name])){
-			// Create template
-			$this->templates[$name]	= new \Blight\Template($this->blog, $name);
-		}
+		$callback	= array($this->theme, 'render_'.$name);
+		if(is_callable($callback)){
+			return call_user_func($callback, $params);
 
-		return $this->templates[$name]->render($params);
+		} elseif(isset($this->inbuilt_templates[$name])){
+			// Use default template
+			$template	= new \Blight\Template($this->blog, $this->theme, $name, $this->inbuilt_templates[$name]);
+			return $template->render($params);
+
+		} else {
+			return $this->theme->render_template($name, $params);
+		}
 	}
 
 	/**
@@ -443,5 +454,21 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$this->render_template_to_file('sitemap', $path, array(
 			'pages'	=> $pages
 		));
+	}
+
+
+	/**
+	 * Copies all static assets from the theme to the web directory
+	 */
+	public function update_assets(){
+		$source	= $this->theme->get_path_assets();
+		$target	= $this->blog->get_path_www().'assets/';
+
+		if(!is_dir($source)){
+			// No assets in theme?
+			return;
+		}
+
+		$this->blog->get_file_system()->copy_dir($source, $target, 0755, true, true, true);
 	}
 };
