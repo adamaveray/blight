@@ -14,6 +14,8 @@
         {% if post is defined or page is defined %}
         <link rel="canonical" href="{% if post is defined %}{{ post._permalink }}{% else %}{{ page._permalink }}{% endif %}" />
         {% endif %}
+
+        {{ styles() }}
     {% endblock %}
 </head>
 <body>
@@ -78,5 +80,7 @@
         <p><a href="{{ blog._feed_url|e }}">RSS</a></p>
     {% endblock %}
 </footer>
+
+{{ scripts() }}
 </body>
 </html>

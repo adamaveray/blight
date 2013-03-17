@@ -40,3 +40,47 @@ _Editable parameters for hooks can be modified from within the callback to chang
 	- string **content**: _(editable)_ The post's raw Markdown content
 	- string **append**: _(editable)_ A string to append to the post content. Defaults to a permalink for linked posts.
 	- bool **process_content**: _(editable)_
+
+
+- ## render_styles
+
+	Allows adding styles to rendered pages
+
+	### Params
+
+	- \Blight\Interfaces\Packages\Theme **theme**: The current theme
+	- \Blight\Interfaces\Template **template**: The current template
+	- string **name**: The name of the template being rendered
+	- array **styles**: _(editable)_ An array of styles
+
+		**External:**
+
+			$styles[]	= '/path/to/styles.css';
+			$styles[]	= array('href' => '/path/to/styles.css', 'media' => 'print');
+
+		**Embedded:**
+
+			$styles[]	= 'body { background: #fff; }';
+
+
+- ## render_scripts
+
+	Allows adding scripts to rendered pages
+
+	### Params
+
+	- \Blight\Interfaces\Packages\Theme **theme**: The current theme
+	- \Blight\Interfaces\Template **template**: The current template
+	- string **name**: The name of the template being rendered
+	- array **scripts**: _(editable)_ An array of scripts
+
+		**External:**
+
+			$styles[]	= '/path/to/scripts.js';
+			$styles[]	= array('src' => '/path/to/scripts.js', 'async' => 'async');
+
+		**Embedded:**
+
+			$styles[]	= 'alert("Scripts");';
+
+

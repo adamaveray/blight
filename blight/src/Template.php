@@ -14,6 +14,7 @@ class Template implements \Blight\Interfaces\Template {
 	/** @var \Blight\Interfaces\Packages\Theme */
 	protected $theme;
 	protected $dir;
+	protected $name;
 	protected $filename;
 	protected $type;
 
@@ -31,6 +32,7 @@ class Template implements \Blight\Interfaces\Template {
 
 		$this->dir	= (isset($dir) ? $dir : $theme->get_path_templates());
 
+		$this->name	= $name;
 		$this->locate_template($name);
 	}
 
@@ -153,6 +155,10 @@ class Template implements \Blight\Interfaces\Template {
 			self::$twig_environments[$dir]->addGlobal('blog', $this->blog);
 			self::$twig_environments[$dir]->addGlobal('theme', $this->theme);
 
+			// Set up functions
+			self::$twig_environments[$dir]->addFunction(new \Twig_SimpleFunction('styles', array($this, 'get_styles'), array('is_safe' => array('html'))));
+			self::$twig_environments[$dir]->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'get_scripts'), array('is_safe' => array('html'))));
+
 			// Set up filters
 			$blog	= $this->blog;
 			$text_processor	= new TextProcessor($this->blog);
@@ -184,5 +190,88 @@ class Template implements \Blight\Interfaces\Template {
 		}
 
 		return self::$twig_environments[$dir];
+	}
+
+
+	/**
+	 * @return string	The HTML for the styles
+	 */
+	public function get_styles(){
+		$styles	= array();
+		$this->blog->do_hook('render_styles', array(
+			'theme'		=> $this->theme,
+			'template'	=> $this,
+			'name'		=> $this->name,
+			'styles'	=> &$styles
+		));
+
+		return $this->build_styles_scripts($styles, 'link', 'href', true, 'style');
+	}
+
+	/**
+	 * @return string	The HTML for the scripts
+	 */
+	public function get_scripts(){
+		$scripts	= array();
+		$this->blog->do_hook('render_scripts', array(
+			'theme'		=> $this->theme,
+			'template'	=> $this,
+			'name'		=> $this->name,
+			'scripts'	=> &$scripts
+		));
+
+		return $this->build_styles_scripts($scripts, 'script', 'src', false);
+	}
+
+	/**
+	 * Builds the HTML tags for the provided scripts or styles
+	 *
+	 * @param array $items	The items to build tags for
+	 * @param string $tag	The name of the external linking tag
+	 * @param string $url_attr	The attribute the external tag uses to link to external items
+	 * @param bool $self_closing	Whether the external tag should be self-closing (<tag />) or not (<tag></tag>)
+	 * @param string|null $embedded_tag	A different tag to use for embedded items. If not set, defaults to the normal tag.
+	 * @return string	The built HTML for the items
+	 */
+	protected function build_styles_scripts($items, $tag, $url_attr = 'href', $self_closing = true, $embedded_tag = null){
+		if(!isset($embedded_tag)){
+			$embedded_tag	= $tag;
+		}
+
+		$output	= array();
+		foreach($items as $item){
+			$external	= true;
+			if(!is_array($item)){
+				if(preg_match('#(((https?|ftp)://([\w-\d]+\.)+[\w-\d]+){0,1}(/[\w~,;\-\./?%&+\#=]*))#i', $item)){
+					// External
+					$item	= array(
+						$url_attr	=> $item
+					);
+				} else {
+					// Embedded
+					$external	= false;
+				}
+			}
+
+			if($external){
+				$line	= '<'.$tag;
+				foreach($item as $attr => $val){
+					$line	.= ' '.$attr.'="'.$val.'"';
+				}
+				if($self_closing){
+					$line	.= ' />';
+				} else {
+					$line	.= '></'.$tag.'>';
+				}
+
+			} else {
+				// Embedded
+				$line	= '<'.$embedded_tag.'>'.$item.'</'.$embedded_tag.'>';
+			}
+
+			$output[]	= $line;
+		}
+
+		return implode("\n", $output);
 	}
 };
