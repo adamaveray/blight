@@ -28,4 +28,11 @@ abstract class Theme extends Package implements \Blight\Interfaces\Packages\Them
 	public function get_path_templates(){
 		return $this->path.'templates/';
 	}
+
+	/**
+	 * @return string	The path to the assets directory
+	 */
+	public function get_path_assets(){
+		return $this->path.'assets/';
+	}
 };

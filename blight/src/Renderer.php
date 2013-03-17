@@ -440,4 +440,20 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'pages'	=> $pages
 		));
 	}
+
+
+	/**
+	 * Copies all static assets from the theme to the web directory
+	 */
+	public function update_assets(){
+		$source	= $this->theme->get_path_assets();
+		$target	= $this->blog->get_path_www().'assets/';
+
+		if(!is_dir($source)){
+			// No assets in theme?
+			return;
+		}
+
+		$this->blog->get_file_system()->copy_dir($source, $target, 0755, true, true, true);
+	}
 };

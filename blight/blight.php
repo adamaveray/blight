@@ -127,8 +127,12 @@ debug_output('Renderer initialised');
 	));
 	debug_output('Sitemap rendered');
 
-// Rendering completed
+	// Rendering completed
 
+// Copy theme assets
+$renderer->update_assets();
+
+// Remove old draft files
 $manager->cleanup_drafts();
 
 debug_output('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
