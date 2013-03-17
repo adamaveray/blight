@@ -58,7 +58,7 @@ $archive	= $manager->get_posts_by_year();
 debug_output('Archive built');
 
 // Begin rendering
-$renderer	= new Renderer($blog, $manager);
+$renderer	= new Renderer($blog, $manager, $blog->get_theme());
 debug_output('Renderer initialised');
 
 	// Render pages

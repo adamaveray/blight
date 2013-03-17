@@ -2,7 +2,7 @@
 namespace Blight\Interfaces;
 
 interface Renderer {
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager);
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager, \Blight\Interfaces\Packages\Theme $theme);
 
 	public function render_page(Page $page);
 

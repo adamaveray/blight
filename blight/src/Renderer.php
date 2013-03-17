@@ -7,12 +7,11 @@ namespace Blight;
 class Renderer implements \Blight\Interfaces\Renderer {
 	protected $blog;
 	protected $manager;
+	protected $theme;
 
 	protected $output_dir;
 	protected $template_dir;
 	protected $posts;
-
-	protected $templates	= array();
 
 	protected $twig_environment;
 
@@ -23,9 +22,10 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @param \Blight\Interfaces\Manager $manager
 	 * @throws \RuntimeException	Web or templates directory cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager, \Blight\Interfaces\Packages\Theme $theme){
 		$this->blog		= $blog;
 		$this->manager	= $manager;
+		$this->theme	= $theme;
 
 		if(!is_dir($blog->get_path_www())){
 			try {
@@ -33,9 +33,6 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			} catch(\Exception $e){
 				throw new \RuntimeException('Output directory cannot be found');
 			}
-		}
-		if(!is_dir($blog->get_path_templates())){
-			throw new \RuntimeException('Templates directory cannot be found');
 		}
 	}
 
@@ -54,13 +51,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'categories'	=> $this->manager->get_posts_by_category()
 		), (array)$params);
 
-		// Check if template cached
-		if(!isset($this->templates[$name])){
-			// Create template
-			$this->templates[$name]	= new \Blight\Template($this->blog, $name);
-		}
-
-		return $this->templates[$name]->render($params);
+		return $this->theme->render_template($name, $params);
 	}
 
 	/**
