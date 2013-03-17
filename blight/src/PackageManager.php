@@ -127,6 +127,30 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	}
 
 	/**
+	 * @param string $theme_name	The name of the theme to retrieve
+	 * @return \Blight\Interfaces\Packages\Theme
+	 * @throws \RuntimeException	Theme not found
+	 * @throws \RuntimeException	Invalid theme package
+	 */
+	public function get_theme($theme_name){
+		$path	= $this->blog->get_path_themes($theme_name.'.phar');
+		if(!file_exists($path)){
+			throw new \RuntimeException('Theme `'.$theme_name.'` not found');
+		}
+
+		$is_phar	= (pathinfo($path, \PATHINFO_EXTENSION) == 'phar');
+		if($is_phar){
+			$path	= 'phar://'.$path;
+		}
+		$theme	= $this->initialise_package($theme_name, $path);
+		if(!($theme instanceof \Blight\Interfaces\Packages\Theme)){
+			throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Packages\Theme');
+		}
+
+		return $theme;
+	}
+
+	/**
 	 * Runs a hook through plugins
 	 *
 	 * @param string $hook	The name of the hook to run
