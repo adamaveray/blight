@@ -98,10 +98,12 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 
 		// Parse manifest
 		$config	= \Blight\Utilities::array_multi_merge(array(
-			'namespace'	=> '\\'
+			'package'	=> array(
+				'namespace'	=> '\\'
+			)
 		), $this->parse_manifest($this->blog->get_file_system()->load_file($package_manifest)));
 
-		$class	= rtrim($config['namespace'], '\\').'\\'.$name;
+		$class	= rtrim($config['package']['namespace'], '\\').'\\'.$name;
 
 		$config['path']	= $directory.'/';
 
