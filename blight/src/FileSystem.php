@@ -77,8 +77,12 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @see delete_file()
 	 */
 	public function move_file($old_path, $new_path, $cleanup = false, $maintain_attributes = true){
-		$this->copy_file($old_path, $new_path, $maintain_attributes);
-		$this->delete_file($old_path, $cleanup);
+		rename($old_path, $new_path);
+
+		if($maintain_attributes){
+			// Attempt to update owner
+			$this->match_file_ownership($source_path, $target_path);
+		}
 	}
 
 	/**
@@ -86,16 +90,12 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 *
 	 * @param string $source_path	The path to the original file
 	 * @param string $target_path	The path to the file to create
-	 * @param bool $maintain_attributes	Whether to set the new file's modification date and ownership to match the original
+	 * @param bool $maintain_attributes	Whether to set the new file's ownership to match the original
 	 */
 	public function copy_file($source_path, $target_path, $maintain_attributes = true){
-		$content	= $this->load_file($source_path);
-		$this->create_file($target_path, $content);
+		copy($source_path, $target_path);
 
 		if($maintain_attributes){
-			// Update modification date
-			touch($target_path, filemtime($source_path));
-
 			// Attempt to update owner
 			$this->match_file_ownership($source_path, $target_path);
 		}
