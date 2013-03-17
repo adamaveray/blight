@@ -10,7 +10,7 @@ interface Blog {
 
 	public function get_path_app($append = '');
 
-	public function get_path_templates($append = '');
+	public function get_path_themes($append = '');
 
 	public function get_path_plugins($append = '');
 

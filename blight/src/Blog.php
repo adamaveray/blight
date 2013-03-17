@@ -56,7 +56,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			'pages'			=> 'pages',
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
-			'templates'		=> 'templates',
+			'themes'		=> 'themes',
 			'plugins'		=> 'plugins',
 			'cache'			=> 'cache'
 		);
@@ -121,14 +121,14 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * Returns the path to the templates directory
+	 * Returns the path to the themes directory
 	 *
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_templates($append = ''){
-		return $this->paths['templates'].$append;
+	public function get_path_themes($append = ''){
+		return $this->paths['themes'].$append;
 	}
 
 	/**
