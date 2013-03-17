@@ -2,8 +2,8 @@
 /** @var \Blight\Interfaces\Blog $blog */
 /** @var array $pages */
 
-$sitemap_create_url	= function(\DOMDocument $document, $url, $last_modified = null, $params = null){
-	$sitemap_create_node	= function(\DOMDocument $document, $node_name, $content, $attributes = null, $callback = null){
+$create_url	= function(\DOMDocument $document, $url, $last_modified = null, $params = null){
+	$create_node	= function(\DOMDocument $document, $node_name, $content, $attributes = null, $callback = null){
 		$node	= $document->createElement($node_name);
 		if(is_array($attributes)){
 			foreach($attributes as $key => $value){
@@ -26,16 +26,16 @@ $sitemap_create_url	= function(\DOMDocument $document, $url, $last_modified = nu
 
 	$url_node	= $document->createElement('url');
 
-		$node	= $sitemap_create_node($document, 'loc', $url);
+		$node	= $create_node($document, 'loc', $url);
 		$url_node->appendChild($node);
 
 		if(isset($last_modified) && $last_modified instanceof \DateTime){
-			$node	= $sitemap_create_node($document, 'lastmod', $last_modified->format('c'));
+			$node	= $create_node($document, 'lastmod', $last_modified->format('c'));
 			$url_node->appendChild($node);
 		}
 
 		foreach($params as $param => $value){
-			$node	= $sitemap_create_node($document, $param, $value);
+			$node	= $create_node($document, $param, $value);
 			$url_node->appendChild($node);
 		}
 
@@ -53,7 +53,7 @@ $root->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 // Create URLs
 foreach($pages as $page){
 	/** @var \Blight\Interfaces\Page $page */
-	$node	= $sitemap_create_url($dom, $page->get_permalink(), $page->get_date());
+	$node	= $create_url($dom, $page->get_permalink(), $page->get_date());
 	$root->appendChild($node);
 }
 

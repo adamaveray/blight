@@ -1,6 +1,6 @@
 <?php
 /** @var \Blight\Interfaces\Blog $blog */
-$feed_create_node	= function(\DOMDocument $document, \DOMElement $parent, $node_name, $content, $attributes = null, $callback = null){
+$create_node	= function(\DOMDocument $document, \DOMElement $parent, $node_name, $content, $attributes = null, $callback = null){
 	$node	= $document->createElement($node_name);
 	if(is_array($attributes)){
 		foreach($attributes as $key => $value){
@@ -27,11 +27,11 @@ $root->setAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
 
 $channel	= $dom->createElement('channel');
 
-	$feed_create_node($dom, $channel, 'title', $blog->get_name());
-	$feed_create_node($dom, $channel, 'link', $blog->get_url());
-	$feed_create_node($dom, $channel, 'description', $blog->get_description());
-	$feed_create_node($dom, $channel, 'lastBuildDate', $now->format('r'));
-	$feed_create_node($dom, $channel, 'atom:link', null, array(
+	$create_node($dom, $channel, 'title', $blog->get_name());
+	$create_node($dom, $channel, 'link', $blog->get_url());
+	$create_node($dom, $channel, 'description', $blog->get_description());
+	$create_node($dom, $channel, 'lastBuildDate', $now->format('r'));
+	$create_node($dom, $channel, 'atom:link', null, array(
 		'href'	=> $blog->get_feed_url(),
 		'rel'	=> 'self',
 		'type'	=> 'application/rss+xml'
@@ -68,13 +68,13 @@ $channel	= $dom->createElement('channel');
 				'append'	=> &$append
 			));
 
-			$feed_create_node($dom, $item, 'title', $title);
-			$feed_create_node($dom, $item, 'link', $link);
-			$feed_create_node($dom, $item, 'guid', $guid, array(
+			$create_node($dom, $item, 'title', $title);
+			$create_node($dom, $item, 'link', $link);
+			$create_node($dom, $item, 'guid', $guid, array(
 				'isPermaLink'	=> $guid_is_permalink
 			));
-			$feed_create_node($dom, $item, 'pubDate', $date->format('r'));
-			$feed_create_node($dom, $item, 'description', ($process_content ? $text->process_markdown($content) : $content));
+			$create_node($dom, $item, 'pubDate', $date->format('r'));
+			$create_node($dom, $item, 'description', ($process_content ? $text->process_markdown($content) : $content));
 
 		$channel->appendChild($item);
 	}
