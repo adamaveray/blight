@@ -5,7 +5,7 @@
 		"description":	"A blank example theme",
 		"license":	{
 			"name":	"BSD",
-			"url":	""
+			"url":	"http://opensource.org/licenses/BSD-2-Clause"
 		},
 		"version":	"1.0",
 		"namespace":	"\\BlightThemes"
