@@ -23,6 +23,10 @@ AddDefaultCharset UTF-8
 	# Handle trailing slash
 	RewriteRule ^(.+)/$ /$1 [R=301,L]
 
+	# Map theme assets
+	RewriteCond %{DOCUMENT_ROOT}/{%WEB_PATH%}/assets/$1 -f
+	RewriteRule (.*) {%WEB_PATH%}/assets/$1 [L]
+
 	# Rebuild site
 	RewriteRule ^$ index.php [L]
 </IfModule>
