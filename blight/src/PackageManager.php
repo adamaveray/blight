@@ -103,6 +103,12 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 			)
 		), $this->parse_manifest($this->blog->get_file_system()->load_file($package_manifest)));
 
+		$min_version	= $config['compatibility']['minimum'];
+		if(version_compare($min_version, \Blight\Blog::VERSION, '>')){
+			// Needs newer version
+			throw new \RuntimeException('Package requires version '.$config['package']['version']);
+		}
+
 		$class	= rtrim($config['package']['namespace'], '\\').'\\'.$name;
 
 		$config['path']	= $directory.'/';

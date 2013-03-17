@@ -5,6 +5,8 @@ namespace Blight;
  * Stores configuration data for the blog
  */
 class Blog implements \Blight\Interfaces\Blog {
+	const VERSION	= '0.6.0';
+
 	protected $config;
 
 	/** @var \Blight\Interfaces\FileSystem */
