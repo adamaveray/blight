@@ -64,6 +64,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			'drafts'		=> 'drafts',
 			'themes'		=> 'themes',
 			'plugins'		=> 'plugins',
+			'assets'		=> 'assets',
 			'cache'			=> 'cache'
 		);
 		foreach($this->paths as $key => $config_key){
@@ -168,6 +169,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function get_path_posts($append = ''){
 		return $this->paths['posts'].$append;
+	}
+
+	/**
+	 * Returns the path to the assets directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function get_path_assets($append = ''){
+		return $this->paths['assets'].$append;
 	}
 
 	/**

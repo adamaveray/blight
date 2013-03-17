@@ -25,4 +25,8 @@ interface Renderer {
 	public function render_feeds($options = null);
 
 	public function render_sitemap($options = null);
+
+	public function update_user_assets();
+
+	public function update_theme_assets();
 };

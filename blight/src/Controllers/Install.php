@@ -216,6 +216,7 @@ class Install {
 			'drafts'		=> 'blog-data/drafts',
 			'themes'		=> 'blog-data/themes',
 			'plugins'		=> 'blog-data/plugins',
+			'assets'		=> 'blog-data/assets',
 			'web'			=> 'www/_blog',
 			'drafts-web'	=> 'www/_drafts',
 			'cache'			=> 'cache',

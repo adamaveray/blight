@@ -460,15 +460,31 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Copies all static assets from the theme to the web directory
 	 */
-	public function update_assets(){
-		$source	= $this->theme->get_path_assets();
-		$target	= $this->blog->get_path_www().'assets/';
+	public function update_theme_assets(){
+		$this->update_assets($this->theme->get_path_assets());
+	}
 
-		if(!is_dir($source)){
+	/**
+	 * Copies all static assets from the user assets directory to the web directory
+	 */
+	public function update_user_assets(){
+		$this->update_assets($this->blog->get_path_assets());
+	}
+
+	/**
+	 * Ensures all assets within the source directory exist in the public assets directory, copying
+	 * only nonexistent or updated files.
+	 *
+	 * @param string $source_dir	The directory to copy assets from
+	 */
+	protected function update_assets($source_dir){
+		$target_dir	= $this->blog->get_path_www().'assets/';
+
+		if(!is_dir($source_dir)){
 			// No assets in theme?
 			return;
 		}
 
-		$this->blog->get_file_system()->copy_dir($source, $target, 0755, true, true, true);
+		$this->blog->get_file_system()->copy_dir($source_dir, $target_dir, 0755, true, true, true);
 	}
 };

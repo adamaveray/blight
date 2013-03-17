@@ -21,6 +21,7 @@ After installation, your directory structure should look like the following:
 		posts/
 		templates/
 		plugins/
+		assets/
 	
 	www/
 		.htaccess
@@ -93,6 +94,13 @@ Once the pages are built, the page will automatically reload showing the generat
 ### Updating
 
 When published, original post Markdown files will be organised into date folders, such as `posts/2013/02/2013-02-02-post.md`. To make changes to a previous post, just locate the post in these date folders, make any changes, and trigger a rebuild of the site.
+
+
+### Media
+
+Any additional files accompanying posts, such as images, should be stored in the `assets/` directory. These files will then be available at the web root.
+
+eg:	`blog-data/assets/img/photo.jpg` → `http://www.example.com/img/photo.jpg`
 
 
 ## Themes

@@ -22,6 +22,7 @@ $config	= array(
 		'drafts'		=> 'blog-data/drafts/',
 		'templates'		=> 'blog-data/templates/',
 		'plugins'		=> 'blog-data/plugins/',
+		'assets'		=> 'blog-data/assets/',
 		'web'			=> 'www/_blog/',
 		'drafts-web'	=> 'www/_drafts/',
 		'cache'			=> 'cache/'

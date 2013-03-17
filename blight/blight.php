@@ -130,8 +130,12 @@ debug_output('Renderer initialised');
 	// Rendering completed
 
 // Copy theme assets
-$renderer->update_assets();
+$renderer->update_theme_assets();
 debug_output('Theme assets updated');
+
+// Copy user assets
+$renderer->update_user_assets();
+debug_output('User assets updated');
 
 // Remove old draft files
 $manager->cleanup_drafts();
