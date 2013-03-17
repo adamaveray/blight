@@ -13,6 +13,11 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	protected $template_dir;
 	protected $posts;
 
+	protected $inbuilt_templates	= array(
+		'feed'		=> 'src/views/templates/',
+		'sitemap'	=> 'src/views/templates/'
+	);
+
 	protected $twig_environment;
 
 	/**
@@ -34,6 +39,10 @@ class Renderer implements \Blight\Interfaces\Renderer {
 				throw new \RuntimeException('Output directory cannot be found');
 			}
 		}
+
+		foreach($this->inbuilt_templates as $name => &$path){
+			$path	= $this->blog->get_path_app($path);
+		}
 	}
 
 	/**
@@ -54,6 +63,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$callback	= array($this->theme, 'render_'.$name);
 		if(is_callable($callback)){
 			return call_user_func($callback, $params);
+
+		} elseif(isset($this->inbuilt_templates[$name])){
+			// Use default template
+			$template	= new \Blight\Template($this->blog, $this->theme, $name, $this->inbuilt_templates[$name]);
+			return $template->render($params);
+
 		} else {
 			return $this->theme->render_template($name, $params);
 		}
