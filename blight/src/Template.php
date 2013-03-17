@@ -97,7 +97,9 @@ class Template implements \Blight\Interfaces\Template {
 	 * @return string		The rendered content from the template
 	 */
 	protected function render_php($params){
-		$params['text']	= new TextProcessor($this->blog);
+		$params['blog']		= $this->blog;
+		$params['theme']	= $this->theme;
+		$params['text']		= new TextProcessor($this->blog);
 
 		extract($params);
 		ob_start();
@@ -146,6 +148,10 @@ class Template implements \Blight\Interfaces\Template {
 		if(!isset(self::$twig_environments[$dir])){
 			$loader	= new \Twig_Loader_Filesystem($dir);
 			self::$twig_environments[$dir]	= new \Twig_Environment($loader);
+
+			// Add globals
+			self::$twig_environments[$dir]->addGlobal('blog', $this->blog);
+			self::$twig_environments[$dir]->addGlobal('theme', $this->theme);
 
 			// Set up filters
 			$blog	= $this->blog;

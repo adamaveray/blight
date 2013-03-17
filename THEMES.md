@@ -40,6 +40,7 @@ Templates are written using [Twig](http://twig.sensiolabs.org), or alternatively
 The following variables are available to both PHP and Twig templates:
 
 - **blog**: An instance of the Blog class, providing access to site-wide URLs and other config settings.
+- **theme**: An instance of the theme itself
 - **text**: An instance of the TextProcessor class, for converting raw posts to Markdown, etc
 - **archives**: An array of the years posts exist for
 

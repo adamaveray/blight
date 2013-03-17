@@ -55,7 +55,6 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 */
 	protected function render_template($name, $params = null){
 		$params	= array_merge(array(
-			'blog'			=> $this->blog,
 			'archives'		=> $this->manager->get_posts_by_year(),
 			'categories'	=> $this->manager->get_posts_by_category()
 		), (array)$params);
