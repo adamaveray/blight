@@ -51,7 +51,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'categories'	=> $this->manager->get_posts_by_category()
 		), (array)$params);
 
-		return $this->theme->render_template($name, $params);
+		$callback	= array($this->theme, 'render_'.$name);
+		if(is_callable($callback)){
+			return call_user_func($callback, $params);
+		} else {
+			return $this->theme->render_template($name, $params);
+		}
 	}
 
 	/**
