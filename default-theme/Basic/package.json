@@ -1,0 +1,20 @@
+{
+	"package":	{
+		"name":	"Blank",
+		"url":	"http://www.example.com",
+		"description":	"A blank example theme",
+		"license":	{
+			"name":	"BSD",
+			"url":	""
+		},
+		"version":	"1.0",
+		"namespace":	"\\BlightThemes"
+	},
+	"compatibility":	{
+		"minimum":		"0.6"
+	},
+	"author":	{
+		"name":	"Adam Averay",
+		"url":	"http://adamaveray.com.au"
+	}
+}
