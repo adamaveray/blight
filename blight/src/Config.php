@@ -3,16 +3,6 @@ namespace Blight;
 
 class Config implements \Blight\Interfaces\Config {
 	/**
-	 * Converts the config file text into values
-	 *
-	 * @param string $contents	The contents for the config file
-	 * @return array	An associative array of the config data
-	 */
-	public function unserialize($contents){
-		return json_decode($contents, true);
-	}
-
-	/**
 	 * Converts the config data into a text format
 	 *
 	 * @param array $values	The config data to convert
@@ -28,6 +18,16 @@ class Config implements \Blight\Interfaces\Config {
 			$result	= $this->pretty_print($result);
 		}
 		return $result;
+	}
+
+	/**
+	 * Converts the config file text into values
+	 *
+	 * @param string $contents	The contents for the config file
+	 * @return array	An associative array of the config data
+	 */
+	public function unserialize($contents){
+		return json_decode($contents, true);
 	}
 
 	/**

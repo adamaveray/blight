@@ -178,7 +178,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all pages found as Page objects
 	 *
-	 * @return array	An array of pages
+	 * @return array	An array of \Blight\Page objects
 	 */
 	public function get_pages(){
 		if(!isset($this->pages)){
@@ -215,7 +215,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all draft posts found as Post objects
 	 *
-	 * @return array	An array of posts
+	 * @return array	An array of \Blight\Page objects
 	 */
 	public function get_draft_posts(){
 		if(!isset($this->draft_posts)){
@@ -377,7 +377,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups all posts by publication year
 	 *
-	 * @return array	An array of tags containing posts
+	 * @return array	An array of \Blight\Containers\Year objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -400,7 +400,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups posts by tag
 	 *
-	 * @return array	An array of tags containing posts
+	 * @return array	An array of \Blight\Containers\Tag objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -423,7 +423,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups posts by category
 	 *
-	 * @return array	An array of categories containing posts
+	 * @return array	An array of \Blight\Containers\Category objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(

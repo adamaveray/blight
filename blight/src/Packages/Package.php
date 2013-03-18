@@ -11,6 +11,10 @@ abstract class Package implements \Blight\Interfaces\Packages\Package {
 
 	protected $path;
 
+	/**
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @param array|null $config	The configuration data for the package
+	 */
 	final public function __construct(\Blight\Interfaces\Blog $blog, $config = null){
 		$this->blog	= $blog;
 
@@ -23,6 +27,12 @@ abstract class Package implements \Blight\Interfaces\Packages\Package {
 		$this->setup();
 	}
 
+	/**
+	 * Processes and standardises the package configuration data
+	 *
+	 * @param array|null $config	The configuration data for the package
+	 * @return array				The processed configuration data
+	 */
 	final protected function load_config($config){
 		$config	= (array)$config;
 
