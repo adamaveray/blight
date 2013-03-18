@@ -2,6 +2,7 @@
 namespace Blight\Tests;
 
 require_once(__DIR__.'/mock/RendererTestManager.php');
+require_once(__DIR__.'/mock/Theme.php');
 
 class RendererTest extends \PHPUnit_Framework_TestCase {
 	static public function setUpBeforeClass(){
@@ -39,6 +40,8 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 	protected $blog;
 	/** @var \Blight\Tests\Mock\RendererTestManager */
 	protected $manager;
+	/** @var \Blight\Tests\Mock\Theme */
+	protected $theme;
 	/** @var \Blight\Renderer */
 	protected $renderer;
 
@@ -47,7 +50,6 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 		$test_config	= $config;
 		$test_config['paths']['web']		= __DIR__.'/files/web/';
 		$test_config['paths']['drafts-web']	= __DIR__.'/files/web/_drafts/';
-		$test_config['paths']['templates']	= __DIR__.'/files/templates/';
 		$this->blog		= new \Blight\Blog($test_config);
 
 		$this->manager	= new \Blight\Tests\Mock\RendererTestManager($this->blog);
@@ -69,7 +71,12 @@ EOD;
 		$this->manager->set_mock_posts($posts, 'drafts');
 		$this->manager->set_mock_posts($posts, 'drafts');
 
-		$this->renderer	= new \Blight\Renderer($this->blog, $this->manager);
+
+		$this->theme	= new \Blight\Tests\Mock\Theme($this->blog, array(
+			'path'	=> __DIR__.'/files/'
+		));
+
+		$this->renderer	= new \Blight\Renderer($this->blog, $this->manager, $this->theme);
 
 	}
 
@@ -77,21 +84,8 @@ EOD;
 	 * @covers \Blight\Renderer::__construct
 	 */
 	public function testConstruct(){
-		$renderer	= new \Blight\Renderer($this->blog, $this->manager);
+		$renderer	= new \Blight\Renderer($this->blog, $this->manager, $this->theme);
 		$this->assertInstanceOf('\Blight\Interfaces\Renderer', $renderer);
-	}
-
-	/**
-	 * @covers \Blight\Renderer::__construct
-	 * @expectedException \RuntimeException
-	 */
-	public function testInvalidConstruct(){
-		global $config;
-		$test_config	= $config;
-		$test_config['paths']['templates']	= 'nonexistent';
-
-		$blog	= new \Blight\Blog($test_config);
-		new \Blight\Renderer($blog, new \Blight\Manager($blog));
 	}
 
 	/**

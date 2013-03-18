@@ -1,9 +1,13 @@
 <?php
 namespace Blight\Tests;
 
+require_once(__DIR__.'/mock/Theme.php');
+
 class TemplateTest extends \PHPUnit_Framework_TestCase {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
+	/** @var \Blight\Tests\Mock\Theme */
+	protected $theme;
 
 	protected $template_php_name;
 	protected $template_twig_name;
@@ -17,9 +21,11 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 
 	public function setUp(){
 		global $config;
-		$test_config	= $config;
-		$test_config['paths']['templates']	= __DIR__.'/files/templates/';
-		$this->blog		= new \Blight\Blog($test_config);
+		$this->blog		= new \Blight\Blog($config);
+
+		$this->theme	= new \Blight\Tests\Mock\Theme($this->blog, array(
+			'path'	=> __DIR__.'/files/'
+		));
 
 		$this->template_php_name	= 'test_php';
 		$this->template_twig_name	= 'test_twig';
@@ -27,15 +33,15 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 		$this->template_content				= 'Template'."\n".'No Variable';
 		$this->template_content_variable	= 'Template'."\n".'Variable: %s';
 
-		$this->template_php		= new \Blight\Template($this->blog, $this->template_php_name);
-		$this->template_twig	= new \Blight\Template($this->blog, $this->template_twig_name);
+		$this->template_php		= new \Blight\Template($this->blog, $this->theme, $this->template_php_name);
+		$this->template_twig	= new \Blight\Template($this->blog, $this->theme, $this->template_twig_name);
 	}
 
 	/**
 	 * @covers \Blight\Template::__construct
 	 */
 	public function testPHPConstruct(){
-		$template	= new \Blight\Template($this->blog, $this->template_php_name);
+		$template	= new \Blight\Template($this->blog, $this->theme, $this->template_php_name);
 		$this->assertInstanceOf('\Blight\Template', $template);
 	}
 
@@ -43,7 +49,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\Template::__construct
 	 */
 	public function testTwigConstruct(){
-		$template	= new \Blight\Template($this->blog, $this->template_twig_name);
+		$template	= new \Blight\Template($this->blog, $this->theme, $this->template_twig_name);
 		$this->assertInstanceOf('\Blight\Template', $template);
 	}
 
@@ -52,7 +58,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \RuntimeException
 	 */
 	public function testNonexistentConstruct(){
-		new \Blight\Template($this->blog, 'nonexistent');
+		new \Blight\Template($this->blog, $this->theme, 'nonexistent');
 	}
 
 	/**

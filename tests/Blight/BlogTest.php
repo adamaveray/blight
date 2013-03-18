@@ -73,12 +73,12 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_templates
+	 * @covers \Blight\Blog::get_path_themes
 	 */
-	public function testGetPathTemplates(){
-		$this->assertEquals($this->root_path.$this->config['paths']['templates'], $this->blog->get_path_templates());
+	public function testGetPathThemes(){
+		$this->assertEquals($this->root_path.$this->config['paths']['themes'], $this->blog->get_path_themes());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['templates'].'test', $this->blog->get_path_templates('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['themes'].'test', $this->blog->get_path_themes('test'));
 	}
 
 	/**
