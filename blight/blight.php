@@ -24,7 +24,36 @@ function debug_output($message){
 	echo $timestamp.'-'.$memstamp.': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
 }
 
-$root_path		= str_replace('phar://', '', dirname(__DIR__)).'/';
+$root_path	= str_replace('phar://', '', dirname(__DIR__)).'/';
+$lock_file	= $root_path.'blight-update.lock';
+
+// Setup locking
+if(file_exists($lock_file)){
+	// Process running
+	if(IS_CLI){
+		echo 'Already running'.PHP_EOL;
+	}
+	exit;
+}
+
+$result	= touch($lock_file);
+if(!$result){
+	// Cannot create lock
+	if(IS_CLI){
+		echo 'Cannot create lock file'.PHP_EOL;
+	}
+
+	// Try running anyway
+}
+
+register_shutdown_function(function() use($lock_file){
+	try {
+		unlink($lock_file);
+	} catch(Exception $e){
+		// Cannot remove lock file
+	}
+});
+
 $config_file	= $root_path.'config.json';
 if(!file_exists($config_file) || isset($_COOKIE[\Blight\Controllers\Install::COOKIE_NAME])){
 	// Blog not installed
@@ -49,7 +78,6 @@ $parser	= new \Blight\Config();
 $config	= $parser->unserialize(file_get_contents($config_file));
 $config['root_path']	= $root_path;
 $blog	= new Blog($config);
-
 
 // Load posts
 $manager	= new Manager($blog);
