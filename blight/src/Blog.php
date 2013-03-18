@@ -15,8 +15,8 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\PackageManager */
 	protected $package_manager;
 
-	/** @var \Blight\Interfaces\Packages\Plugin */
-	protected $plugin;
+	/** @var \Blight\Interfaces\Packages\Theme */
+	protected $theme;
 
 
 	protected $root_path;
