@@ -30,10 +30,8 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @throws \RuntimeException	The file cannot be written or the containing directory cannot be made
 	 */
 	public function create_file($path, $content, $match_directory_ownership = true){
-		$dir	= pathinfo($path, \PATHINFO_DIRNAME);
-		if(!is_dir($dir)){
-			$this->create_dir($dir);
-		}
+		$dir	= dirname($path);
+		$this->create_dir($dir);
 
 		$result	= file_put_contents($path, $content);
 		if($result === false){
@@ -77,11 +75,13 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @see delete_file()
 	 */
 	public function move_file($old_path, $new_path, $cleanup = false, $maintain_attributes = true){
+		$this->create_dir(dirname($new_path));
+
 		rename($old_path, $new_path);
 
 		if($maintain_attributes){
 			// Attempt to update owner
-			$this->match_file_ownership($source_path, $target_path);
+			$this->match_file_ownership($old_path, $new_path);
 		}
 	}
 
@@ -93,6 +93,8 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @param bool $maintain_attributes	Whether to set the new file's ownership to match the original
 	 */
 	public function copy_file($source_path, $target_path, $maintain_attributes = true){
+		$this->create_dir(dirname($target_path));
+
 		copy($source_path, $target_path);
 
 		if($maintain_attributes){
