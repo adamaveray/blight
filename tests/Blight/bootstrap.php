@@ -4,6 +4,7 @@ date_default_timezone_set('UTC');
 global $root_path;
 $root_path	= realpath(__DIR__.'/../../').'/';
 
+require('phar://'.$root_path.'Blight.phar/vendor/autoload.php');
 require('phar://'.$root_path.'Blight.phar/src/autoload.php');
 
 global $config;

@@ -11,6 +11,8 @@ if(!isset($_SERVER['REQUEST_TIME_FLOAT'])) $_SERVER['REQUEST_TIME_FLOAT'] = micr
 
 // Set up environment
 date_default_timezone_set('UTC');
+
+require('vendor/autoload.php');
 require('src/autoload.php');
 
 function debug_output($message){

@@ -1,0 +1,11 @@
+{
+	"require": {
+		"twig/twig": "1.12.*",
+		"dflydev/markdown": "v1.0.2",
+		"phptypography/phptypography": "1.21",
+		"cybits/minify": "dev-master"
+	},
+	"config": {
+		"vendor-dir": "blight/vendor"
+	}
+}

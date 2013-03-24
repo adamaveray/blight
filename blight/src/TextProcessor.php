@@ -9,10 +9,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 
 	/** @var \phpTypograhy */
 	protected $typography;
-	/** @var \Markdown */
+	/** @var \dflydev\markdown\MarkdownExtraParser */
 	protected $markdown;
-	/** @var \TruncateHTML */
-	protected $truncator;
 
 	/**
 	 * Initialises the processor
@@ -87,49 +85,135 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	}
 
 	/**
-	 * Truncates a block of HTML to a specified length.
+	 * Shortens a given block of text, preserving HTML tags and whole words
 	 *
 	 * @param string $html	The HTML to truncate
 	 * @param int $length	The maximum length of text to return. If the given HTML is shorter than this length,
 	 * 						no truncation will take place.
 	 * @param string $ending	Characters to be appended if the string is truncated
-	 * @return string	The truncated string
+	 * @param boolean $split_words		Whether to truncate text mid-word
+	 * @param boolean $handle_html	If true, HTML tags would be handled correctly
+	 *
+	 * @return string	The truncated text
 	 */
-	public function truncate_html($html, $length = 100, $ending = '...'){
-		return $this->get_truncator()->truncate($html, $length, $ending);
+	public function truncate_html($html, $length = 100, $ending = '...', $split_words = false, $handle_html = true){
+		if(!$handle_html){
+			// Ignore HTML tags
+			if(strlen($html) <= $length){
+				// No need to truncate
+				return $html;
+			} else {
+				// Truncate text
+				$output	= substr($html, 0, $length - strlen($ending));
+			}
+		} else {
+			if(strlen(strip_tags($html)) <= $length){
+				// No need to truncate
+				return $html;
+			}
+
+			// Split HTML tags to scannable lines
+			preg_match_all('/(<.+?>)?([^<>]*)/s', $html, $lines, \PREG_SET_ORDER);
+
+			$total_length	= strlen($ending);
+			$open_tags		= array();
+			$output			= '';
+			foreach($lines as $line_matchings){
+				if (!empty($line_matchings[1])) {
+					// Has HTML tag
+					if(preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])){
+						// Empty element - ignore
+					} else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+						// Closing tag - delete from open tags list
+						$pos = array_search($tag_matchings[1], $open_tags);
+						if($pos !== false){
+							unset($open_tags[$pos]);
+						}
+
+					} else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
+						// Opening tag - add to open tags list
+						array_unshift($open_tags, strtolower($tag_matchings[1]));
+					}
+
+					// Add tag to truncated text
+					$output .= $line_matchings[1];
+				}
+
+				// Caclulate length of plain text in line
+				$content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
+				if(($total_length + $content_length) > $length){
+					// Remaining characters
+					$left = $length - $total_length;
+
+					$entities_length = 0;
+					// Find HTML entities
+					if(preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', $line_matchings[2], $entities, \PREG_OFFSET_CAPTURE)){
+						// Calculate real length of all entities whithin legal range
+						foreach($entities[0] as $entity){
+							if($entity[1]+1-$entities_length > $left){
+								continue;
+							}
+
+							$left--;
+							$entities_length += strlen($entity[0]);
+						}
+					}
+
+					$output .= substr($line_matchings[2], 0, $left+$entities_length);
+					// maximum lenght is reached, so get off the loop
+					break;
+
+				} else {
+					$output .= $line_matchings[2];
+					$total_length += $content_length;
+				}
+				// if the maximum length is reached, get off the loop
+				if($total_length>= $length) {
+					break;
+				}
+			}
+		}
+
+		if(!$split_words){
+			// Don't split words
+			$spacepos = strrpos($output, ' ');
+			if(isset($spacepos)){
+				// Cut text at last occurance of space
+				$output = substr($output, 0, $spacepos);
+			}
+		}
+
+		// Append ending string
+		$output .= $ending;
+		if($handle_html){
+			// Close remaining HTML tags
+			foreach($open_tags as $tag){
+				$output .= '</'.$tag.'>';
+			}
+		}
+
+		return $output;
 	}
 
-
 	/**
-	 * @return \Markdown	The Markdown parsing instance
+	 * @return \dflydev\markdown\MarkdownExtraParser	The Markdown parsing instance
 	 */
 	protected function get_markdown(){
 		if(!isset($this->markdown)){
-			$this->markdown	= new \Markdown();
+			$this->markdown	= new \dflydev\markdown\MarkdownExtraParser();
 		}
 
 		return $this->markdown;
 	}
 
 	/**
-	 * @return \phpTypograhy	The phpTypography instance
+	 * @return \PHPTypography\PHPTypograhy	The phpTypography instance
 	 */
 	protected function get_typography(){
 		if(!isset($this->typography)){
-			$this->typography	= new \phpTypography();
+			$this->typography	= new \PHPTypography\PHPTypography();
 		}
 
 		return $this->typography;
-	}
-
-	/**
-	 * @return \TruncateHTML	The TruncateHTML instance
-	 */
-	protected function get_truncator(){
-		if(!isset($this->truncator)){
-			$this->truncator	= new \TruncateHTML();
-		}
-
-		return $this->truncator;
 	}
 };

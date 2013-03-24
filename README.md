@@ -163,5 +163,5 @@ Plugins can be installed to extend the platform. View [the plugins documentation
 
 ## Building
 
-Building the Phar from the source files is accomplished by running `php build.php` from the terminal.
+Dependencies are installed using [Composer](http://getcomposer.org). If you don't have Composer installed, run `curl -sS https://getcomposer.org/installer | php` from the terminal, then `php composer.phar install`. Building the Phar from the source files is then accomplished by running `php build.php`.
 

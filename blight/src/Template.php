@@ -136,7 +136,7 @@ class Template implements \Blight\Interfaces\Template {
 	 * @return string		The minified HTML
 	 */
 	protected function minify_html($html){
-		return \MinifyHTML::minify($html);
+		return \Minify_HTML::minify($html);
 	}
 
 
