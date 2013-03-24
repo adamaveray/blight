@@ -200,7 +200,7 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 */
 	protected function get_markdown(){
 		if(!isset($this->markdown)){
-			$this->markdown	= new \dflydev\markdown\MarkdownExtraParser();
+			$this->markdown	= new \Michelf\MarkdownExtra();
 		}
 
 		return $this->markdown;
