@@ -2,16 +2,16 @@
 $dir	= 'blight';
 $name	= 'Blight.phar';
 
-$path_source	= __DIR__.'/'.$dir;
-$path_build		= __DIR__;
+$pathSource	= __DIR__.'/'.$dir;
+$pathBuild		= __DIR__;
 
 try {
-	if(!is_dir($path_build)){
-		mkdir($path_build);
+	if(!is_dir($pathBuild)){
+		mkdir($pathBuild);
 	}
 
-	$phar = new Phar($path_build.'/'.$name, 0, $name);
-	$phar->buildFromDirectory($path_source);
+	$phar = new Phar($pathBuild.'/'.$name, 0, $name);
+	$phar->buildFromDirectory($pathSource);
 
 	// Update Composer to handle Phar
 	$path	= 'vendor/composer/autoload_classmap.php';
@@ -21,7 +21,7 @@ try {
 		$phar->addFromString($path, $content);
 	}
 
-	$phar->setStub(file_get_contents($path_source.'/phar-stub.php'));
+	$phar->setStub(file_get_contents($pathSource.'/phar-stub.php'));
 	unset($phar);
 
 } catch(\Exception $e){

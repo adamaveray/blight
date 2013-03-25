@@ -6,8 +6,8 @@
 foreach($posts as $post){
 	/** @var \Blight\Interfaces\Post $post */
 	?>
-	<h1><?php echo $post->get_title();?></h1>
+	<h1><?php echo $post->getTitle();?></h1>
 	<?php
-	echo $text->process_markdown($post->get_content());
+	echo $text->processMarkdown($post->getContent());
 }
 ?>

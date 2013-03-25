@@ -1,7 +1,7 @@
 <?php
 /** @var \Blight\Interfaces\Blog $blog */
-$create_node	= function(\DOMDocument $document, \DOMElement $parent, $node_name, $content, $attributes = null, $callback = null){
-	$node	= $document->createElement($node_name);
+$createNode	= function(\DOMDocument $document, \DOMElement $parent, $nodeName, $content, $attributes = null, $callback = null){
+	$node	= $document->createElement($nodeName);
 	if(is_array($attributes)){
 		foreach($attributes as $key => $value){
 			$node->setAttribute($key, $value);
@@ -27,12 +27,12 @@ $root->setAttribute('xmlns:atom', 'http://www.w3.org/2005/Atom');
 
 $channel	= $dom->createElement('channel');
 
-	$create_node($dom, $channel, 'title', $blog->get_name());
-	$create_node($dom, $channel, 'link', $blog->get_url());
-	$create_node($dom, $channel, 'description', $blog->get_description());
-	$create_node($dom, $channel, 'lastBuildDate', $now->format('r'));
-	$create_node($dom, $channel, 'atom:link', null, array(
-		'href'	=> $blog->get_feed_url(),
+	$createNode($dom, $channel, 'title', $blog->getName());
+	$createNode($dom, $channel, 'link', $blog->getURL());
+	$createNode($dom, $channel, 'description', $blog->getDescription());
+	$createNode($dom, $channel, 'lastBuildDate', $now->format('r'));
+	$createNode($dom, $channel, 'atom:link', null, array(
+		'href'	=> $blog->getFeedURL(),
 		'rel'	=> 'self',
 		'type'	=> 'application/rss+xml'
 	));
@@ -41,40 +41,40 @@ $channel	= $dom->createElement('channel');
 		/** @var \Blight\Interfaces\Post $post */
 		$item	= $dom->createElement('item');
 
-			$title	= $post->get_title();
-			$link	= $post->get_link();
-			$guid	= $post->get_permalink();
-			$guid_is_permalink	= true;
-			$date	= $post->get_date();
+			$title	= $post->getTitle();
+			$link	= $post->getLink();
+			$guid	= $post->getPermalink();
+			$guidIsPermalink	= true;
+			$date	= $post->getDate();
 
 			// Build post content
-			$content	= $post->get_content();
-			$process_content	= true;
+			$content	= $post->getContent();
+			$processContent	= true;
 			$append		= '';
-			if($post->is_linked()){
+			if($post->isLinked()){
 				// Append permalink link
-				$append	= "\n\n".'[∞ Permalink]('.$post->get_permalink().')';
+				$append	= "\n\n".'[∞ Permalink]('.$post->getPermalink().')';
 			}
 
-			$blog->do_hook('feed_post', array(
+			$blog->doHook('feed_post', array(
 				'post'		=> $post,
 				'title'		=> &$title,
 				'link'		=> &$link,
 				'date_published'	=> &$date,
 				'guid'		=> &$guid,
-				'guid_is_permalink'	=> &$guid_is_permalink,
+				'guid_is_permalink'	=> &$guidIsPermalink,
 				'content'	=> &$content,
-				'process_content'	=> &$process_content,
+				'process_content'	=> &$processContent,
 				'append'	=> &$append
 			));
 
-			$create_node($dom, $item, 'title', $title);
-			$create_node($dom, $item, 'link', $link);
-			$create_node($dom, $item, 'guid', $guid, array(
-				'isPermaLink'	=> $guid_is_permalink
+			$createNode($dom, $item, 'title', $title);
+			$createNode($dom, $item, 'link', $link);
+			$createNode($dom, $item, 'guid', $guid, array(
+				'isPermaLink'	=> $guidIsPermalink
 			));
-			$create_node($dom, $item, 'pubDate', $date->format('r'));
-			$create_node($dom, $item, 'description', ($process_content ? $text->process_markdown($content) : $content));
+			$createNode($dom, $item, 'pubDate', $date->format('r'));
+			$createNode($dom, $item, 'description', ($processContent ? $text->processMarkdown($content) : $content));
 
 		$channel->appendChild($item);
 	}

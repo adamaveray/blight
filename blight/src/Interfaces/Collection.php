@@ -11,32 +11,32 @@ interface Collection {
 	/**
 	 * @return string	The collection instance's name
 	 */
-	public function get_name();
+	public function getName();
 
 	/**
 	 * @return string	The URL slug
 	 */
-	public function get_slug();
+	public function getSlug();
 
 	/**
 	 * @return string	The web URL to this collection
-	 * @see get_slug()
+	 * @see getSlug()
 	 */
-	public function get_url();
+	public function getURL();
 
 	/**
 	 * @param array $posts	An array of Post objects
 	 * @throws \InvalidArgumentException	Invalid posts
 	 */
-	public function set_posts($posts);
+	public function setPosts($posts);
 
 	/**
 	 * @param \Blight\Interfaces\Post $post	The post to add
 	 */
-	public function add_post(\Blight\Interfaces\Post $post);
+	public function addPost(\Blight\Interfaces\Post $post);
 
 	/**
 	 * @return array	An array of Post objects
 	 */
-	public function get_posts();
+	public function getPosts();
 };

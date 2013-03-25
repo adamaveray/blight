@@ -12,11 +12,11 @@ class YearTest extends CollectionTest {
 	}
 
 	/**
-	 * @covers \Blight\Collections\Year::get_url
+	 * @covers \Blight\Collections\Year::getURL
 	 */
 	public function testGetURL(){
 		$y	= date('Y');
 		$year	= new \Blight\Collections\Year($this->blog, $y);
-		$this->assertEquals($year->get_url(), $this->blog->get_url().'archive/'.$y);
+		$this->assertEquals($year->getURL(), $this->blog->getURL().'archive/'.$y);
 	}
 };

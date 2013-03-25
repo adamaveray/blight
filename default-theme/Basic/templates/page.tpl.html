@@ -2,8 +2,8 @@
 
 {% block content %}
 <header>
-    <h1>{{ page._title|e|typo }}</h1>
+    <h1>{{ page.title|e|typo }}</h1>
 </header>
 
-{{ page._content|md }}
+{{ page.content|md }}
 {% endblock %}

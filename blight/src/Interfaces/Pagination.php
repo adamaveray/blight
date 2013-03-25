@@ -15,32 +15,32 @@ interface Pagination {
 	/**
 	 * @return mixed	The item before the current item
 	 */
-	public function get_prev();
+	public function getPrev();
 
 	/**
 	 * @return mixed	The item after the current item
 	 */
-	public function get_next();
+	public function getNext();
 
 	/**
 	 * @return int	The number of items
 	 */
-	public function get_count();
+	public function getCount();
 
 	/**
 	 * @return mixed	The current item
 	 */
-	public function get_current();
+	public function getCurrent();
 
 	/**
 	 * @return int	The current position
 	 */
-	public function get_position();
+	public function getPosition();
 
 	/**
 	 * @param int $i	The index of the item to retrieve
 	 * @return mixed	The item at the given index
 	 * @throws \OutOfRangeException	No item exists at the given position
 	 */
-	public function get_index($i);
+	public function getIndex($i);
 };

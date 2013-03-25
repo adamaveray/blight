@@ -26,7 +26,7 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	/**
 	 * @return string	The collection instance's name
 	 */
-	public function get_name(){
+	public function getName(){
 		return $this->name;
 	}
 
@@ -36,9 +36,9 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 *
 	 * @return string	The URL slug
 	 */
-	public function get_slug(){
+	public function getSlug(){
 		if(!isset($this->slug)){
-			$this->slug	= $this->convert_to_slug($this->name);
+			$this->slug	= $this->convertToSlug($this->name);
 		}
 
 		return $this->slug;
@@ -48,10 +48,10 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * Retrieves the collection's full web URL, using the collection's slug
 	 *
 	 * @return string	The web URL to this collection
-	 * @see get_slug()
+	 * @see getSlug()
 	 */
-	public function get_url(){
-		return $this->blog->get_url($this->get_slug());
+	public function getURL(){
+		return $this->blog->getURL($this->getSlug());
 	}
 
 
@@ -61,7 +61,7 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * @param array $posts	An array of Post objects
 	 * @throws \InvalidArgumentException	Invalid posts
 	 */
-	public function set_posts($posts){
+	public function setPosts($posts){
 		if(!is_array($posts)){
 			throw new \InvalidArgumentException('Posts must be an array');
 		}
@@ -80,7 +80,7 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 *
 	 * @param \Blight\Interfaces\Post $post	The post to add
 	 */
-	public function add_post(\Blight\Interfaces\Post $post){
+	public function addPost(\Blight\Interfaces\Post $post){
 		if(!isset($this->posts)){
 			$this->posts	= array();
 		}
@@ -93,7 +93,7 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 *
 	 * @return array	An array of Post objects
 	 */
-	public function get_posts(){
+	public function getPosts(){
 		if(!isset($this->posts)){
 			$this->posts	= array();
 		}
@@ -107,7 +107,7 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * @param string $name	The name to convert
 	 * @return string		The converted URL slug
 	 */
-	protected function convert_to_slug($name){
+	protected function convertToSlug($name){
 		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
 		$clean	= strtolower(trim($clean, '-'));
 		$clean	= preg_replace('/[\/_|+ -]+/', '-', $clean);
@@ -117,25 +117,25 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 
 
 	/* Iterator */
-	protected $iterator_position	= 0;
+	protected $iteratorPosition	= 0;
 
 	function rewind(){
-		$this->iterator_position	= 0;
+		$this->iteratorPosition	= 0;
 	}
 
 	function current(){
-		return $this->posts[$this->iterator_position];
+		return $this->posts[$this->iteratorPosition];
 	}
 
 	function key(){
-		return $this->iterator_position;
+		return $this->iteratorPosition;
 	}
 
 	function next(){
-		++$this->iterator_position;
+		++$this->iteratorPosition;
 	}
 
 	function valid(){
-		return isset($this->posts[$this->iterator_position]);
+		return isset($this->posts[$this->iteratorPosition]);
 	}
 };

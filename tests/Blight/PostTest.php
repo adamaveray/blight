@@ -95,10 +95,10 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Post::get_title
+	 * @covers \Blight\Post::getTitle
 	 */
 	public function testGetTitle(){
-		$this->assertEquals($this->content_title, $this->post->get_title(true));
+		$this->assertEquals($this->content_title, $this->post->getTitle(true));
 
 
 		// Test linkblogs
@@ -113,10 +113,10 @@ EOD;
 		$blog	= new \Blight\Blog($test_config);
 		// Non-linked post
 		$post	= new \Blight\Post($blog, $this->content, $this->content_slug);
-		$this->assertEquals($this->content_title, $post->get_title());
+		$this->assertEquals($this->content_title, $post->getTitle());
 		// Linked post
 		$post	= new \Blight\Post($blog, $this->linked_content, $this->content_slug);
-		$this->assertEquals($link_char.' '.$this->content_title, $post->get_title());
+		$this->assertEquals($link_char.' '.$this->content_title, $post->getTitle());
 
 		// Test linkblog
 		$post_char	= '*';
@@ -125,14 +125,14 @@ EOD;
 		$blog	= new \Blight\Blog($test_config);
 		// Non-linked post
 		$post	= new \Blight\Post($blog, $this->content, $this->content_slug);
-		$this->assertEquals($post_char.' '.$this->content_title, $post->get_title());
+		$this->assertEquals($post_char.' '.$this->content_title, $post->getTitle());
 		// Linked post
 		$post	= new \Blight\Post($blog, $this->linked_content, $this->content_slug);
-		$this->assertEquals($this->content_title, $post->get_title());
+		$this->assertEquals($this->content_title, $post->getTitle());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_metadata
+	 * @covers \Blight\Post::getMetadata
 	 */
 	public function testGetMetadata(){
 		$meta	= array(
@@ -142,75 +142,75 @@ EOD;
 			'category'	=> $this->content_metadata['Category']
 		);
 
-		$this->assertEquals($meta, $this->post->get_metadata());
+		$this->assertEquals($meta, $this->post->getMetadata());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_link
+	 * @covers \Blight\Post::getLink
 	 */
 	public function testGetLink(){
-		$url	= $this->blog->get_url($this->content_date->format('Y/m').'/'.$this->content_slug);
-		$this->assertEquals($url, $this->post->get_link());
+		$url	= $this->blog->getURL($this->content_date->format('Y/m').'/'.$this->content_slug);
+		$this->assertEquals($url, $this->post->getLink());
 
 		// Test linked post
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
-		$this->assertEquals($this->linked_content_link, $post->get_link());
+		$this->assertEquals($this->linked_content_link, $post->getLink());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_permalink
+	 * @covers \Blight\Post::getPermalink
 	 */
 	public function testGetPermalink(){
-		$url	= $this->blog->get_url($this->content_date->format('Y/m').'/'.$this->content_slug);
-		$this->assertEquals($url, $this->post->get_permalink());
-		$this->assertEquals($this->post->get_link(), $this->post->get_permalink());
+		$url	= $this->blog->getURL($this->content_date->format('Y/m').'/'.$this->content_slug);
+		$this->assertEquals($url, $this->post->getPermalink());
+		$this->assertEquals($this->post->getLink(), $this->post->getPermalink());
 
 		// Test linked post
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
-		$url	= $this->blog->get_url($this->content_date->format('Y/m').'/'.$this->content_slug);
-		$this->assertEquals($url, $post->get_permalink());
-		$this->assertNotEquals($post->get_link(), $post->get_permalink());
+		$url	= $this->blog->getURL($this->content_date->format('Y/m').'/'.$this->content_slug);
+		$this->assertEquals($url, $post->getPermalink());
+		$this->assertNotEquals($post->getLink(), $post->getPermalink());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_relative_permalink
+	 * @covers \Blight\Post::getRelativePermalink
 	 */
 	public function testGetRelativePermalink(){
 		$url	= $this->content_date->format('Y/m').'/'.$this->content_slug;
-		$this->assertEquals($url, $this->post->get_relative_permalink());
+		$this->assertEquals($url, $this->post->getRelativePermalink());
 
 		// Test linked post
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
 		$url	= $this->content_date->format('Y/m').'/'.$this->content_slug;
-		$this->assertEquals($url, $post->get_relative_permalink());
+		$this->assertEquals($url, $post->getRelativePermalink());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_year
+	 * @covers \Blight\Post::getYear
 	 */
 	public function testGetYear(){
-		$year	= $this->post->get_year();
+		$year	= $this->post->getYear();
 		$this->assertInstanceOf('\Blight\Collections\Year', $year);
 
-		$this->assertEquals($this->content_date->format('Y'), $year->get_name());
+		$this->assertEquals($this->content_date->format('Y'), $year->getName());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_tags
+	 * @covers \Blight\Post::getTags
 	 */
 	public function testGetTags(){
-		$tags	= $this->post->get_tags();
+		$tags	= $this->post->getTags();
 		$this->assertTrue(is_array($tags));
 		$this->assertEquals(count($this->content_tags), count($tags));
 
 		foreach($tags as $tag){
 			$this->assertInstanceOf('\Blight\Collections\Tag', $tag);
-			$this->assertTrue(in_array($tag->get_name(), $this->content_tags));
+			$this->assertTrue(in_array($tag->getName(), $this->content_tags));
 		}
 	}
 
 	/**
-	 * @covers \Blight\Post::get_tags
+	 * @covers \Blight\Post::getTags
 	 */
 	public function testDuplicateGetTags(){
 		$raw_tags	= array(
@@ -229,7 +229,7 @@ Test post
 EOD;
 
 		$post	= new \Blight\Post($this->blog, str_replace('{TAGS}', implode(',', $raw_tags), $content), 'test-post');
-		$tags	= $post->get_tags();
+		$tags	= $post->getTags();
 		$this->assertTrue(is_array($tags));
 		$this->assertNotEquals(count($raw_tags), count($tags));
 		$this->assertEquals(count($raw_tags)-1, count($tags));
@@ -237,7 +237,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Post::get_tags
+	 * @covers \Blight\Post::getTags
 	 */
 	public function testNoTagsGetTags(){
 		$content	= <<<EOD
@@ -248,23 +248,23 @@ Date: 2013-01-01
 Test content
 EOD;
 		$post	= new \Blight\Post($this->blog, $content, 'test-post');
-		$tags	= $post->get_tags();
+		$tags	= $post->getTags();
 		$this->assertTrue(is_array($tags));
 		$this->assertEquals(0, count($tags));
 	}
 
 	/**
-	 * @covers \Blight\Post::get_category
+	 * @covers \Blight\Post::getCategory
 	 */
 	public function testGetCategory(){
-		$category	= $this->post->get_category();
+		$category	= $this->post->getCategory();
 		$this->assertInstanceOf('\Blight\Collections\Category', $category);
 
-		$this->assertEquals($this->content_category, $category->get_name());
+		$this->assertEquals($this->content_category, $category->getName());
 	}
 
 	/**
-	 * @covers \Blight\Post::get_category
+	 * @covers \Blight\Post::getCategory
 	 */
 	public function testNoCategoryGetCategory(){
 		$content	= <<<EOD
@@ -275,45 +275,45 @@ Date: 2013-01-01
 Test content
 EOD;
 		$post	= new \Blight\Post($this->blog, $content, 'test-post');
-		$category	= $post->get_category();
+		$category	= $post->getCategory();
 		$this->assertNull($category);
 	}
 
 	/**
-	 * @covers \Blight\Post::is_draft
+	 * @covers \Blight\Post::isDraft
 	 */
 	public function testIsDraft(){
-		$this->assertFalse($this->post->is_draft());
+		$this->assertFalse($this->post->isDraft());
 
 		$post	= new \Blight\Post($this->blog, $this->content, $this->content_slug, true);
-		$this->assertTrue($post->is_draft());
+		$this->assertTrue($post->isDraft());
 	}
 
 	/**
-	 * @covers \Blight\Post::is_being_published
+	 * @covers \Blight\Post::isBeingPublished
 	 */
 	public function testIsBeingPublished(){
-		$this->assertFalse($this->post->is_being_published());
+		$this->assertFalse($this->post->isBeingPublished());
 	}
 
 	/**
-	 * @covers \Blight\Post::set_being_published
+	 * @covers \Blight\Post::setBeingPublished
 	 */
 	public function testSetBeingPublished(){
-		$this->assertFalse($this->post->is_being_published());
-		$this->post->set_being_published(true);
-		$this->assertTrue($this->post->is_being_published());
-		$this->post->set_being_published(false);
-		$this->assertFalse($this->post->is_being_published());
+		$this->assertFalse($this->post->isBeingPublished());
+		$this->post->setBeingPublished(true);
+		$this->assertTrue($this->post->isBeingPublished());
+		$this->post->setBeingPublished(false);
+		$this->assertFalse($this->post->isBeingPublished());
 	}
 
 	/**
-	 * @covers \Blight\Post::is_linked
+	 * @covers \Blight\Post::isLinked
 	 */
 	public function testIsLinked(){
-		$this->assertFalse($this->post->is_linked());
+		$this->assertFalse($this->post->isLinked());
 
 		$post	= new \Blight\Post($this->blog, $this->linked_content, $this->content_slug);
-		$this->assertTrue($post->is_linked());
+		$this->assertTrue($post->isLinked());
 	}
 };

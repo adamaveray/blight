@@ -37,7 +37,7 @@ abstract class Package implements \Blight\Interfaces\Packages\Package {
 		$config	= (array)$config;
 
 		// Parse authors
-		$normalise_author	= function($author){
+		$normaliseAuthor	= function($author){
 			if(is_array($author)){
 				return $author;
 			}
@@ -56,10 +56,10 @@ abstract class Package implements \Blight\Interfaces\Packages\Package {
 		};
 
 		if(isset($config['author'])){
-			$config['author']	= $normalise_author($config['author']);
+			$config['author']	= $normaliseAuthor($config['author']);
 		}
 		if(isset($config['contributors']) && is_array($config['contributors'])){
-			$config['contributors']	= array_map($normalise_author, $config['contributors']);
+			$config['contributors']	= array_map($normaliseAuthor, $config['contributors']);
 		}
 
 

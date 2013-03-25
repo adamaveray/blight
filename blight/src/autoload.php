@@ -12,13 +12,13 @@ spl_autoload_register(function($class){
 	if(!file_exists($path)){
 		$dir	= dirname($path);
 		$file	= pathinfo($path, \PATHINFO_FILENAME);
-		$new_path	= $dir.'/'.$file.'/'.$file.'.php';
+		$newPath	= $dir.'/'.$file.'/'.$file.'.php';
 
-		if(!file_exists($new_path)){
+		if(!file_exists($newPath)){
 			return;
 		}
 
-		$path	= $new_path;
+		$path	= $newPath;
 	}
 
 	require_once($path);

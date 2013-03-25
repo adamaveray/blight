@@ -22,7 +22,7 @@ _Editable parameters for hooks can be modified from within the callback to chang
 
 	### Notes
 
-	- The URL the post was published to can be accessed through the `$post->get_permalink()` method
+	- The URL the post was published to can be accessed through the `$post->getPermalink()` method
 
 
 - ## feed_post

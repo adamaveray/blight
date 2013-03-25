@@ -6,7 +6,7 @@ class Template implements \Blight\Interfaces\Template {
 	const TYPE_TWIG	= 'twig';
 
 	/** @var \Twig_Environment	The Twig environment to use across all templates */
-	static protected $twig_environments	= array();
+	static protected $twigEnvironments	= array();
 
 
 	/** @var \Blight\Interfaces\Blog */
@@ -30,10 +30,10 @@ class Template implements \Blight\Interfaces\Template {
 		$this->blog		= $blog;
 		$this->theme	= $theme;
 
-		$this->dir	= (isset($dir) ? $dir : $theme->get_path_templates());
+		$this->dir	= (isset($dir) ? $dir : $theme->getPathTemplates());
 
 		$this->name	= $name;
-		$this->locate_template($name);
+		$this->locateTemplate($name);
 	}
 
 	/**
@@ -42,7 +42,7 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param string $name			The name of the current template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	protected function locate_template($name){
+	protected function locateTemplate($name){
 		$template	= $this->dir.$name;
 
 		if(file_exists($template.'.php')){
@@ -77,18 +77,23 @@ class Template implements \Blight\Interfaces\Template {
 
 		switch($this->type){
 			case self::TYPE_PHP:
-				return $this->render_php($params);
+				$output	= $this->renderPHP($params);
 				break;
 
 			case self::TYPE_TWIG:
-				return $this->render_twig($params);
+				$output	= $this->renderTwig($params);
 				break;
 
 			default:
-				// Should never happen - constructor/locate_template() will prevent this
+				// Should never happen - constructor/locateTemplate() will prevent this
 				throw new \RuntimeException('Unknown template type rendered');
 				break;
 		}
+
+		if($this->blog->get('minify_html', 'output', false)){
+			$output	= $this->minifyHTML($output);
+		}
+		return $output;
 	}
 
 
@@ -98,7 +103,7 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param array $params	An array of variables to be assigned to the local scope of the template
 	 * @return string		The rendered content from the template
 	 */
-	protected function render_php($params){
+	protected function renderPHP($params){
 		$params['blog']		= $this->blog;
 		$params['theme']	= $this->theme;
 		$params['text']		= new TextProcessor($this->blog);
@@ -106,12 +111,7 @@ class Template implements \Blight\Interfaces\Template {
 		extract($params);
 		ob_start();
 		include($this->dir.$this->filename);
-		$output	= ob_get_clean();
-		if($this->blog->get('minify_html', 'output', false)){
-			$output	= $this->minify_html($output);
-		}
-
-		return $output;
+		return ob_get_clean();
 	}
 
 	/**
@@ -120,13 +120,8 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param array $params	An array of variables to be assigned to the local scope of the template
 	 * @return string		The rendered content from the template
 	 */
-	protected function render_twig($params){
-		$output	= $this->get_twig_environment($this->dir)->render($this->filename, $params);
-		if($this->blog->get('minify_html', 'output', false)){
-			$output	= $this->minify_html($output);
-		}
-
-		return $output;
+	protected function renderTwig($params){
+		return $this->getTwigEnvironment($this->dir)->render($this->filename, $params);
 	}
 
 	/**
@@ -135,7 +130,7 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param string $html	The raw HTML to minify
 	 * @return string		The minified HTML
 	 */
-	protected function minify_html($html){
+	protected function minifyHTML($html){
 		return \Minify_HTML::minify($html);
 	}
 
@@ -146,81 +141,81 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param string $dir	The template directory for the environment
 	 * @return \Twig_Environment	The Twig environment object
 	 */
-	protected function get_twig_environment($dir){
-		if(!isset(self::$twig_environments[$dir])){
+	protected function getTwigEnvironment($dir){
+		if(!isset(self::$twigEnvironments[$dir])){
 			$loader	= new \Twig_Loader_Filesystem($dir);
-			self::$twig_environments[$dir]	= new \Twig_Environment($loader);
+			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader);
 
 			// Add globals
-			self::$twig_environments[$dir]->addGlobal('blog', $this->blog);
-			self::$twig_environments[$dir]->addGlobal('theme', $this->theme);
+			self::$twigEnvironments[$dir]->addGlobal('blog', $this->blog);
+			self::$twigEnvironments[$dir]->addGlobal('theme', $this->theme);
 
 			// Set up functions
-			self::$twig_environments[$dir]->addFunction(new \Twig_SimpleFunction('styles', array($this, 'get_styles'), array('is_safe' => array('html'))));
-			self::$twig_environments[$dir]->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'get_scripts'), array('is_safe' => array('html'))));
+			self::$twigEnvironments[$dir]->addFunction(new \Twig_SimpleFunction('styles', array($this, 'getStyles'), array('is_safe' => array('html'))));
+			self::$twigEnvironments[$dir]->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'getScripts'), array('is_safe' => array('html'))));
 
 			// Set up filters
 			$blog	= $this->blog;
-			$text_processor	= new TextProcessor($this->blog);
+			$textProcessor	= new TextProcessor($this->blog);
 
 			// Markdown filter
-			self::$twig_environments[$dir]->addFilter(new \Twig_SimpleFilter('md', function($string, $filter_typography = true) use($blog, $text_processor){
+			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){
 				$filters	= array(
 					'markdown'		=> true,
 					'typography'	=> true
 				);
-				if(!$filter_typography){
+				if(!$filterTypography){
 					$filters['typography']	= false;
 				}
-				return $text_processor->process($string, $filters);
+				return $textProcessor->process($string, $filters);
 			}, array(
 				'is_safe' => array('html')
 			)));
 
 			// Typography filter
-			self::$twig_environments[$dir]->addFilter(new \Twig_SimpleFilter('typo', array($text_processor, 'process_typography'), array(
+			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('typo', array($textProcessor, 'processTypography'), array(
 				'pre_escape'	=> 'html',
 				'is_safe'		=> array('html')
 			)));
 
 			// Truncate filter
-			self::$twig_environments[$dir]->addFilter(new \Twig_SimpleFilter('truncate', array($text_processor, 'truncate_html'), array(
+			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('truncate', array($textProcessor, 'truncateHTML'), array(
 				'is_safe'	=> array('html')
 			)));
 		}
 
-		return self::$twig_environments[$dir];
+		return self::$twigEnvironments[$dir];
 	}
 
 
 	/**
 	 * @return string	The HTML for the styles
 	 */
-	public function get_styles(){
+	public function getStyles(){
 		$styles	= array();
-		$this->blog->do_hook('render_styles', array(
+		$this->blog->doHook('render_styles', array(
 			'theme'		=> $this->theme,
 			'template'	=> $this,
 			'name'		=> $this->name,
 			'styles'	=> &$styles
 		));
 
-		return $this->build_styles_scripts($styles, 'link', 'href', true, 'style');
+		return $this->buildStylesScripts($styles, 'link', 'href', true, 'style');
 	}
 
 	/**
 	 * @return string	The HTML for the scripts
 	 */
-	public function get_scripts(){
+	public function getScripts(){
 		$scripts	= array();
-		$this->blog->do_hook('render_scripts', array(
+		$this->blog->doHook('render_scripts', array(
 			'theme'		=> $this->theme,
 			'template'	=> $this,
 			'name'		=> $this->name,
 			'scripts'	=> &$scripts
 		));
 
-		return $this->build_styles_scripts($scripts, 'script', 'src', false);
+		return $this->buildStylesScripts($scripts, 'script', 'src', false);
 	}
 
 	/**
@@ -228,14 +223,14 @@ class Template implements \Blight\Interfaces\Template {
 	 *
 	 * @param array $items	The items to build tags for
 	 * @param string $tag	The name of the external linking tag
-	 * @param string $url_attr	The attribute the external tag uses to link to external items
-	 * @param bool $self_closing	Whether the external tag should be self-closing (<tag />) or not (<tag></tag>)
-	 * @param string|null $embedded_tag	A different tag to use for embedded items. If not set, defaults to the normal tag.
+	 * @param string $urlAttr	The attribute the external tag uses to link to external items
+	 * @param bool $selfClosing	Whether the external tag should be self-closing (<tag />) or not (<tag></tag>)
+	 * @param string|null $embeddedTag	A different tag to use for embedded items. If not set, defaults to the normal tag.
 	 * @return string	The built HTML for the items
 	 */
-	protected function build_styles_scripts($items, $tag, $url_attr = 'href', $self_closing = true, $embedded_tag = null){
-		if(!isset($embedded_tag)){
-			$embedded_tag	= $tag;
+	protected function buildStylesScripts($items, $tag, $urlAttr = 'href', $selfClosing = true, $embeddedTag = null){
+		if(!isset($embeddedTag)){
+			$embeddedTag	= $tag;
 		}
 
 		$output	= array();
@@ -245,7 +240,7 @@ class Template implements \Blight\Interfaces\Template {
 				if(preg_match('#(((https?|ftp)://([\w-\d]+\.)+[\w-\d]+){0,1}(/[\w~,;\-\./?%&+\#=]*))#i', $item)){
 					// External
 					$item	= array(
-						$url_attr	=> $item
+						$urlAttr	=> $item
 					);
 				} else {
 					// Embedded
@@ -258,7 +253,7 @@ class Template implements \Blight\Interfaces\Template {
 				foreach($item as $attr => $val){
 					$line	.= ' '.$attr.'="'.$val.'"';
 				}
-				if($self_closing){
+				if($selfClosing){
 					$line	.= ' />';
 				} else {
 					$line	.= '></'.$tag.'>';
@@ -266,7 +261,7 @@ class Template implements \Blight\Interfaces\Template {
 
 			} else {
 				// Embedded
-				$line	= '<'.$embedded_tag.'>'.$item.'</'.$embedded_tag.'>';
+				$line	= '<'.$embeddedTag.'>'.$item.'</'.$embeddedTag.'>';
 			}
 
 			$output[]	= $line;

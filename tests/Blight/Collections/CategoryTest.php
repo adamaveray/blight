@@ -9,11 +9,11 @@ class CategoryTest extends CollectionTest {
 	}
 
 	/**
-	 * @covers \Blight\Collections\Category::get_url
+	 * @covers \Blight\Collections\Category::getURL
 	 */
 	public function testGetURL(){
 		$name	= 'Test Name';
 		$category	= new \Blight\Collections\Category($this->blog, $name);
-		$this->assertEquals($category->get_url(), $this->blog->get_url().'category/test-name');
+		$this->assertEquals($category->getURL(), $this->blog->getURL().'category/test-name');
 	}
 };

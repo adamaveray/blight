@@ -1,5 +1,5 @@
 <?php
-function build_package($source, $target_dir){
+function buildPackage($source, $target_dir){
 	$name	= basename($source).'.phar';
 
 	try {
@@ -13,29 +13,29 @@ function build_package($source, $target_dir){
 		return;
 	}
 
-	echo 'Packaged `'.$name.'`'.PHP_EOL;
+	echo 'Packaged "'.$name.'"'.PHP_EOL;
 }
 
 // Build default theme
-$default_theme	= __DIR__.'/default-theme/Basic/';
-if(is_dir($default_theme)){
-	build_package($default_theme, __DIR__.'/blog-data/themes/');
+$defaultTheme	= __DIR__.'/default-theme/Basic/';
+if(is_dir($defaultTheme)){
+	buildPackage($defaultTheme, __DIR__.'/blog-data/themes/');
 }
 
 // Build additional packages
-$base_dirs	= array(
+$baseDirs	= array(
 	__DIR__.'/blog-data/plugins/',
 	__DIR__.'/blog-data/themes/'
 );
 
-foreach($base_dirs as $base_dir){
-	$dirs	= glob($base_dir.'/*');
+foreach($baseDirs as $baseDir){
+	$dirs	= glob($baseDir.'/*');
 
 	foreach($dirs as $dir){
 		if(!is_dir($dir)){
 			continue;
 		}
 
-		build_package($dir, $base_dir);
+		buildPackage($dir, $baseDir);
 	}
 }

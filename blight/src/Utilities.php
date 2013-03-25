@@ -18,7 +18,7 @@ abstract class Utilities implements \Blight\Interfaces\Utilities {
 	 * @param array $_
 	 * @return mixed
 	 */
-	public static function array_multi_merge($array1, $array2 = null, $_ = null){
+	public static function arrayMultiMerge($array1, $array2 = null, $_ = null){
 		$arrays	= func_get_args();
 		$base	= array_shift($arrays);
 		foreach($arrays as $array){
@@ -30,7 +30,7 @@ abstract class Utilities implements \Blight\Interfaces\Utilities {
 						$value	= array($value);
 					}
 
-					$base[$key]	= static::array_multi_merge($base[$key], $value);
+					$base[$key]	= static::arrayMultiMerge($base[$key], $value);
 				} else {
 					$base[$key]	= $value;
 				}

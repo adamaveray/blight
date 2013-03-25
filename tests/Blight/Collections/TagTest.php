@@ -9,11 +9,11 @@ class TagTest extends CollectionTest {
 	}
 
 	/**
-	 * @covers \Blight\Collections\Tag::get_url
+	 * @covers \Blight\Collections\Tag::getURL
 	 */
 	public function testGetURL(){
 		$name	= 'Test Name';
 		$tag	= new \Blight\Collections\Tag($this->blog, $name);
-		$this->assertEquals($tag->get_url(), $this->blog->get_url().'tag/test-name');
+		$this->assertEquals($tag->getURL(), $this->blog->getURL().'tag/test-name');
 	}
 };

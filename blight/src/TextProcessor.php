@@ -32,8 +32,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * 		'typography'
 	 *
 	 * @return string	The processed text
-	 * @see process_markdown()
-	 * @see process_typography()
+	 * @see processMarkdown()
+	 * @see processTypography()
 	 */
 	public function process($raw, $filters = null){
 		if(!is_array($filters)){
@@ -51,10 +51,10 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 		$output	= $raw;
 
 		if($filters['markdown']){
-			$output	= $this->process_markdown($output);
+			$output	= $this->processMarkdown($output);
 		}
 		if($filters['typography']){
-			$output	= $this->process_typography($output);
+			$output	= $this->processTypography($output);
 		}
 
 		return $output;
@@ -66,8 +66,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * @param string $raw	The raw Markdown
 	 * @return string		The processed HTML
 	 */
-	public function process_markdown($raw){
-		return $this->get_markdown()->transform($raw);
+	public function processMarkdown($raw){
+		return $this->getMarkdown()->transform($raw);
 	}
 
 	/**
@@ -76,9 +76,9 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * @param string $html	The HTML to process
 	 * @return string		The processed HTML
 	 */
-	public function process_typography($html){
+	public function processTypography($html){
 		$errors	= error_reporting(0);
-		$result	= $this->get_typography()->process($html);
+		$result	= $this->getTypography()->process($html);
 		error_reporting($errors);
 
 		return $result;
@@ -91,13 +91,13 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * @param int $length	The maximum length of text to return. If the given HTML is shorter than this length,
 	 * 						no truncation will take place.
 	 * @param string $ending	Characters to be appended if the string is truncated
-	 * @param boolean $split_words		Whether to truncate text mid-word
-	 * @param boolean $handle_html	If true, HTML tags would be handled correctly
+	 * @param boolean $splitWords		Whether to truncate text mid-word
+	 * @param boolean $handleHTML	If true, HTML tags would be handled correctly
 	 *
 	 * @return string	The truncated text
 	 */
-	public function truncate_html($html, $length = 100, $ending = '...', $split_words = false, $handle_html = true){
-		if(!$handle_html){
+	public function truncateHTML($html, $length = 100, $ending = '...', $splitWords = false, $handleHTML = true){
+		if(!$handleHTML){
 			// Ignore HTML tags
 			if(strlen($html) <= $length){
 				// No need to truncate
@@ -115,79 +115,79 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 			// Split HTML tags to scannable lines
 			preg_match_all('/(<.+?>)?([^<>]*)/s', $html, $lines, \PREG_SET_ORDER);
 
-			$total_length	= strlen($ending);
-			$open_tags		= array();
+			$totalLength	= strlen($ending);
+			$openTags		= array();
 			$output			= '';
-			foreach($lines as $line_matchings){
-				if (!empty($line_matchings[1])) {
+			foreach($lines as $lineMatchings){
+				if (!empty($lineMatchings[1])) {
 					// Has HTML tag
-					if(preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $line_matchings[1])){
+					if(preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $lineMatchings[1])){
 						// Empty element - ignore
-					} else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $line_matchings[1], $tag_matchings)) {
+					} else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $lineMatchings[1], $tagMatchings)) {
 						// Closing tag - delete from open tags list
-						$pos = array_search($tag_matchings[1], $open_tags);
+						$pos = array_search($tagMatchings[1], $openTags);
 						if($pos !== false){
-							unset($open_tags[$pos]);
+							unset($openTags[$pos]);
 						}
 
-					} else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $line_matchings[1], $tag_matchings)) {
+					} else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $lineMatchings[1], $tagMatchings)) {
 						// Opening tag - add to open tags list
-						array_unshift($open_tags, strtolower($tag_matchings[1]));
+						array_unshift($openTags, strtolower($tagMatchings[1]));
 					}
 
 					// Add tag to truncated text
-					$output .= $line_matchings[1];
+					$output .= $lineMatchings[1];
 				}
 
 				// Caclulate length of plain text in line
-				$content_length = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $line_matchings[2]));
-				if(($total_length + $content_length) > $length){
+				$contentLength = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $lineMatchings[2]));
+				if(($totalLength + $contentLength) > $length){
 					// Remaining characters
-					$left = $length - $total_length;
+					$left = $length - $totalLength;
 
-					$entities_length = 0;
+					$entitiesLength = 0;
 					// Find HTML entities
-					if(preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', $line_matchings[2], $entities, \PREG_OFFSET_CAPTURE)){
+					if(preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', $lineMatchings[2], $entities, \PREG_OFFSET_CAPTURE)){
 						// Calculate real length of all entities whithin legal range
 						foreach($entities[0] as $entity){
-							if($entity[1]+1-$entities_length > $left){
+							if($entity[1]+1-$entitiesLength > $left){
 								continue;
 							}
 
 							$left--;
-							$entities_length += strlen($entity[0]);
+							$entitiesLength += strlen($entity[0]);
 						}
 					}
 
-					$output .= substr($line_matchings[2], 0, $left+$entities_length);
+					$output .= substr($lineMatchings[2], 0, $left+$entitiesLength);
 					// maximum lenght is reached, so get off the loop
 					break;
 
 				} else {
-					$output .= $line_matchings[2];
-					$total_length += $content_length;
+					$output .= $lineMatchings[2];
+					$totalLength += $contentLength;
 				}
 				// if the maximum length is reached, get off the loop
-				if($total_length>= $length) {
+				if($totalLength >= $length) {
 					break;
 				}
 			}
 		}
 
-		if(!$split_words){
+		if(!$splitWords){
 			// Don't split words
-			$spacepos = strrpos($output, ' ');
-			if(isset($spacepos)){
+			$spacePosition = strrpos($output, ' ');
+			if(isset($spacePosition)){
 				// Cut text at last occurance of space
-				$output = substr($output, 0, $spacepos);
+				$output = substr($output, 0, $spacePosition);
 			}
 		}
 
 		// Append ending string
 		$output .= $ending;
-		if($handle_html){
+		if($handleHTML){
 			// Close remaining HTML tags
-			foreach($open_tags as $tag){
+			foreach($openTags as $tag){
 				$output .= '</'.$tag.'>';
 			}
 		}
@@ -198,7 +198,7 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	/**
 	 * @return \dflydev\markdown\MarkdownExtraParser	The Markdown parsing instance
 	 */
-	protected function get_markdown(){
+	protected function getMarkdown(){
 		if(!isset($this->markdown)){
 			$this->markdown	= new \Michelf\MarkdownExtra();
 		}
@@ -207,9 +207,9 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	}
 
 	/**
-	 * @return \PHPTypography\PHPTypograhy	The phpTypography instance
+	 * @return \PHPTypography\PHPTypograhy	The PHPTypography instance
 	 */
-	protected function get_typography(){
+	protected function getTypography(){
 		if(!isset($this->typography)){
 			$this->typography	= new \PHPTypography\PHPTypography();
 		}

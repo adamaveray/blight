@@ -1,5 +1,5 @@
 <?php
-$web_path	= __DIR__;
+$webPath	= __DIR__;
 require('../Blight.phar');
 
 // Redirect to generated pages

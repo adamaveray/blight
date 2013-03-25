@@ -2,9 +2,9 @@
 /** @var \Blight\Interfaces\Blog $blog */
 /** @var array $pages */
 
-$create_url	= function(\DOMDocument $document, $url, $last_modified = null, $params = null){
-	$create_node	= function(\DOMDocument $document, $node_name, $content, $attributes = null, $callback = null){
-		$node	= $document->createElement($node_name);
+$createURL	= function(\DOMDocument $document, $url, $lastModified = null, $params = null){
+	$createNode	= function(\DOMDocument $document, $nodeName, $content, $attributes = null, $callback = null){
+		$node	= $document->createElement($nodeName);
 		if(is_array($attributes)){
 			foreach($attributes as $key => $value){
 				$node->setAttribute($key, $value);
@@ -24,22 +24,22 @@ $create_url	= function(\DOMDocument $document, $url, $last_modified = null, $par
 
 	), (array)$params);
 
-	$url_node	= $document->createElement('url');
+	$urlNode	= $document->createElement('url');
 
-		$node	= $create_node($document, 'loc', $url);
-		$url_node->appendChild($node);
+		$node	= $createNode($document, 'loc', $url);
+		$urlNode->appendChild($node);
 
-		if(isset($last_modified) && $last_modified instanceof \DateTime){
-			$node	= $create_node($document, 'lastmod', $last_modified->format('c'));
-			$url_node->appendChild($node);
+		if(isset($lastModified) && $lastModified instanceof \DateTime){
+			$node	= $createNode($document, 'lastmod', $lastModified->format('c'));
+			$urlNode->appendChild($node);
 		}
 
 		foreach($params as $param => $value){
-			$node	= $create_node($document, $param, $value);
-			$url_node->appendChild($node);
+			$node	= $createNode($document, $param, $value);
+			$urlNode->appendChild($node);
 		}
 
-	return $url_node;
+	return $urlNode;
 };
 
 $now	= new \DateTime();
@@ -53,7 +53,7 @@ $root->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 // Create URLs
 foreach($pages as $page){
 	/** @var \Blight\Interfaces\Page $page */
-	$node	= $create_url($dom, $page->get_permalink(), $page->get_date());
+	$node	= $createURL($dom, $page->getPermalink(), $page->getDate());
 	$root->appendChild($node);
 }
 

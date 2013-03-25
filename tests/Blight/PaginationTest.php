@@ -48,38 +48,38 @@ class PaginationTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_prev
+	 * @covers \Blight\Pagination::getPrev
 	 */
 	public function testGetPrev(){
 		$start	= 2;
 		$pagination	= new \Blight\Pagination($this->items, $start);
 
-		$this->assertEquals($this->items[$start-1], $pagination->get_prev());
+		$this->assertEquals($this->items[$start-1], $pagination->getPrev());
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_prev
+	 * @covers \Blight\Pagination::getPrev
 	 * @expectedException \OutOfRangeException
 	 */
 	public function testInvalidGetPrev(){
 		$start	= 1;
 		$pagination	= new \Blight\Pagination($this->items, $start);
 
-		$pagination->get_prev();
+		$pagination->getPrev();
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_next
+	 * @covers \Blight\Pagination::getNext
 	 */
 	public function testGetNext(){
 		$start	= 2;
 		$pagination	= new \Blight\Pagination($this->items, $start);
 
-		$this->assertEquals($this->items[$start+1], $pagination->get_next());
+		$this->assertEquals($this->items[$start+1], $pagination->getNext());
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_next
+	 * @covers \Blight\Pagination::getNext
 	 * @expectedException \OutOfRangeException
 	 */
 	public function testInvalidGetNext(){
@@ -87,56 +87,56 @@ class PaginationTest extends \PHPUnit_Framework_TestCase {
 		$start	= count($this->items);
 		$pagination	= new \Blight\Pagination($this->items, $start);
 
-		$pagination->get_next();
+		$pagination->getNext();
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_count
+	 * @covers \Blight\Pagination::getCount
 	 */
 	public function testGetCount(){
 		$pagination	= new \Blight\Pagination($this->items);
 
-		$this->assertEquals(count($this->items), $pagination->get_count());
+		$this->assertEquals(count($this->items), $pagination->getCount());
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_current
+	 * @covers \Blight\Pagination::getCurrent
 	 */
 	public function testGetCurrent(){
 		$start	= 1;
 		$pagination	= new \Blight\Pagination($this->items, $start);
 
-		$this->assertEquals($this->items[$start], $pagination->get_current());
+		$this->assertEquals($this->items[$start], $pagination->getCurrent());
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_next
+	 * @covers \Blight\Pagination::getPosition
 	 */
 	public function testGetPosition(){
 		$start	= 1;
 		$pagination	= new \Blight\Pagination($this->items, $start);
 
-		$this->assertEquals($start, $pagination->get_position());
+		$this->assertEquals($start, $pagination->getPosition());
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_index
+	 * @covers \Blight\Pagination::getIndex
 	 */
 	public function testGetIndex(){
 		$pagination	= new \Blight\Pagination($this->items);
 
 		$i	= 1;
-		$this->assertEquals($this->items[$i], $pagination->get_index($i));
+		$this->assertEquals($this->items[$i], $pagination->getIndex($i));
 	}
 
 	/**
-	 * @covers \Blight\Pagination::get_index
+	 * @covers \Blight\Pagination::getIndex
 	 * @expectedException \OutOfRangeException
 	 */
 	public function testInvalidGetIndex(){
 		$pagination	= new \Blight\Pagination($this->items);
 
-		$pagination->get_index(count($this->items)+1);
+		$pagination->getIndex(count($this->items)+1);
 	}
 
 	/**

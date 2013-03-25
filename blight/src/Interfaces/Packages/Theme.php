@@ -8,15 +8,15 @@ interface Theme extends \Blight\Interfaces\Packages\Package {
 	 * @return string	The rendered content from the template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function render_template($name, $params = null);
+	public function renderTemplate($name, $params = null);
 
 	/**
 	 * @return string	The path to the templates directory
 	 */
-	public function get_path_templates();
+	public function getPathTemplates();
 
 	/**
 	 * @return string	The path to the assets directory
 	 */
-	public function get_path_assets();
+	public function getPathAssets();
 };

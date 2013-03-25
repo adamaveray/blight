@@ -11,12 +11,12 @@ interface Manager {
 	/**
 	 * @return array	An array of \Blight\Page objects
 	 */
-	public function get_pages();
+	public function getPages();
 
 	/**
 	 * @return array	An array of \Blight\Page objects
 	 */
-	public function get_draft_posts();
+	public function getDraftPosts();
 
 	/**
 	 * @param array $filters	Any filters to apply
@@ -25,7 +25,7 @@ interface Manager {
 	 * 		)
 	 * @return array			An array of posts
 	 */
-	public function get_posts($filters = null);
+	public function getPosts($filters = null);
 
 	/**
 	 * @return array	An array of \Blight\Containers\Year objects containing posts
@@ -33,14 +33,14 @@ interface Manager {
 	 * 		Example:
 	 * 		array(
 	 * 			Year (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			),
 	 * 			Year (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			)
 	 * 		);
 	 */
-	public function get_posts_by_year();
+	public function getPostsByYear();
 
 	/**
 	 * @return array	An array of \Blight\Containers\Tag objects containing posts
@@ -48,14 +48,14 @@ interface Manager {
 	 * 		Example:
 	 * 		array(
 	 * 			Tag (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			),
 	 * 			Tag (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			)
 	 * 		);
 	 */
-	public function get_posts_by_tag();
+	public function getPostsByTag();
 
 	/**
 	 * @return array	An array of \Blight\Containers\Category objects containing posts
@@ -63,14 +63,14 @@ interface Manager {
 	 * 		Example:
 	 * 		array(
 	 * 			Category (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			),
 	 * 			Category (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			)
 	 * 		);
 	 */
-	public function get_posts_by_category();
+	public function getPostsByCategory();
 
-	public function cleanup_drafts();
+	public function cleanupDrafts();
 };

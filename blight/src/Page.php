@@ -24,15 +24,15 @@ class Page implements \Blight\Interfaces\Page {
 	public function __construct(\Blight\Interfaces\Blog $blog, $content, $slug){
 		$this->blog	= $blog;
 
-		$data	= $this->parse_content($content);
+		$data	= $this->parseContent($content);
 
 		$this->title	= $data['title'];
 		$this->content	= $data['content'];
 		$this->metadata	= $data['metadata'];
 
-		if($this->has_meta('date')){
+		if($this->hasMeta('date')){
 			try {
-				$this->date	= new \DateTime($this->get_meta('date'));
+				$this->date	= new \DateTime($this->getMeta('date'));
 			} catch(\Exception $e){
 				throw new \InvalidArgumentException('Article date invalid');
 			}
@@ -47,9 +47,9 @@ class Page implements \Blight\Interfaces\Page {
 	 * @param string $content	The raw Markdown content for the page
 	 * @return array			The metadata retrieved from the page
 	 * @throws \InvalidArgumentException	The page format is incorrect
-	 * @see parse_metadata()
+	 * @see parseMetadata()
 	 */
-	protected function parse_content($content){
+	protected function parseContent($content){
 		$lines	= explode("\n", $content);
 
 		$title	= array_shift($lines);
@@ -57,7 +57,7 @@ class Page implements \Blight\Interfaces\Page {
 			throw new \InvalidArgumentException('Article does not meet correct format');
 		}
 
-		$metadata	= $this->parse_metadata($lines);
+		$metadata	= $this->parseMetadata($lines);
 
 		$content	= trim(implode("\n", $lines));
 
@@ -75,7 +75,7 @@ class Page implements \Blight\Interfaces\Page {
 	 * @param array|string &$lines	The lines from the page body
 	 * @return array	The metadata contained within the lines
 	 */
-	protected function parse_metadata(&$lines){
+	protected function parseMetadata(&$lines){
 		if(!is_array($lines)){
 			$lines	= explode("\n", $lines);
 		}
@@ -94,7 +94,7 @@ class Page implements \Blight\Interfaces\Page {
 				$line[]	= true;
 			}
 
-			$metadata[$this->normalise_meta_name($line[0])]	= $line[1];
+			$metadata[$this->normaliseMetaName($line[0])]	= $line[1];
 		}
 
 		return $metadata;
@@ -104,21 +104,21 @@ class Page implements \Blight\Interfaces\Page {
 	/**
 	 * @return string	The page title
 	 */
-	public function get_title(){
+	public function getTitle(){
 		return $this->title;
 	}
 
 	/**
 	 * @return string	The page slug
 	 */
-	public function get_slug(){
+	public function getSlug(){
 		return $this->slug;
 	}
 
 	/**
 	 * @return \DateTime	The page date
 	 */
-	public function get_date(){
+	public function getDate(){
 		if(!isset($this->date)){
 			return new \DateTime();
 		}
@@ -128,21 +128,21 @@ class Page implements \Blight\Interfaces\Page {
 	/**
 	 * @param \DateTime $date	The new date for the post
 	 */
-	public function set_date(\DateTime $date){
+	public function setDate(\DateTime $date){
 		$this->date	= $date;
 	}
 
 	/**
 	 * @return string	The page's raw Markdown content
 	 */
-	public function get_content(){
+	public function getContent(){
 		return $this->content;
 	}
 
 	/**
 	 * @return array	The page metadata
 	 */
-	public function get_metadata(){
+	public function getMetadata(){
 		return $this->metadata;
 	}
 
@@ -152,10 +152,10 @@ class Page implements \Blight\Interfaces\Page {
 	 * @param string $name	The metadata to retrieve
 	 * @return mixed|null	The metadata value if set, or null
 	 */
-	public function get_meta($name){
-		$name	= $this->normalise_meta_name($name);
+	public function getMeta($name){
+		$name	= $this->normaliseMetaName($name);
 
-		if(!$this->has_meta($name)){
+		if(!$this->hasMeta($name)){
 			return null;
 		}
 
@@ -168,8 +168,8 @@ class Page implements \Blight\Interfaces\Page {
 	 * @param string $name	The meta to check if exists
 	 * @return bool	If the meta exists
 	 */
-	public function has_meta($name){
-		$name	= $this->normalise_meta_name($name);
+	public function hasMeta($name){
+		$name	= $this->normaliseMetaName($name);
 		return isset($this->metadata[$name]);
 	}
 
@@ -179,7 +179,7 @@ class Page implements \Blight\Interfaces\Page {
 	 * @param string $name	The metadata name to convert
 	 * @return string		The converted name
 	 */
-	protected function normalise_meta_name($name){
+	protected function normaliseMetaName($name){
 		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
 		$clean	= strtolower(trim($clean, '-'));
 		$clean	= preg_replace('/[\/_|+ -]+/', '-', $clean);
@@ -190,16 +190,16 @@ class Page implements \Blight\Interfaces\Page {
 	/**
 	 * @return string	The URL to the page
 	 */
-	public function get_link(){
-		return $this->get_permalink();
+	public function getLink(){
+		return $this->getPermalink();
 	}
 
 	/**
 	 * @return string	The URL to the page
 	 */
-	public function get_permalink(){
+	public function getPermalink(){
 		if(!isset($this->permalink)){
-			$this->permalink	= $this->blog->get_url($this->get_relative_permalink());
+			$this->permalink	= $this->blog->getURL($this->getRelativePermalink());
 		}
 
 		return $this->permalink;
@@ -208,7 +208,7 @@ class Page implements \Blight\Interfaces\Page {
 	/**
 	 * @return string	The URL to the page without the prefixed site URL
 	 */
-	public function get_relative_permalink(){
+	public function getRelativePermalink(){
 		return $this->slug;
 	}
 }

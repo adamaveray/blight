@@ -12,9 +12,9 @@ interface Renderer {
 	/**
 	 * @param \Blight\Interfaces\Page $page	The page to generate an HTML page from
 	 */
-	public function render_page(Page $page);
+	public function renderPage(Page $page);
 
-	public function render_pages();
+	public function renderPages();
 
 	/**
 	 * @param \Blight\Interfaces\Post $post	The post to generate the page for
@@ -22,19 +22,18 @@ interface Renderer {
 	 * @param \Blight\Interfaces\Post|null $next	The adjacent next/newer post to the given post
 	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Post
 	 */
-	public function render_post(Post $post);
+	public function renderPost(Post $post);
 
-	public function render_drafts();
+	public function renderDrafts();
 
 	/**
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
 	 *
-	 * @see render_year
-	 * @see render_collections
+	 * @see renderYear
 	 */
-	public function render_archives($options = null);
+	public function renderArchives($options = null);
 
 	/**
 	 * @param \Blight\Interfaces\Collection $year	The archive year to render
@@ -42,35 +41,30 @@ interface Renderer {
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
 	 *
-	 * @see render_archives
-	 * @see render_collection
+	 * @see renderArchives
 	 */
-	public function render_year(\Blight\Interfaces\Collection $year, $options = null);
+	public function renderYear(\Blight\Interfaces\Collection $year, $options = null);
 
 	/**
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
-	 *
-	 * @see render_collections
 	 */
-	public function render_tags($options = null);
+	public function renderTags($options = null);
 
 	/**
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
-	 *
-	 * @see render_collections
 	 */
-	public function render_categories($options = null);
+	public function renderCategories($options = null);
 
 	/**
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
 	 */
-	public function render_home($options = null);
+	public function renderHome($options = null);
 
 	/**
 	 * @param array|null $options	An array of options to alter the rendered pages
@@ -78,14 +72,14 @@ interface Renderer {
 	 * 		in 'limit':		The number of posts to include. 0 includes all posts [Default: 20]
 	 * 		bool 'subfeed':	Whether to generate feeds for categories and tags [Default: true]
 	 */
-	public function render_feeds($options = null);
+	public function renderFeeds($options = null);
 
 	/**
 	 * @param array|null $options	An array of options to alter the rendered document
 	 */
-	public function render_sitemap($options = null);
+	public function renderSitemap($options = null);
 
-	public function update_user_assets();
+	public function updateUserAssets();
 
-	public function update_theme_assets();
+	public function updateThemeAssets();
 };

@@ -8,39 +8,39 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	protected $year;
 	protected $tags;
 	protected $category;
-	protected $is_draft;
+	protected $isDraft;
 	protected $link;
-	protected $is_being_published;
+	protected $isBeingPublished;
 
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
 	 *
 	 * @param \Blight\Interfaces\Blog $blog
-	 * @param string $content	The raw Markdown content for the post
-	 * @param string $slug		The post URL slug
-	 * @param bool $is_draft	Whether the post is a draft
-	 * @throws \InvalidArgumentException	Article date is invalid
+	 * @param string $content    The raw Markdown content for the post
+	 * @param string $slug        The post URL slug
+	 * @param bool $isDraft 	   Whether the post is a draft
+	 * @throws \InvalidArgumentException    Article date is invalid
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, $content, $slug, $is_draft = false){
-		$this->blog	= $blog;
+	public function __construct(\Blight\Interfaces\Blog $blog, $content, $slug, $isDraft = false){
+		$this->blog = $blog;
 
-		$this->is_draft	= $is_draft;
+		$this->isDraft = $isDraft;
 
-		$data	= $this->parse_content($content);
+		$data = $this->parseContent($content);
 
-		$this->title	= $data['title'];
-		$this->content	= $data['content'];
-		$this->metadata	= $data['metadata'];
+		$this->title = $data['title'];
+		$this->content = $data['content'];
+		$this->metadata = $data['metadata'];
 
-		if($this->has_meta('date')){
+		if($this->hasMeta('date')){
 			try {
-				$this->date	= new \DateTime($this->get_meta('date'));
+				$this->date = new \DateTime($this->getMeta('date'));
 			} catch(\Exception $e){
 				throw new \InvalidArgumentException('Article date invalid');
 			}
 		}
 
-		$this->slug	= strtolower($slug);
+		$this->slug = strtolower($slug);
 	}
 
 
@@ -48,33 +48,33 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	 * @param bool $raw	Whether to prepend any additional linkblog glyphs to the title
 	 * @return string	The post title
 	 */
-	public function get_title($raw = false){
-		$prepend	= '';
-		
+	public function getTitle($raw = false){
+		$prepend = '';
+
 		if(!$raw){
-			$is_linkblog	= $this->blog->is_linkblog();
-			$is_linkpost	= $this->is_linked();
+			$isLinkblog	= $this->blog->isLinkblog();
+			$isLinkpost	= $this->isLinked();
 
-			if($is_linkblog && !$is_linkpost){
+			if($isLinkblog && !$isLinkpost){
 				// Unlinked post - prepend glyph
-				$prepend	= $this->blog->get('post_character', 'linkblog', '★').' ';
+				$prepend = $this->blog->get('post_character', 'linkblog', '★') . ' ';
 
-			} elseif(!$is_linkblog && $is_linkpost){
+			} elseif(!$isLinkblog && $isLinkpost) {
 				// Linked post - prepend arrow
-				$prepend	= $this->blog->get('link_character', 'linkblog', '→').' ';
+				$prepend = $this->blog->get('link_character', 'linkblog', '→') . ' ';
 			}
 		}
 
-		return $prepend.$this->title;
+		return $prepend . $this->title;
 	}
 
 	/**
-	 * @return \DateTime	The post date
-	 * @throws \RuntimeException	The post does not have a date set
+	 * @return \DateTime    The post date
+	 * @throws \RuntimeException    The post does not have a date set
 	 */
-	public function get_date(){
+	public function getDate(){
 		if(!isset($this->date)){
-			if($this->is_draft()){
+			if($this->isDraft()){
 				// Draft - use current date
 				return new \DateTime();
 			} else {
@@ -86,16 +86,16 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	}
 
 	/**
-	 * @return string	The URL to the post or to the linked article if set
+	 * @return string    The URL to the post or to the linked article if set
 	 */
-	public function get_link(){
+	public function getLink(){
 		if(!isset($this->link)){
-			if($this->is_linked()){
+			if($this->isLinked()){
 				// Linked post
-				$this->link	= $this->get_meta('link');
+				$this->link = $this->getMeta('link');
 			} else {
 				// Standard post
-				$this->link	= $this->get_permalink();
+				$this->link = $this->getPermalink();
 			}
 		}
 
@@ -103,15 +103,15 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	}
 
 	/**
-	 * @return string	The URL to the post without the prefixed site URL
+	 * @return string    The URL to the post without the prefixed site URL
 	 */
-	public function get_relative_permalink(){
-		$permalink	= $this->get_date()->format('Y/m').'/'.$this->slug;
+	public function getRelativePermalink(){
+		$permalink = $this->getDate()->format('Y/m') . '/' . $this->slug;
 
-		if($this->is_linked()){
-			$prefix	= $this->blog->get('link_directory', 'linkblog');
+		if($this->isLinked()){
+			$prefix = $this->blog->get('link_directory', 'linkblog');
 			if(isset($prefix)){
-				$permalink	= rtrim($prefix,'/').'/'.$permalink;
+				$permalink = rtrim($prefix, '/') . '/' . $permalink;
 			}
 		}
 
@@ -121,11 +121,11 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	/**
 	 * Creates a collection for the year the post was authored
 	 *
-	 * @return \Blight\Collections\Year	The Year collection the post belongs in
+	 * @return \Blight\Collections\Year    The Year collection the post belongs in
 	 */
-	public function get_year(){
+	public function getYear(){
 		if(!isset($this->year)){
-			$this->year	= new \Blight\Collections\Year($this->blog, $this->get_date()->format('Y'));
+			$this->year = new \Blight\Collections\Year($this->blog, $this->getDate()->format('Y'));
 		}
 
 		return $this->year;
@@ -137,18 +137,18 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	 * The post could have no tags assigned, which would result in an
 	 * empty array being returned.
 	 *
-	 * @return array	An array of Tag collections
+	 * @return array    An array of Tag collections
 	 */
-	public function get_tags(){
+	public function getTags(){
 		if(!isset($this->tags)){
-			if($this->has_meta('tags')){
-				$tags	= array_map('trim', explode(',', $this->get_meta('tags')));
-				$this->tags	= array_map(function($item){
+			if($this->hasMeta('tags')){
+				$tags = array_map('trim', explode(',', $this->getMeta('tags')));
+				$this->tags = array_map(function ($item){
 					return new \Blight\Collections\Tag($this->blog, $item);
 				}, array_unique($tags));
 			} else {
 				// No tags
-				$this->tags	= array();
+				$this->tags = array();
 			}
 		}
 
@@ -160,41 +160,41 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	 *
 	 * If the post has no category assigned, null will be returned
 	 *
-	 * @return \Blight\Collections\Category|null	The Category collection the post belongs in, or null
+	 * @return \Blight\Collections\Category|null    The Category collection the post belongs in, or null
 	 */
-	public function get_category(){
-		if(!isset($this->category) && $this->has_meta('category')){
-			$this->category	= new \Blight\Collections\Category($this->blog, $this->get_meta('category'));
+	public function getCategory(){
+		if(!isset($this->category) && $this->hasMeta('category')){
+			$this->category = new \Blight\Collections\Category($this->blog, $this->getMeta('category'));
 		}
 
 		return $this->category;
 	}
 
 	/**
-	 * @return bool	Whether the post is being published during this build
+	 * @return bool    Whether the post is being published during this build
 	 */
-	public function is_being_published(){
-		return (bool)$this->is_being_published;
+	public function isBeingPublished(){
+		return (bool)$this->isBeingPublished;
 	}
 
 	/**
-	 * @param bool $is_being_published	Whether the post is being published during this build
+	 * @param bool $isBeingPublished    Whether the post is being published during this build
 	 */
-	public function set_being_published($is_being_published){
-		$this->is_being_published	= (bool)$is_being_published;
+	public function setBeingPublished($isBeingPublished){
+		$this->isBeingPublished = (bool)$isBeingPublished;
 	}
 
 	/**
-	 * @return bool	Whether the post is a draft
+	 * @return bool    Whether the post is a draft
 	 */
-	public function is_draft(){
-		return (bool)$this->is_draft;
+	public function isDraft(){
+		return (bool)$this->isDraft;
 	}
 
 	/**
-	 * @return bool	Whether the post is a linked post
+	 * @return bool    Whether the post is a linked post
 	 */
-	public function is_linked(){
-		return $this->has_meta('link');
+	public function isLinked(){
+		return $this->hasMeta('link');
 	}
 }

@@ -12,16 +12,16 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected $pages;
 
 	protected $posts;
-	protected $posts_by_year;
-	protected $posts_by_tag;
-	protected $posts_by_category;
-	protected $draft_posts;
-	protected $post_extension;
+	protected $postsByYear;
+	protected $postsByTag;
+	protected $postsByCategory;
+	protected $draftPosts;
+	protected $postExtension;
 
 	/**
 	 * @var array The extensions of files to consider posts
 	 */
-	protected $allowed_extensions	= array('md', 'markdown', 'mdown');
+	protected $allowedExtensions	= array('md', 'markdown', 'mdown');
 
 	/**
 	 * Initialises the posts manager
@@ -32,14 +32,14 @@ class Manager implements \Blight\Interfaces\Manager {
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 
-		if(!is_dir($blog->get_path_posts())){
+		if(!is_dir($blog->getPathPosts())){
 			throw new \RuntimeException('Posts directory not found');
 		}
 
 		if($blog->get('allow_txt', 'posts', false)){
-			$this->allowed_extensions[]	= 'txt';
+			$this->allowedExtensions[]	= 'txt';
 		}
-		$this->post_extension	= ltrim($blog->get('default_extension', 'posts', current($this->allowed_extensions)), '.');
+		$this->postExtension	= ltrim($blog->get('default_extension', 'posts', current($this->allowedExtensions)), '.');
 	}
 
 	/**
@@ -47,15 +47,16 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	A list of filenames for each page file found
 	 */
-	protected function get_raw_pages(){
-		$dir	= $this->blog->get_path_pages();
-		function get_sub_pages($dir){
+	protected function getRawPages(){
+		$dir	= $this->blog->getPathPages();
+
+		function getSubPages($dir){
 			$dir	= rtrim($dir, '/');
 
 			$files	= array();
 
-			$raw_files	= glob($dir.'/*');
-			foreach($raw_files as $file){
+			$rawFiles	= glob($dir.'/*');
+			foreach($rawFiles as $file){
 				if(is_dir($file)){
 					$files	= array_merge($files, get_sub_pages($file));
 				} else {
@@ -66,7 +67,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			return $files;
 		};
 
-		$files	= get_sub_pages($dir);
+		$files	= getSubPages($dir);
 
 		return $files;
 	}
@@ -77,17 +78,17 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * @param bool $drafts	Whether to return only drafts or only published posts
 	 * @return array	A list of filenames for each post file found
 	 */
-	protected function get_raw_posts($drafts = false){
-		$dir	= ($drafts ? $this->blog->get_path_drafts() : $this->blog->get_path_posts());
+	protected function getRawPosts($drafts = false){
+		$dir	= ($drafts ? $this->blog->getPathDrafts() : $this->blog->getPathPosts());
 		$files	= glob($dir.'*.*');
 
 		if(!$drafts){
-			$draft_publish_dir	= $this->blog->get_path_drafts(self::DRAFT_PUBLISH_DIR);
+			$draftPublishDir	= $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR);
 
 			$files	= array_merge(
 				$files,		// Unsorted
 				glob($dir.'*/*/*.*'),	// Sorted (YYYY/DD/post.md)
-				glob($draft_publish_dir.'*.*')	// Ready-to-publish drafts
+				glob($draftPublishDir.'*.*')	// Ready-to-publish drafts
 			);
 		}
 
@@ -97,14 +98,14 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Converts a post file to a Post object
 	 *
-	 * @param string $raw_post	The path to a post file
+	 * @param string $rawPost	The path to a post file
 	 * @return \Blight\Interfaces\Post		The post built from the provided file
 	 */
-	protected function build_post($raw_post){
-		$content	= $this->blog->get_file_system()->load_file($raw_post);
+	protected function buildPost($rawPost){
+		$content	= $this->blog->getFileSystem()->loadFile($rawPost);
 
-		$filename	= pathinfo($raw_post, \PATHINFO_FILENAME);
-		if(preg_match('/\\/(\d{4})\\/(\d{2})\\/\1-\2-\d\d-([^\/]*?)\.(\w*?)$/', $raw_post, $matches)){
+		$filename	= pathinfo($rawPost, \PATHINFO_FILENAME);
+		if(preg_match('/\\/(\d{4})\\/(\d{2})\\/\1-\2-\d\d-([^\/]*?)\.(\w*?)$/', $rawPost, $matches)){
 			$filename	= $matches[3];
 		}
 
@@ -115,17 +116,17 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * Moves a post source file to a more-logical location. Moves files to YYYY/MM/YYYY-MM-DD-post.md
 	 *
 	 * @param \Blight\Interfaces\Post $post	The post to move
-	 * @param string $current_path	The current path to the post's file
+	 * @param string $currentPath	The current path to the post's file
 	 * @return bool	Whether the post file was moved to be published
 	 */
-	protected function organise_post_file(\Blight\Interfaces\Post $post, $current_path){
+	protected function organisePostFile(\Blight\Interfaces\Post $post, $currentPath){
 		// Check for special headers
-		$has_date		= $post->has_meta('date');
-		$has_publish	= $post->has_meta('publish-now');
-		if(!$has_date || $has_publish){
-			$lines	= explode("\n", $this->blog->get_file_system()->load_file($current_path));
+		$hasDate	= $post->hasMeta('date');
+		$hasPublish	= $post->hasMeta('publish-now');
+		if(!$hasDate || $hasPublish){
+			$lines	= explode("\n", $this->blog->getFileSystem()->loadFile($currentPath));
 
-			if($has_publish){
+			if($hasPublish){
 				// Remove publish header
 				$count	= count($lines);
 				for($i = 2; $i < $count; $i++){
@@ -143,33 +144,33 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 			}
 
-			if(!$has_date && ($has_publish || !$post->is_draft())){
+			if(!$hasDate && ($hasPublish || !$post->isDraft())){
 				// Add date header
 				$now	= new \DateTime();
-				$post->set_date($now);
-				$date_line	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
-				array_splice($lines, 2, 0, $date_line);
+				$post->setDate($now);
+				$dateLine	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
+				array_splice($lines, 2, 0, $dateLine);
 			}
 
 			// Update file
-			$this->blog->get_file_system()->create_file($current_path, implode("\n", $lines));
+			$this->blog->getFileSystem()->createFile($currentPath, implode("\n", $lines));
 		}
 
 		// Build filename
-		$new_path	= $post->get_date()->format('Y/m/Y-m-d').'-'.$post->get_slug().'.'.$this->post_extension;
-		$new_path	= $this->blog->get_path_posts($new_path);
+		$newPath	= $post->getDate()->format('Y/m/Y-m-d').'-'.$post->getSlug().'.'.$this->postExtension;
+		$newPath	= $this->blog->getPathPosts($newPath);
 
-		if($current_path == $new_path){
+		if($currentPath == $newPath){
 			// Already moved and published
 			return false;
 		}
 
 		// Move file
-		$is_draft_dir	= (strstr($current_path, $this->blog->get_path_drafts()) !== false);
-		$this->blog->get_file_system()->move_file($current_path, $new_path, !$is_draft_dir);	// Don't clean up drafts
+		$isDraftDir	= (strstr($currentPath, $this->blog->getPathDrafts()) !== false);
+		$this->blog->getFileSystem()->moveFile($currentPath, $newPath, !$isDraftDir);	// Don't clean up drafts
 
 		// Update modification time
-		touch($new_path);
+		touch($newPath);
 
 		// Moved - publishing
 		return true;
@@ -180,21 +181,21 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	An array of \Blight\Page objects
 	 */
-	public function get_pages(){
+	public function getPages(){
 		if(!isset($this->pages)){
-			$files	= $this->get_raw_pages();
-			$dir	= $this->blog->get_path_pages();
+			$files	= $this->getRawPages();
+			$dir	= $this->blog->getPathPages();
 
 			$pages	= array();
 
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
-				if(!in_array($extension, $this->allowed_extensions)){
+				if(!in_array($extension, $this->allowedExtensions)){
 					// Unknown filetype - ignore
 					continue;
 				}
 
-				$content	= $this->blog->get_file_system()->load_file($file);
+				$content	= $this->blog->getFileSystem()->loadFile($file);
 
 				// Create page object
 				try {
@@ -217,19 +218,19 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	An array of \Blight\Page objects
 	 */
-	public function get_draft_posts(){
-		if(!isset($this->draft_posts)){
-			$files	= $this->get_raw_posts(true);
+	public function getDraftPosts(){
+		if(!isset($this->draftPosts)){
+			$files	= $this->getRawPosts(true);
 			$posts	= array();
 
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
-				if(!in_array($extension, $this->allowed_extensions)){
+				if(!in_array($extension, $this->allowedExtensions)){
 					// Unknown filetype - ignore
 					continue;
 				}
 
-				$content	= $this->blog->get_file_system()->load_file($file);
+				$content	= $this->blog->getFileSystem()->loadFile($file);
 
 				// Create post object
 				try {
@@ -238,19 +239,19 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				if($post->has_meta('publish-now')){
+				if($post->hasMeta('publish-now')){
 					// Move to publish directory
-					$this->blog->get_file_system()->move_file($file, str_replace($this->blog->get_path_drafts(), $this->blog->get_path_drafts(self::DRAFT_PUBLISH_DIR), $file));
+					$this->blog->getFileSystem()->moveFile($file, str_replace($this->blog->getPathDrafts(), $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR), $file));
 					continue;
 				}
 
 				$posts[]	= $post;
 			}
 
-			$this->draft_posts	= $posts;
+			$this->draftPosts	= $posts;
 		}
 
-		return $this->draft_posts;
+		return $this->draftPosts;
 	}
 
 	/**
@@ -262,45 +263,45 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		)
 	 * @return array			An array of posts
 	 */
-	public function get_posts($filters = null){
+	public function getPosts($filters = null){
 		if(!isset($this->posts)){
 			// Update drafts first
-			$this->get_draft_posts();
+			$this->getDraftPosts();
 
 			// Load files
-			$files	= $this->get_raw_posts();
+			$files	= $this->getRawPosts();
 
 			$posts	= array();
 
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
-				if(!in_array($extension, $this->allowed_extensions)){
+				if(!in_array($extension, $this->allowedExtensions)){
 					// Unknown filetype - ignore
 					continue;
 				}
 
 				// Create post object
 				try {
-					$post	= $this->build_post($file);
+					$post	= $this->buildPost($file);
 				} catch(\Exception $e){
 					continue;
 				}
 
 				// Organise source file
-				$will_publish	= $this->organise_post_file($post, $file);
-				$post->set_being_published($will_publish);
+				$willPublish	= $this->organisePostFile($post, $file);
+				$post->setBeingPublished($willPublish);
 
 				$posts[]	= $post;
 			}
 
 			usort($posts, function(Post $a, Post $b){
-				$a_date	= $a->get_date();
-				$b_date	= $b->get_date();
+				$aDate	= $a->getDate();
+				$bDate	= $b->getDate();
 
-				if($a_date == $b_date){
+				if($aDate == $bDate){
 					return 0;
 				}
-				return ($a_date < $b_date) ? 1 : -1;
+				return ($aDate < $bDate) ? 1 : -1;
 			});
 
 			$this->posts	= $posts;
@@ -314,11 +315,11 @@ class Manager implements \Blight\Interfaces\Manager {
 		foreach($this->posts as $post){
 			/** @var \Blight\Interfaces\Post $post */
 			if($filters['rss'] !== true){
-				$is_rss_only	= $post->get_meta('rss-only');
-				if($filters['rss'] === 'only' && !$is_rss_only){
+				$isRSSOnly	= $post->getMeta('rss-only');
+				if($filters['rss'] === 'only' && !$isRSSOnly){
 					// Only allow RSS-only posts, post is not RSS-only
 					continue;
-				} elseif(!$filters['rss'] && $is_rss_only){
+				} elseif(!$filters['rss'] && $isRSSOnly){
 					// Do not allow RSS-only posts, post is RSS-only
 					continue;
 				}
@@ -333,45 +334,45 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups posts by year, tag and category
 	 */
-	protected function group_posts(){
-		$this->posts_by_year		= array();
-		$this->posts_by_tag			= array();
-		$this->posts_by_category	= array();
+	protected function groupPosts(){
+		$this->postsByYear		= array();
+		$this->postsByTag			= array();
+		$this->postsByCategory	= array();
 
-		$posts	= $this->get_posts();
+		$posts	= $this->getPosts();
 
 		foreach($posts as $post){
 			// Group post by year
-			$year	= $post->get_year();
-			$slug	= $year->get_slug();
-			if(!isset($this->posts_by_year[$slug])){
-				$this->posts_by_year[$slug]	= $year;
+			$year	= $post->getYear();
+			$slug	= $year->getSlug();
+			if(!isset($this->postsByYear[$slug])){
+				$this->postsByYear[$slug]	= $year;
 			}
-			$this->posts_by_year[$slug]->add_post($post);
+			$this->postsByYear[$slug]->addPost($post);
 
 			// Group post by tag
-			$tags	= $post->get_tags();
+			$tags	= $post->getTags();
 			foreach($tags as $tag){
-				$slug	= $tag->get_slug();
-				if(!isset($this->posts_by_tag[$slug])){
-					$this->posts_by_tag[$slug]	= $tag;
+				$slug	= $tag->getSlug();
+				if(!isset($this->postsByTag[$slug])){
+					$this->postsByTag[$slug]	= $tag;
 				}
-				$this->posts_by_tag[$slug]->add_post($post);
+				$this->postsByTag[$slug]->addPost($post);
 			}
 
 			// Group post by category
-			$category	= $post->get_category();
+			$category	= $post->getCategory();
 			if(isset($category)){
-				$slug		= $category->get_slug();
-				if(!isset($this->posts_by_category[$slug])){
-					$this->posts_by_category[$slug]	= $category;
+				$slug		= $category->getSlug();
+				if(!isset($this->postsByCategory[$slug])){
+					$this->postsByCategory[$slug]	= $category;
 				}
-				$this->posts_by_category[$slug]->add_post($post);
+				$this->postsByCategory[$slug]->addPost($post);
 			}
 		}
 
-		ksort($this->posts_by_tag);
-		ksort($this->posts_by_category);
+		ksort($this->postsByTag);
+		ksort($this->postsByCategory);
 	}
 
 	/**
@@ -382,19 +383,19 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		Example:
 	 * 		array(
 	 * 			Year (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			),
 	 * 			Year (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			)
 	 * 		);
 	 */
-	public function get_posts_by_year(){
-		if(!isset($this->posts_by_tag)){
-			$this->group_posts();
+	public function getPostsByYear(){
+		if(!isset($this->postsByTag)){
+			$this->groupPosts();
 		}
 
-		return $this->posts_by_year;
+		return $this->postsByYear;
 	}
 
 	/**
@@ -405,19 +406,19 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		Example:
 	 * 		array(
 	 * 			Tag (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			),
 	 * 			Tag (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			)
 	 * 		);
 	 */
-	public function get_posts_by_tag(){
-		if(!isset($this->posts_by_tag)){
-			$this->group_posts();
+	public function getPostsByTag(){
+		if(!isset($this->postsByTag)){
+			$this->groupPosts();
 		}
 
-		return $this->posts_by_tag;
+		return $this->postsByTag;
 	}
 
 	/**
@@ -428,33 +429,33 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		Example:
 	 * 		array(
 	 * 			Category (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			),
 	 * 			Category (
-	 * 				get_posts()
+	 * 				getPosts()
 	 * 			)
 	 * 		);
 	 */
-	public function get_posts_by_category(){
-		if(!isset($this->posts_by_tag)){
-			$this->group_posts();
+	public function getPostsByCategory(){
+		if(!isset($this->postsByTag)){
+			$this->groupPosts();
 		}
 
-		return $this->posts_by_category;
+		return $this->postsByCategory;
 	}
 
 	/**
 	 * Deletes any rendered drafts without an associated draft post
 	 */
-	public function cleanup_drafts(){
-		$posts_dir	= $this->blog->get_path_drafts();
-		$files	= glob($this->blog->get_path_drafts_web('*.html'));
+	public function cleanupDrafts(){
+		$postsDir	= $this->blog->getPathDrafts();
+		$files	= glob($this->blog->getPathDraftsWeb('*.html'));
 		foreach($files as $file){
 			$slug	= pathinfo($file, \PATHINFO_BASENAME);
 
 			$found	= false;
-			foreach($this->allowed_extensions as $ext){
-				if(file_exists($posts_dir.$slug.'.'.$ext)){
+			foreach($this->allowedExtensions as $ext){
+				if(file_exists($postsDir.$slug.'.'.$ext)){
 					$found	= true;
 					break;
 				}
@@ -466,7 +467,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			}
 
 			// Post not found - remove
-			$this->blog->get_file_system()->delete_file($file);
+			$this->blog->getFileSystem()->deleteFile($file);
 		}
 	}
 };

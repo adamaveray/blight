@@ -13,57 +13,57 @@ interface Page {
 	/**
 	 * @return string	The page title
 	 */
-	public function get_title();
+	public function getTitle();
 
 	/**
 	 * @return string	The page slug
 	 */
-	public function get_slug();
+	public function getSlug();
 
 	/**
 	 * @return \DateTime	The page date
 	 */
-	public function get_date();
+	public function getDate();
 
 	/**
 	 * @param \DateTime $date	The new date for the post
 	 */
-	public function set_date(\DateTime $date);
+	public function setDate(\DateTime $date);
 
 	/**
 	 * @return string	The page's raw Markdown content
 	 */
-	public function get_content();
+	public function getContent();
 
 	/**
 	 * @return array	The page metadata
 	 */
-	public function get_metadata();
+	public function getMetadata();
 
 	/**
 	 * @param string $name	The metadata to retrieve
 	 * @return mixed|null	The metadata value if set, or null
 	 */
-	public function get_meta($name);
+	public function getMeta($name);
 
 	/**
 	 * @param string $name	The meta to check if exists
 	 * @return bool	If the meta exists
 	 */
-	public function has_meta($name);
+	public function hasMeta($name);
 
 	/**
 	 * @return string	The URL to the page
 	 */
-	public function get_link();
+	public function getLink();
 
 	/**
 	 * @return string	The URL to the page
 	 */
-	public function get_permalink();
+	public function getPermalink();
 
 	/**
 	 * @return string	The URL to the page without the prefixed site URL
 	 */
-	public function get_relative_permalink();
+	public function getRelativePermalink();
 };

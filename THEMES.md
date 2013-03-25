@@ -16,13 +16,13 @@ Theme main classes must extend the `\Blight\Packages\Theme` class.
 
 ### Overriding Templates
 
-Individual templates can have additional processing performed before rendering by implementing the method `render_{THEME}` in the main class.
+Individual templates can have additional processing performed before rendering by implementing the method `render{THEME}` in the main class.
 
-	public function render_home($params){
+	public function renderHome($params){
 		 // Additional processing
 
 		 // Render template
-		 return $this->render_template('home', $params);
+		 return $this->renderTemplate('home', $params);
 	}
 
 

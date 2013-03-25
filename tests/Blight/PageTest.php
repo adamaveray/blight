@@ -65,44 +65,44 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::get_title
+	 * @covers \Blight\Page::getTitle
 	 */
 	public function testGetTitle(){
-		$this->assertEquals($this->content_title, $this->page->get_title(true));
+		$this->assertEquals($this->content_title, $this->page->getTitle(true));
 	}
 
 	/**
-	 * @covers \Blight\Page::get_slug
+	 * @covers \Blight\Page::getSlug
 	 */
 	public function testGetSlug(){
-		$this->assertEquals($this->content_slug, $this->page->get_slug());
+		$this->assertEquals($this->content_slug, $this->page->getSlug());
 	}
 
 	/**
 	 * @covers \Blight\Page::get_date
 	 */
 	public function testGetDate(){
-		$this->assertEquals($this->content_date, $this->page->get_date());
+		$this->assertEquals($this->content_date, $this->page->getDate());
 	}
 
 	/**
-	 * @covers \Blight\Page::set_date
+	 * @covers \Blight\Page::setDate
 	 */
 	public function testSetDate(){
 		$date	= new \DateTime('now');
-		$this->page->set_date($date);
-		$this->assertEquals($date, $this->page->get_date());
+		$this->page->setDate($date);
+		$this->assertEquals($date, $this->page->getDate());
 	}
 
 	/**
-	 * @covers \Blight\Page::get_content
+	 * @covers \Blight\Page::getContent
 	 */
 	public function testGetContent(){
-		$this->assertEquals($this->content_text, $this->page->get_content());
+		$this->assertEquals($this->content_text, $this->page->getContent());
 	}
 
 	/**
-	 * @covers \Blight\Page::get_metadata
+	 * @covers \Blight\Page::getMetadata
 	 */
 	public function testGetMetadata(){
 		$meta	= array(
@@ -110,50 +110,50 @@ EOD;
 			'test-meta'	=> $this->content_metadata['Test Meta']
 		);
 
-		$this->assertEquals($meta, $this->page->get_metadata());
+		$this->assertEquals($meta, $this->page->getMetadata());
 	}
 
 	/**
-	 * @covers \Blight\Page::get_meta
+	 * @covers \Blight\Page::getMeta
 	 */
 	public function testGetMeta(){
-		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->get_meta('Test Meta'));
-		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->get_meta('test-meta'));
+		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->getMeta('Test Meta'));
+		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->getMeta('test-meta'));
 
 		// Non-existent
-		$this->assertNull($this->page->get_meta('nonexistent'));
+		$this->assertNull($this->page->getMeta('nonexistent'));
 	}
 
 	/**
-	 * @covers \Blight\Page::has_meta
+	 * @covers \Blight\Page::hasMeta
 	 */
 	public function testHasMeta(){
-		$this->assertTrue($this->page->has_meta('Test Meta'));
-		$this->assertTrue($this->page->has_meta('test-meta'));
-		$this->assertFalse($this->page->has_meta('nonexistent'));
+		$this->assertTrue($this->page->hasMeta('Test Meta'));
+		$this->assertTrue($this->page->hasMeta('test-meta'));
+		$this->assertFalse($this->page->hasMeta('nonexistent'));
 	}
 
 	/**
-	 * @covers \Blight\Page::get_link
+	 * @covers \Blight\Page::getLink
 	 */
 	public function testGetLink(){
-		$url	= $this->blog->get_url($this->content_slug);
-		$this->assertEquals($url, $this->page->get_link());
+		$url	= $this->blog->getURL($this->content_slug);
+		$this->assertEquals($url, $this->page->getLink());
 	}
 
 	/**
-	 * @covers \Blight\Page::get_permalink
+	 * @covers \Blight\Page::getPermalink
 	 */
 	public function testGetPermalink(){
-		$url	= $this->blog->get_url($this->content_slug);
-		$this->assertEquals($url, $this->page->get_permalink());
+		$url	= $this->blog->getURL($this->content_slug);
+		$this->assertEquals($url, $this->page->getPermalink());
 	}
 
 	/**
-	 * @covers \Blight\Page::get_relative_permalink
+	 * @covers \Blight\Page::getRelativePermalink
 	 */
 	public function testGetRelativePermalink(){
 		$url	= $this->content_slug;
-		$this->assertEquals($url, $this->page->get_relative_permalink());
+		$this->assertEquals($url, $this->page->getRelativePermalink());
 	}
 };

@@ -1,4 +1,4 @@
 <?php
 /** @var \Blight\TextProcessor $text */
-echo $text->process_markdown($post->get_content());
+echo $text->processMarkdown($post->getContent());
 ?>

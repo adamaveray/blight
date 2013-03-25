@@ -12,130 +12,130 @@ interface Blog {
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The root path, with the provided string appended
 	 */
-	public function get_path_root($append = '');
+	public function getPathRoot($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The cache directory path, with the provided string appended
 	 */
-	public function get_path_cache($append = '');
+	public function getPathCache($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_app($append = '');
+	public function getPathApp($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_themes($append = '');
+	public function getPathThemes($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_plugins($append = '');
+	public function getPathPlugins($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_assets($append = '');
+	public function getPathAssets($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_pages($append = '');
+	public function getPathPages($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_posts($append = '');
+	public function getPathPosts($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_drafts($append = '');
+	public function getPathDrafts($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_drafts_web($append = '');
+	public function getPathDraftsWeb($append = '');
 
 	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
-	 * @see get_root_path()
+	 * @see getRootPath()
 	 */
-	public function get_path_www($append = '');
+	public function getPathWWW($append = '');
 
 	/**
 	 * @param string $append	An additonal URL fragment to append to the path
 	 * @return string			The URL, with the provided string appended
 	 */
-	public function get_url($append = '');
+	public function getURL($append = '');
 
 	/**
 	 * @return string	The blog name
 	 */
-	public function get_name();
+	public function getName();
 
 	/**
 	 * @return string|null	The blog description if set, or null
 	 */
-	public function get_description();
+	public function getDescription();
 
 	/**
 	 * @return string	The URL to the site feed
 	 */
-	public function get_feed_url();
+	public function getFeedURL();
 
 	/**
 	 * @return \Blight\Interfaces\FileSystem	The common FileSystem object
 	 */
-	public function get_file_system();
+	public function getFileSystem();
 
 	/**
 	 * @return \Blight\Interfaces\PackageManager
 	 */
-	public function get_package_manager();
+	public function getPackageManager();
 
 	/**
 	 * @return \Blight\Interfaces\Packages\Theme
 	 */
-	public function get_theme();
+	public function getTheme();
 
 	/**
 	 * @return bool	Whether the blog is a linkblog
 	 */
-	public function is_linkblog();
+	public function isLinkblog();
 
 	/**
 	 * @param string $hook	The name of the hook to run
 	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
 	 *
 	 * 		$value	= 1;
-	 * 		do_hook('hook_name', array(
+	 * 		doHook('hook_name', array(
 	 * 			'param'	=> &$value
 	 *  	));
 	 *
-	 * @see \Blight\PackageManager::do_hook
+	 * @see \Blight\PackageManager::doHook
 	 */
-	public function do_hook($hook, $params = null);
+	public function doHook($hook, $params = null);
 
 	/**
 	 * @param string $parameter		The name of the parameter to retrieve

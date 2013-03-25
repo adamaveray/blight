@@ -128,10 +128,10 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Manager::get_pages
+	 * @covers \Blight\Manager::getPages
 	 */
 	public function testGetPages(){
-		$pages	= $this->manager->get_pages();
+		$pages	= $this->manager->getPages();
 		$this->assertTrue(is_array($pages));
 		$this->assertEquals(count($pages), self::$pages_count);
 		foreach($pages as $page){
@@ -140,36 +140,36 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Manager::get_draft_posts
+	 * @covers \Blight\Manager::getDraftPosts
 	 */
 	public function testGetDraftPosts(){
-		$posts	= $this->manager->get_draft_posts();
+		$posts	= $this->manager->getDraftPosts();
 		$this->assertTrue(is_array($posts));
 		$this->assertEquals(count($posts), self::$drafts_count);
 		foreach($posts as $post){
 			$this->assertInstanceOf('\Blight\Interfaces\Post', $post);
-			$this->assertTrue($post->is_draft());
+			$this->assertTrue($post->isDraft());
 		}
 	}
 
 	/**
-	 * @covers \Blight\Manager::get_posts
+	 * @covers \Blight\Manager::getPosts
 	 */
 	public function testGetPosts(){
-		$posts	= $this->manager->get_posts();
+		$posts	= $this->manager->getPosts();
 		$this->assertTrue(is_array($posts));
 		$this->assertEquals(count($posts), self::$posts_count);
 		foreach($posts as $post){
 			$this->assertInstanceOf('\Blight\Interfaces\Post', $post);
-			$this->assertFalse($post->is_draft());
+			$this->assertFalse($post->isDraft());
 		}
 	}
 
 	/**
-	 * @covers \Blight\Manager::get_posts_by_year
+	 * @covers \Blight\Manager::getPostsByYear
 	 */
 	public function testGetPostsByYear(){
-		$archive	= $this->manager->get_posts_by_year();
+		$archive	= $this->manager->getPostsByYear();
 		$this->assertTrue(is_array($archive));
 		$this->assertEquals(self::$collection_count_year, count($archive));
 		foreach($archive as $year){
@@ -178,10 +178,10 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Manager::get_posts_by_tag
+	 * @covers \Blight\Manager::getPostsByTag
 	 */
 	public function testGetPostsByTag(){
-		$tags	= $this->manager->get_posts_by_tag();
+		$tags	= $this->manager->getPostsByTag();
 		$this->assertTrue(is_array($tags));
 		$this->assertEquals(self::$collection_count_tag, count($tags));
 		foreach($tags as $tag){
@@ -190,10 +190,10 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Manager::get_posts_by_category
+	 * @covers \Blight\Manager::getPostsByCategory
 	 */
 	public function testGetPostsByCategory(){
-		$categories	= $this->manager->get_posts_by_category();
+		$categories	= $this->manager->getPostsByCategory();
 		$this->assertTrue(is_array($categories));
 		$this->assertEquals(self::$collection_count_category, count($categories));
 		foreach($categories as $category){
@@ -202,18 +202,18 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Manager::cleanup_drafts
+	 * @covers \Blight\Manager::cleanupDrafts
 	 */
 	public function testCleanupDrafts(){
-		$dir	= $this->blog->get_path_drafts_web();
+		$dir	= $this->blog->getPathDraftsWeb();
 		if(!is_dir($dir)){
 			mkdir($dir);
 		}
 		file_put_contents($dir.'test.html', 'Test file');
 
-		$this->manager->cleanup_drafts();
+		$this->manager->cleanupDrafts();
 
 		// Directory should be empty
-		$this->assertEquals(0, count(glob($this->blog->get_path_drafts_web('*'))));
+		$this->assertEquals(0, count(glob($this->blog->getPathDraftsWeb('*'))));
 	}
 };

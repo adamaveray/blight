@@ -17,16 +17,16 @@ class Theme implements \Blight\Interfaces\Packages\Theme {
 	public function setup(){
 	}
 
-	public function render_template($name, $params = null){
+	public function renderTemplate($name, $params = null){
 		$template	= new \Blight\Template($this->blog, $this, $name);
 		return $template->render($params);
 	}
 
-	public function get_path_templates(){
+	public function getPathTemplates(){
 		return $this->path.'templates/';
 	}
 
-	public function get_path_assets(){
+	public function getPathAssets(){
 		return $this->path.'assets/';
 	}
 };

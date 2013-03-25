@@ -89,7 +89,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_page
+	 * @covers \Blight\Renderer::renderPage
 	 */
 	public function testRenderPage(){
 		$content	= <<<EOD
@@ -102,15 +102,15 @@ EOD;
 
 		$page	= new \Blight\Page($this->blog, $content, 'test-page');
 
-		$this->renderer->render_page($page);
+		$this->renderer->renderPage($page);
 
-		$path	= $this->blog->get_path_www($page->get_relative_permalink().'.html');
+		$path	= $this->blog->getPathWWW($page->getRelativePermalink().'.html');
 
 		$this->assertTrue(file_exists($path));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_pages
+	 * @covers \Blight\Renderer::renderPages
 	 */
 	public function testRenderPages(){
 		$content	= <<<EOD
@@ -128,18 +128,18 @@ EOD;
 
 		$this->manager->set_mock_pages($pages);
 
-		$this->renderer->render_pages();
+		$this->renderer->renderPages();
 
-		$path	= $this->blog->get_path_www();
+		$path	= $this->blog->getPathWWW();
 
 		foreach($pages as $page){
 			/** @var \Blight\Interfaces\Page $page */
-			$this->assertTrue(file_exists($path.$page->get_relative_permalink().'.html'));
+			$this->assertTrue(file_exists($path.$page->getRelativePermalink().'.html'));
 		}
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_post
+	 * @covers \Blight\Renderer::renderPost
 	 */
 	public function testRenderPost(){
 		$content	= <<<EOD
@@ -155,13 +155,13 @@ EOD;
 EOD;
 
 		$post	= new \Blight\Post($this->blog, $content, 'test-post');
-		$this->renderer->render_post($post);
+		$this->renderer->renderPost($post);
 
-		$this->assertEquals($rendered_content, file_get_contents($this->blog->get_path_www($post->get_relative_permalink().'.html')));
+		$this->assertEquals($rendered_content, file_get_contents($this->blog->getPathWWW($post->getRelativePermalink().'.html')));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_post
+	 * @covers \Blight\Renderer::renderPost
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testInvalidRenderPost(){
@@ -178,11 +178,11 @@ EOD;
 EOD;
 
 		$post	= new \Blight\Post($this->blog, $content, 'test-post');
-		$this->renderer->render_post($post, '(not a post)');
+		$this->renderer->renderPost($post, '(not a post)');
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_drafts
+	 * @covers \Blight\Renderer::renderDrafts
 	 */
 	public function testRenderDrafts(){
 		$content	= <<<EOD
@@ -200,16 +200,16 @@ EOD;
 		);
 		$this->manager->set_mock_posts($posts, 'drafts');
 
-		$this->renderer->render_drafts();
+		$this->renderer->renderDrafts();
 
-		$output_dir	= $this->blog->get_path_drafts_web();
+		$output_dir	= $this->blog->getPathDraftsWeb();
 		$files	= glob($output_dir.'*');
 
 		$this->assertEquals(count($posts), count($files));
 
 		foreach($posts as $post){
 			// Check each post had file created with same slug
-			$this->assertTrue(in_array($output_dir.$post->get_slug().'.html', $files));
+			$this->assertTrue(in_array($output_dir.$post->getSlug().'.html', $files));
 		}
 	}
 
@@ -242,15 +242,15 @@ EOD;
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$this->renderer->render_archives();
+		$this->renderer->renderArchives();
 
-		$output_dir	= $this->blog->get_path_www().'archive/';
+		$output_dir	= $this->blog->getPathWWW().'archive/';
 		$files	= glob($output_dir.'*');
 		$this->assertEquals(count($date_counts), count($files));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_year
+	 * @covers \Blight\Renderer::renderYear
 	 */
 	public function testRenderYear(){
 		$content	= <<<EOD
@@ -269,15 +269,15 @@ EOD;
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$years	= $this->manager->get_posts_by_year();
+		$years	= $this->manager->getPostsByYear();
 		foreach($years as $year){
-			if($year->get_name() == '2012'){
-				$this->renderer->render_year($year);
+			if($year->getName() == '2012'){
+				$this->renderer->renderYear($year);
 				break;
 			}
 		}
 
-		$this->assertTrue(file_exists($this->blog->get_path_www().'archive/2012.html'));
+		$this->assertTrue(file_exists($this->blog->getPathWWW().'archive/2012.html'));
 	}
 
 	/**
@@ -305,9 +305,9 @@ EOD;
 			'test-tag'	=> 3
 		);
 
-		$dir	= $this->blog->get_path_www('tag/');
+		$dir	= $this->blog->getPathWWW('tag/');
 
-		$this->renderer->render_tags();
+		$this->renderer->renderTags();
 
 		foreach($tag_counts as $tag => $count){
 			$this->assertTrue(file_exists($dir.$tag.'.html'));
@@ -315,7 +315,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_categories
+	 * @covers \Blight\Renderer::renderCategories
 	 */
 	public function testRenderCategories(){
 		$content	= <<<EOD
@@ -339,9 +339,9 @@ EOD;
 			'general'	=> 3
 		);
 
-		$dir	= $this->blog->get_path_www('category/');
+		$dir	= $this->blog->getPathWWW('category/');
 
-		$this->renderer->render_categories();
+		$this->renderer->renderCategories();
 
 		foreach($category_counts as $category => $count){
 			$this->assertTrue(file_exists($dir.$category.'.html'));
@@ -349,7 +349,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_home
+	 * @covers \Blight\Renderer::renderHome
 	 */
 	public function testRenderHome(){
 		$content	= <<<EOD
@@ -366,15 +366,15 @@ EOD;
 			new \Blight\Post($this->blog, $content, 'test-3')
 		);
 
-		$this->renderer->render_home();
+		$this->renderer->renderHome();
 
-		$path	= $this->blog->get_path_www('index.html');
+		$path	= $this->blog->getPathWWW('index.html');
 
 		$this->assertTrue(file_exists($path));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_feeds
+	 * @covers \Blight\Renderer::renderFeeds
 	 */
 	public function testRenderFeeds(){
 		$content	= <<<EOD
@@ -393,17 +393,17 @@ EOD;
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$this->renderer->render_feeds(array(
+		$this->renderer->renderFeeds(array(
 			'subfeeds'	=> false
 		));
 
-		$path	= $this->blog->get_path_www('feed.xml');
+		$path	= $this->blog->getPathWWW('feed.xml');
 
 		$this->assertTrue(file_exists($path));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_sitemap
+	 * @covers \Blight\Renderer::renderSitemap
 	 */
 	public function testRenderSitemap(){
 		$content	= <<<EOD
@@ -421,9 +421,9 @@ EOD;
 
 		$this->manager->set_mock_pages($pages);
 
-		$this->renderer->render_sitemap();
+		$this->renderer->renderSitemap();
 
-		$path	= $this->blog->get_path_www('sitemap.xml');
+		$path	= $this->blog->getPathWWW('sitemap.xml');
 
 		$this->assertTrue(file_exists($path));
 	}

@@ -21,10 +21,10 @@ interface Template {
 	/**
 	 * @return string	The HTML for the styles
 	 */
-	public function get_styles();
+	public function getStyles();
 
 	/**
 	 * @return string	The HTML for the scripts
 	 */
-	public function get_scripts();
+	public function getScripts();
 };

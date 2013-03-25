@@ -8,5 +8,5 @@ interface Utilities {
 	 * @param array $_
 	 * @return mixed
 	 */
-	public static function array_multi_merge($array1, $array2 = null, $_ = null);
+	public static function arrayMultiMerge($array1, $array2 = null, $_ = null);
 };
