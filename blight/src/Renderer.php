@@ -10,7 +10,8 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	protected $theme;
 
 	protected $inbuiltTemplates	= array(
-		'feed'		=> 'src/views/templates/',
+		'feed_atom'	=> 'src/views/templates/',
+		'feed_rss'	=> 'src/views/templates/',
 		'sitemap'	=> 'src/views/templates/'
 	);
 
@@ -413,13 +414,17 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'limit'	=> 20
 		), (array)$options);
 
+		if(!isset($options['format']) || !in_array($options['format'], array('atom', 'rss'))){
+			$options['format']	= $this->blog->get('feed_format', 'output', 'atom');
+		}
+
 		if($options['limit'] > 0){
 			$posts	= array_slice($posts, 0, $options['limit']);
 		}
 
 		$path	= $this->blog->getPathWWW($path.'.xml');
 
-		$this->renderTemplateToFile('feed', $path, array(
+		$this->renderTemplateToFile('feed_'.$options['format'], $path, array(
 			'posts'	=> $posts
 		));
 	}

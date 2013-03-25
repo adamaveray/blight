@@ -43,9 +43,14 @@ $channel	= $dom->createElement('channel');
 
 			$title	= $post->getTitle();
 			$link	= $post->getLink();
+			$date	= $post->getDate();
+			$date_updated	= $post->getDate();
 			$guid	= $post->getPermalink();
 			$guidIsPermalink	= true;
-			$date	= $post->getDate();
+			$author	= $blog->get('author');
+			if(isset($author)){
+				$author	= (object)$author;
+			}
 
 			// Build post content
 			$content	= $post->getContent();
@@ -57,10 +62,13 @@ $channel	= $dom->createElement('channel');
 			}
 
 			$blog->doHook('feed_post', array(
+				'feed_type'	=> 'rss',
 				'post'		=> $post,
 				'title'		=> &$title,
 				'link'		=> &$link,
+				'author'	=> &$author,
 				'date_published'	=> &$date,
+				'date_updated'		=> &$dateUpdated,
 				'guid'		=> &$guid,
 				'guid_is_permalink'	=> &$guidIsPermalink,
 				'content'	=> &$content,
@@ -71,10 +79,13 @@ $channel	= $dom->createElement('channel');
 			$createNode($dom, $item, 'title', $title);
 			$createNode($dom, $item, 'link', $link);
 			$createNode($dom, $item, 'guid', $guid, array(
-				'isPermaLink'	=> $guidIsPermalink
+				'isPermaLink'	=> ($guidIsPermalink ? 'true' : 'false')
 			));
 			$createNode($dom, $item, 'pubDate', $date->format('r'));
-			$createNode($dom, $item, 'description', ($processContent ? $text->processMarkdown($content) : $content));
+			$createNode($dom, $item, 'description', ($processContent ? $text->processMarkdown($content) : $content).$append);
+			if(isset($author->email)){
+				$createNode($dom, $item, 'author', $author->email.(isset($author->name) ? ' ('.$author->name.')' : ''));
+			}
 
 		$channel->appendChild($item);
 	}

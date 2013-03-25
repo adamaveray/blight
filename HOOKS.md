@@ -31,15 +31,18 @@ _Editable parameters for hooks can be modified from within the callback to chang
 
 	### Params
 
+	- string **feed_type**: The feed format type – either `'atom'` or `'rss'`
 	- \Blight\Interfaces\Post **post**: The post being rendered
 	- string **title**: _(editable)_ The title of the post
 	- string **link**: _(editable)_ The URL for the post to link to. For linked posts, this defaults to the external link.
+	- \stdClass **author**: _(editable)_ The author of the post. An object with the properties `name`, `url` and `email`
 	- \DateTime **date_published**: _(editable)_ The publish date of the post
-	- string **guid**: _(editable)_ The RSS GUID for the post. Defaults to the post's permalink.
+	- \DateTime **date_updated**: _(editable)_ The last-updated date of the post
+	- string **guid**: _(editable)_ Either the RSS GUID or Atom ID for the post. Defaults to the post's permalink.
 	- bool **guid_is_permalink**: _(editable)_
 	- string **content**: _(editable)_ The post's raw Markdown content
 	- string **append**: _(editable)_ A string to append to the post content. Defaults to a permalink for linked posts.
-	- bool **process_content**: _(editable)_
+	- bool **process_content**: _(editable)_ Whether to process the content as Markdown
 
 
 - ## render_styles
