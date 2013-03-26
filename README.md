@@ -73,6 +73,10 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 
 	`Category: General`
 
+- **Summary**: A summary of the post's content, in a single line of plaintext
+
+	`Summary: A look back on the history of blogging, and the digital soapbox`
+
 - **RSS Only**: Only display the post in RSS feeds. It will not appear on any rendered HTML files, but will still have a standalone post HTML file generated.
 
 	`RSS Only`

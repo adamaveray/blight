@@ -33,6 +33,16 @@ interface Post extends \Blight\Interfaces\Page {
 	public function getCategory();
 
 	/**
+	 * @return bool	Whether the post has a summary or not
+	 */
+	public function hasSummary();
+
+	/**
+	 * @return string	The post's summary
+	 */
+	public function getSummary();
+
+	/**
 	 * @return bool	Whether the post is being published during this build
 	 */
 	public function isBeingPublished();

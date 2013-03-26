@@ -62,6 +62,7 @@ $root->setAttribute('xml:lang', 'en-US');
 			$author	= (object)$blog->get('author');
 
 			// Build post content
+			$summary	= $post->getSummary();
 			$content	= $post->getContent();
 			$processContent	= true;
 			$append		= '';
@@ -82,7 +83,8 @@ $root->setAttribute('xml:lang', 'en-US');
 				'guid_is_permalink'	=> &$guidIsPermalink,
 				'content'	=> &$content,
 				'process_content'	=> &$processContent,
-				'append'	=> &$append
+				'append'	=> &$append,
+				'summary'	=> &$summary
 			));
 
 			$createNode($dom, $entry, 'title', $post->getTitle());
@@ -108,9 +110,15 @@ $root->setAttribute('xml:lang', 'en-US');
 				});
 			}
 
+			if(isset($summary)){
+				$createNode($dom, $entry, 'summary', $summary, array(
+					'xml:lang'	=> 'en-US'
+				));
+			}
+
 			$base_url	= $post->getPermalink();
 
-				$node	= $dom->createElement('content');
+			$node	= $dom->createElement('content');
 				$node->setAttribute('type', 'html');
 				$node->setAttribute('xml:base', $base_url);
 				$node->setAttribute('xml:lang', 'en-US');
