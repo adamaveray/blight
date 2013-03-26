@@ -41,6 +41,7 @@ _Editable parameters for hooks can be modified from within the callback to chang
 	- string **guid**: _(editable)_ Either the RSS GUID or Atom ID for the post. Defaults to the post's permalink.
 	- bool **guid_is_permalink**: _(editable)_
 	- string **content**: _(editable)_ The post's raw Markdown content
+	- string **summary**: _(editable)_ The post's plaintext summary, or null if not set
 	- string **append**: _(editable)_ A string to append to the post content. Defaults to a permalink for linked posts.
 	- bool **process_content**: _(editable)_ Whether to process the content as Markdown
 
