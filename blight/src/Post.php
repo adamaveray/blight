@@ -171,6 +171,24 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	}
 
 	/**
+	 * @return bool	Whether the post has a summary or not
+	 */
+	public function hasSummary(){
+		return $this->hasMeta('summary');
+	}
+
+	/**
+	 * @return string	The post's summary
+	 */
+	public function getSummary(){
+		if(!$this->hasSummary()){
+			return null;
+		}
+
+		return $this->getMeta('summary');
+	}
+
+	/**
 	 * @return bool    Whether the post is being published during this build
 	 */
 	public function isBeingPublished(){

@@ -264,6 +264,34 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Post::hasSummary
+	 */
+	public function testHasSummary(){
+		$this->assertFalse($this->post->hasSummary());
+
+		$summary	= 'A test summary';
+		$content	= $this->content;
+		$content	= preg_replace('/(=+)(\n)/', '$1$2Summary: '.$summary.'$2', $content);
+
+		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$this->assertTrue($post->hasSummary());
+	}
+
+	/**
+	 * @covers \Blight\Post::getSummary
+	 */
+	public function testGetSummary(){
+		$this->assertNull($this->post->getSummary());
+
+		$summary	= 'A test summary';
+		$content	= $this->content;
+		$content	= preg_replace('/(=+)(\n)/', '$1$2Summary: '.$summary.'$2', $content);
+
+		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$this->assertEquals($summary, $post->getSummary());
+	}
+
+	/**
 	 * @covers \Blight\Post::getCategory
 	 */
 	public function testNoCategoryGetCategory(){
