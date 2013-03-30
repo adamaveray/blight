@@ -8,6 +8,7 @@ class Page implements \Blight\Interfaces\Page {
 	protected $title;
 	protected $slug;
 	protected $date;
+	protected $dateModified;
 	protected $content;
 	protected $metadata;
 
@@ -34,7 +35,14 @@ class Page implements \Blight\Interfaces\Page {
 			try {
 				$this->date	= new \DateTime($this->getMeta('date'));
 			} catch(\Exception $e){
-				throw new \InvalidArgumentException('Article date invalid');
+				throw new \InvalidArgumentException('Created date invalid');
+			}
+		}
+		if($this->hasMeta('dateModified')){
+			try {
+				$this->dateModified	= new \DateTime($this->getMeta('dateModified'));
+			} catch(\Exception $e){
+				throw new \InvalidArgumentException('Modified date invalid');
 			}
 		}
 
@@ -126,10 +134,28 @@ class Page implements \Blight\Interfaces\Page {
 	}
 
 	/**
-	 * @param \DateTime $date	The new date for the post
+	 * @param \DateTime $date	The new date for the page
 	 */
 	public function setDate(\DateTime $date){
 		$this->date	= $date;
+	}
+
+	/**
+	 * @return \DateTime	The page modified date
+	 */
+	public function getDateModified(){
+		if(!isset($this->dateModified)){
+			return $this->getDate();
+		}
+
+		return $this->dateModified;
+	}
+
+	/**
+	 * @param \DateTime $date	The new modified date for the page
+	 */
+	public function setDateModified(\DateTime $date){
+		$this->dateModified	= $date;
 	}
 
 	/**
