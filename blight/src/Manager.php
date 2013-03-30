@@ -109,7 +109,14 @@ class Manager implements \Blight\Interfaces\Manager {
 			$filename	= $matches[3];
 		}
 
-		return new Post($this->blog, $content, $filename);
+		$post	= new Post($this->blog, $content, $filename);
+
+		// Modified time
+		try {
+			$post->setDateModified(new \DateTime('@'.filemtime($rawPost)));
+		} catch(\Exception $e){}
+
+		return $post;
 	}
 
 	/**
@@ -204,6 +211,8 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
+				$page->setDateModified(new \DateTime('@'.filemtime($file)));
+
 				$pages[]	= $page;
 			}
 
@@ -244,6 +253,8 @@ class Manager implements \Blight\Interfaces\Manager {
 					$this->blog->getFileSystem()->moveFile($file, str_replace($this->blog->getPathDrafts(), $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR), $file));
 					continue;
 				}
+
+				$post->setDateModified(new \DateTime('@'.filemtime($file)));
 
 				$posts[]	= $post;
 			}
