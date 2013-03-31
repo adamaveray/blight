@@ -56,7 +56,7 @@ $root->setAttribute('xml:lang', 'en-US');
 			$title	= $post->getTitle();
 			$link	= $post->getLink();
 			$date	= $post->getDate();
-			$dateUpdated	= $post->getDate();
+			$dateUpdated	= $post->getDateUpdated();
 			$guid	= $post->getPermalink();
 			$guidIsPermalink	= true;
 			$author	= (object)$blog->get('author');
