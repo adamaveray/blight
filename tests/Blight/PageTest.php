@@ -95,20 +95,20 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getDateModified
+	 * @covers \Blight\Page::getDateUpdated
 	 */
-	public function testGetDateModified(){
+	public function testGetDateUpdated(){
 		// Should default to date created
-		$this->assertEquals($this->content_date, $this->page->getDateModified());
+		$this->assertEquals($this->content_date, $this->page->getDateUpdated());
 	}
 
 	/**
-	 * @covers \Blight\Page::setDateModified
+	 * @covers \Blight\Page::setDateUpdated
 	 */
-	public function testSetDateModified(){
+	public function testSetDateUpdated(){
 		$date	= new \DateTime('now');
-		$this->page->setDateModified($date);
-		$this->assertEquals($date, $this->page->getDateModified());
+		$this->page->setDateUpdated($date);
+		$this->assertEquals($date, $this->page->getDateUpdated());
 	}
 
 	/**

@@ -113,7 +113,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 		// Modified time
 		try {
-			$post->setDateModified(new \DateTime('@'.filemtime($rawPost)));
+			$post->setDateUpdated(new \DateTime('@'.filemtime($rawPost)));
 		} catch(\Exception $e){}
 
 		return $post;
@@ -211,7 +211,7 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				$page->setDateModified(new \DateTime('@'.filemtime($file)));
+				$page->setDateUpdated(new \DateTime('@'.filemtime($file)));
 
 				$pages[]	= $page;
 			}
@@ -254,7 +254,7 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				$post->setDateModified(new \DateTime('@'.filemtime($file)));
+				$post->setDateUpdated(new \DateTime('@'.filemtime($file)));
 
 				$posts[]	= $post;
 			}

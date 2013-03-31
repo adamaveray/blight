@@ -8,7 +8,7 @@ class Page implements \Blight\Interfaces\Page {
 	protected $title;
 	protected $slug;
 	protected $date;
-	protected $dateModified;
+	protected $dateUpdated;
 	protected $content;
 	protected $metadata;
 
@@ -38,9 +38,9 @@ class Page implements \Blight\Interfaces\Page {
 				throw new \InvalidArgumentException('Created date invalid');
 			}
 		}
-		if($this->hasMeta('dateModified')){
+		if($this->hasMeta('date-updated')){
 			try {
-				$this->dateModified	= new \DateTime($this->getMeta('dateModified'));
+				$this->DateUpdated	= new \DateTime($this->getMeta('date-updated'));
 			} catch(\Exception $e){
 				throw new \InvalidArgumentException('Modified date invalid');
 			}
@@ -143,19 +143,19 @@ class Page implements \Blight\Interfaces\Page {
 	/**
 	 * @return \DateTime	The page modified date
 	 */
-	public function getDateModified(){
-		if(!isset($this->dateModified)){
+	public function getDateUpdated(){
+		if(!isset($this->DateUpdated)){
 			return $this->getDate();
 		}
 
-		return $this->dateModified;
+		return $this->DateUpdated;
 	}
 
 	/**
 	 * @param \DateTime $date	The new modified date for the page
 	 */
-	public function setDateModified(\DateTime $date){
-		$this->dateModified	= $date;
+	public function setDateUpdated(\DateTime $date){
+		$this->DateUpdated	= $date;
 	}
 
 	/**
