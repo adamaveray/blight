@@ -126,6 +126,12 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 - **url**: The URL to the blog, including any directories if appropriate
 - **description**: The blog's description, used in the RSS feed and available in templates
 
+### Author
+
+- **name**: The author's name
+- **email**: The author's email address
+- **url**: The URL to the author's homepage
+
 ### Theme
 
 - **name**: The name of the theme to render the site with

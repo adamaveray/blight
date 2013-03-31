@@ -59,7 +59,10 @@ $root->setAttribute('xml:lang', 'en-US');
 			$dateUpdated	= $post->getDateUpdated();
 			$guid	= $post->getPermalink();
 			$guidIsPermalink	= true;
-			$author	= (object)$blog->get('author');
+			$author	= $blog->get('author');
+			if(isset($author)){
+				$author	= (object)$author;
+			}
 
 			// Build post content
 			$summary	= $post->getSummary();
