@@ -402,7 +402,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		);
 	 */
 	public function getPostsByYear(){
-		if(!isset($this->postsByTag)){
+		if(!isset($this->postsByYear)){
 			$this->groupPosts();
 		}
 
