@@ -3,7 +3,6 @@
  * Blight
  * v0.7
  */
-namespace Blight;
 
 define('IS_CLI', (PHP_SAPI === 'cli'));
 define('VERBOSE', isset($argv[0]) && in_array('-v', $argv));
@@ -79,16 +78,16 @@ if(!file_exists($configFile) || isset($_COOKIE[\Blight\Controllers\Install::COOK
 $parser	= new \Blight\Config();
 $config	= $parser->unserialize(file_get_contents($configFile));
 $config['root_path']	= $rootPath;
-$blog	= new Blog($config);
+$blog	= new \Blight\Blog($config);
 
 // Load posts
-$manager	= new Manager($blog);
+$manager	= new \Blight\Manager($blog);
 debugOutput('Manager initialised');
 $archive	= $manager->getPostsByYear();
 debugOutput('Archive built');
 
 // Begin rendering
-$renderer	= new Renderer($blog, $manager, $blog->getTheme());
+$renderer	= new \Blight\Renderer($blog, $manager, $blog->getTheme());
 debugOutput('Renderer initialised');
 
 	// Render pages
