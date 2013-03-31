@@ -11,6 +11,8 @@ global $config;
 $config	= array(
 	'root_path'	=>	$root_path,
 
+	'author'	=> 'Sam Pell',
+
 	'site'	=> array(
 		'name'	=> 'Test Blog',
 		'url'	=> 'http://www.example.com/',

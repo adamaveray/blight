@@ -138,6 +138,12 @@ interface Blog {
 	public function doHook($hook, $params = null);
 
 	/**
+	 * @param string|null $name	The name of the author to retrieve, or null for the site owner
+	 * @return \Blight\Interfaces\Models\Author|null	The author, or null if not found
+	 */
+	public function getAuthor($name = null);
+
+	/**
 	 * @param string $parameter		The name of the parameter to retrieve
 	 * @param string|null $group	The settings group the parameter exists in
 	 * @param mixed $default		The value to be returned if the requested parameter is not set

@@ -12,23 +12,24 @@
 </section>
 <?php }?>
 
-<?php if(isset($file_config)){?>
-<section>
-	<p>The config file could not be created. Please create the following file:</p>
+<?php
+$files	= array(
+	'config'	=> 'config',
+	'authors'	=> 'authors',
+	'htaccess'	=> '.htaccess'
+);
 
-	<code class="filename file_title"><?php echo $file_config_path;?></code>
-	<pre><code><?php echo htmlspecialchars($file_config);?></code></pre>
-</section>
-<?php }?>
+foreach($files as $file => $name){
+	if(isset(${'file_'.$file})){?>
+		<section>
+			<p>The <?php echo $name;?> file could not be created. Please create the following file:</p>
 
-<?php if(isset($file_htaccess)){?>
-<section>
-	<p>The .htaccess file could not be created. Please create the following file:</p>
-
-	<code class="filename file_title"><?php echo $file_htaccess_path;?></code>
-	<pre><code><?php echo htmlspecialchars($file_htaccess);?></code></pre>
-</section>
-<?php }?>
+			<code class="filename file_title"><?php echo ${'file_'.$file.'_path';?></code>
+			<pre><code><?php echo htmlspecialchars(${'file_'.$file});?></code></pre>
+		</section>
+	<?php }
+}
+?>
 
 <a class="continue retry" href="<?php echo $target_url;?>">Retry</a>
 

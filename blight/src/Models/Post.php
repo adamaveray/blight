@@ -188,6 +188,20 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 		return $this->getMeta('summary');
 	}
 
+	public function getAuthor(){
+		if(!isset($this->author)){
+			$name	= null;
+			if($this->hasMeta('author')){
+				// Post-specific author
+				$name	= $this->getMeta('author');
+			}
+
+			$this->author	= $this->blog->getAuthor($name);
+		}
+
+		return $this->author;
+	}
+
 	/**
 	 * @return bool    Whether the post is being published during this build
 	 */

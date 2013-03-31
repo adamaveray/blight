@@ -42,6 +42,8 @@ interface Post extends \Blight\Interfaces\Models\Page {
 	 */
 	public function getSummary();
 
+	public function getAuthor();
+
 	/**
 	 * @return bool	Whether the post is being published during this build
 	 */

@@ -12,6 +12,11 @@
 			•
             <a class="permalink" title="Permalink" href="{{ post.permalink|e }}">∞</a>
 		</p>
+
+        {% if post.author != blog.author %}
+            {% set author = post.author %}
+            <p class="author">By {% if author.hasURL %}<a href="{{ author.url }}">{% endif %}{{ post.author.name }}{% if author.hasURL %}</a>{% endif %}</p>
+        {% endif %}
 	</header>
 
     {{ post.content|md }}

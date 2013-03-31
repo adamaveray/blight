@@ -206,11 +206,7 @@ class Page implements \Blight\Interfaces\Models\Page {
 	 * @return string		The converted name
 	 */
 	protected function normaliseMetaName($name){
-		$clean	= preg_replace('%[^-/+|\w ]%', '', $name);
-		$clean	= strtolower(trim($clean, '-'));
-		$clean	= preg_replace('/[\/_|+ -]+/', '-', $clean);
-
-		return $clean;
+		return \Blight\Utilities::convertNameToSlug($name);
 	}
 
 	/**

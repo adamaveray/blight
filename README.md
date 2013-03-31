@@ -11,6 +11,7 @@ Copy the `Blight.phar` file alongside your web directory. Then, copy the `index.
 After installation, your directory structure should look like the following:
 
 	config.json
+	authors.json
 
 	Blight.phar
 	
@@ -68,6 +69,10 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 - **Link**: Allows you to create linked posts, where the main link for the article in both the article lists and RSS feed links to the URL provided, while the permalink links to the post itself.
 
 	`Link: http://www.example.com/`
+
+- **Author**: The name of the post author. If not set, the author will default to the site author.
+
+	`Author: Sam Pell`
 
 - **Tags**: A comma-separated list of tags to group the post under. Tags should be written in a human-readable format, as URL-friendly versions will be generated automatically.
 
@@ -128,9 +133,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 
 ### Author
 
-- **name**: The author's name
-- **email**: The author's email address
-- **url**: The URL to the author's homepage
+The default author for the blog. The value must be the name of one of the authors stored in [the authors file](AUTHORS.md).
 
 ### Theme
 
