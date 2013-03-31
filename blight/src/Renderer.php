@@ -414,8 +414,14 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'limit'	=> 20
 		), (array)$options);
 
-		if(!isset($options['format']) || !in_array($options['format'], array('atom', 'rss'))){
-			$options['format']	= $this->blog->get('feed_format', 'output', 'atom');
+		$validFormats	= array('atom', 'rss');
+		$defaultFormat	= current($validFormats);
+		if(!isset($options['format']) || !in_array($options['format'], $validFormats)){
+			$options['format']	= $this->blog->get('feed_format', 'output', $defaultFormat);
+			if(!in_array($options['format'], $validFormats)){
+				// Invalid format in config
+				$options['format']	= $defaultFormat;
+			}
 		}
 
 		if($options['limit'] > 0){
