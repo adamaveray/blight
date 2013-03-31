@@ -172,6 +172,7 @@ The default author for the blog. The value must be the name of one of the author
 
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
 - **feed_format**: The format to build feeds, of either `atom` or `rss`
+- **cache_twig**: Whether to cache compiled Twig tempates
 
 
 ## Plugins

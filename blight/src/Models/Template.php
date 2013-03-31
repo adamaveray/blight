@@ -144,7 +144,9 @@ class Template implements \Blight\Interfaces\Models\Template {
 	protected function getTwigEnvironment($dir){
 		if(!isset(self::$twigEnvironments[$dir])){
 			$loader	= new \Twig_Loader_Filesystem($dir);
-			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader);
+			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader, array(
+				'cache' => ($this->blog->get('cache_twig', 'output', false) ? $this->blog->getPathCache('twig/') : null)
+			));
 
 			// Add globals
 			self::$twigEnvironments[$dir]->addGlobal('blog', $this->blog);
