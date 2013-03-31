@@ -5,7 +5,7 @@ namespace Blight;
  * Stores configuration data for the blog
  */
 class Blog implements \Blight\Interfaces\Blog {
-	const VERSION	= '0.6.0';
+	const VERSION	= '0.7.0';
 	const FILE_AUTHORS	= 'authors.json';
 
 	protected $config;
