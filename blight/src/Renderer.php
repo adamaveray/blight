@@ -75,12 +75,6 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @param string $content	The content to write to the file
 	 */
 	protected function write($path, $content){
-		$url	= $this->blog->getURL();
-		if(strpos($path, $url) === 0){
-			// Convert web path to file
-			$path	= $this->blog->getPathWWW(substr($path, strlen($url)));
-		}
-
 		$this->blog->getFileSystem()->createFile($path, $content);
 	}
 
@@ -307,10 +301,11 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$returnPages	= array();
 
 		$posts	= $collection->getPosts();
+		$base	= $this->blog->getPathWWW();
 
 		if($perPage == 0 || count($posts) <= $perPage){
 			// No pagination necessary
-			$returnPages[$collection->getURL().'.html']	= array(
+			$returnPages[$base.$collection->getURL(true).'.html']	= array(
 				'posts'	=> $posts
 			);
 
@@ -320,13 +315,13 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$noPages	= ceil(count($posts)/$perPage);
 		$pages		= array();
 		for($page = 0; $page < $noPages; $page++){
-			$pages[$page+1]	= $collection->getURL().($page == 0 ? '' : '/'.($page+1));
+			$pages[$page+1]	= $base.$collection->getURL(true).($page == 0 ? '' : '/'.($page+1));
 		}
 
 		// Build each page
 		for($page = 0; $page < $noPages; $page++){
-			$url	= $collection->getURL().'/'.($page == 0 ? 'index' : ($page+1)).'.html';
-			$returnPages[$url]	= array(
+			$path	= $base.$collection->getURL(true).'/'.($page == 0 ? 'index' : ($page+1)).'.html';
+			$returnPages[$path]	= array(
 				'posts'			=> array_slice($posts, ($page-1)*$perPage, $perPage),
 				'pagination'	=> new \Blight\Pagination($pages, $page+1)
 			);

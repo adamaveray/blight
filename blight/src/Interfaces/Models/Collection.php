@@ -19,10 +19,11 @@ interface Collection {
 	public function getSlug();
 
 	/**
+	 * @param bool $relative	Whether the URL should be relative or include the full domain, etc
 	 * @return string	The web URL to this collection
 	 * @see getSlug()
 	 */
-	public function getURL();
+	public function getURL($relative = false);
 
 	/**
 	 * @param array $posts	An array of Post objects

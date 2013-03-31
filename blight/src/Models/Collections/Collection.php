@@ -45,13 +45,18 @@ abstract class Collection implements \Blight\Interfaces\Models\Collection, \Iter
 	}
 
 	/**
-	 * Retrieves the collection's full web URL, using the collection's slug
+	 * Retrieves the collection's web URL, using the collection's slug
 	 *
+	 * @param bool $relative	Whether the URL should be relative or include the full domain, etc
 	 * @return string	The web URL to this collection
 	 * @see getSlug()
 	 */
-	public function getURL(){
-		return $this->blog->getURL($this->getSlug());
+	public function getURL($relative = false){
+		$url	= $this->getSlug();
+		if(!$relative){
+			$url	= $this->blog->getURL($url);
+		}
+		return $url;
 	}
 
 
