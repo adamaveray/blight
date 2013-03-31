@@ -31,6 +31,16 @@ interface Page {
 	public function setDate(\DateTime $date);
 
 	/**
+	 * @return \DateTime	The page modified date
+	 */
+	public function getDateUpdated();
+
+	/**
+	 * @param \DateTime $date	The new modified date for the page
+	 */
+	public function setDateUpdated(\DateTime $date);
+
+	/**
 	 * @return string	The page's raw Markdown content
 	 */
 	public function getContent();
