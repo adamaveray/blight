@@ -9,10 +9,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 
 	/** @var \phpTypograhy */
 	protected $typography;
-	/** @var \Markdown */
+	/** @var \dflydev\markdown\MarkdownExtraParser */
 	protected $markdown;
-	/** @var \TruncateHTML */
-	protected $truncator;
 
 	/**
 	 * Initialises the processor
@@ -34,8 +32,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * 		'typography'
 	 *
 	 * @return string	The processed text
-	 * @see process_markdown()
-	 * @see process_typography()
+	 * @see processMarkdown()
+	 * @see processTypography()
 	 */
 	public function process($raw, $filters = null){
 		if(!is_array($filters)){
@@ -53,10 +51,10 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 		$output	= $raw;
 
 		if($filters['markdown']){
-			$output	= $this->process_markdown($output);
+			$output	= $this->processMarkdown($output);
 		}
 		if($filters['typography']){
-			$output	= $this->process_typography($output);
+			$output	= $this->processTypography($output);
 		}
 
 		return $output;
@@ -68,8 +66,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * @param string $raw	The raw Markdown
 	 * @return string		The processed HTML
 	 */
-	public function process_markdown($raw){
-		return $this->get_markdown()->transform($raw);
+	public function processMarkdown($raw){
+		return $this->getMarkdown()->transform($raw);
 	}
 
 	/**
@@ -78,58 +76,144 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * @param string $html	The HTML to process
 	 * @return string		The processed HTML
 	 */
-	public function process_typography($html){
+	public function processTypography($html){
 		$errors	= error_reporting(0);
-		$result	= $this->get_typography()->process($html);
+		$result	= $this->getTypography()->process($html);
 		error_reporting($errors);
 
 		return $result;
 	}
 
 	/**
-	 * Truncates a block of HTML to a specified length.
+	 * Shortens a given block of text, preserving HTML tags and whole words
 	 *
 	 * @param string $html	The HTML to truncate
 	 * @param int $length	The maximum length of text to return. If the given HTML is shorter than this length,
 	 * 						no truncation will take place.
 	 * @param string $ending	Characters to be appended if the string is truncated
-	 * @return string	The truncated string
+	 * @param boolean $splitWords		Whether to truncate text mid-word
+	 * @param boolean $handleHTML	If true, HTML tags would be handled correctly
+	 *
+	 * @return string	The truncated text
 	 */
-	public function truncate_html($html, $length = 100, $ending = '...'){
-		return $this->get_truncator()->truncate($html, $length, $ending);
+	public function truncateHTML($html, $length = 100, $ending = '...', $splitWords = false, $handleHTML = true){
+		if(!$handleHTML){
+			// Ignore HTML tags
+			if(strlen($html) <= $length){
+				// No need to truncate
+				return $html;
+			} else {
+				// Truncate text
+				$output	= substr($html, 0, $length - strlen($ending));
+			}
+		} else {
+			if(strlen(strip_tags($html)) <= $length){
+				// No need to truncate
+				return $html;
+			}
+
+			// Split HTML tags to scannable lines
+			preg_match_all('/(<.+?>)?([^<>]*)/s', $html, $lines, \PREG_SET_ORDER);
+
+			$totalLength	= strlen($ending);
+			$openTags		= array();
+			$output			= '';
+			foreach($lines as $lineMatchings){
+				if (!empty($lineMatchings[1])) {
+					// Has HTML tag
+					if(preg_match('/^<(\s*.+?\/\s*|\s*(img|br|input|hr|area|base|basefont|col|frame|isindex|link|meta|param)(\s.+?)?)>$/is', $lineMatchings[1])){
+						// Empty element - ignore
+					} else if (preg_match('/^<\s*\/([^\s]+?)\s*>$/s', $lineMatchings[1], $tagMatchings)) {
+						// Closing tag - delete from open tags list
+						$pos = array_search($tagMatchings[1], $openTags);
+						if($pos !== false){
+							unset($openTags[$pos]);
+						}
+
+					} else if (preg_match('/^<\s*([^\s>!]+).*?>$/s', $lineMatchings[1], $tagMatchings)) {
+						// Opening tag - add to open tags list
+						array_unshift($openTags, strtolower($tagMatchings[1]));
+					}
+
+					// Add tag to truncated text
+					$output .= $lineMatchings[1];
+				}
+
+				// Caclulate length of plain text in line
+				$contentLength = strlen(preg_replace('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', ' ', $lineMatchings[2]));
+				if(($totalLength + $contentLength) > $length){
+					// Remaining characters
+					$left = $length - $totalLength;
+
+					$entitiesLength = 0;
+					// Find HTML entities
+					if(preg_match_all('/&[0-9a-z]{2,8};|&#[0-9]{1,7};|[0-9a-f]{1,6};/i', $lineMatchings[2], $entities, \PREG_OFFSET_CAPTURE)){
+						// Calculate real length of all entities whithin legal range
+						foreach($entities[0] as $entity){
+							if($entity[1]+1-$entitiesLength > $left){
+								continue;
+							}
+
+							$left--;
+							$entitiesLength += strlen($entity[0]);
+						}
+					}
+
+					$output .= substr($lineMatchings[2], 0, $left+$entitiesLength);
+					// maximum lenght is reached, so get off the loop
+					break;
+
+				} else {
+					$output .= $lineMatchings[2];
+					$totalLength += $contentLength;
+				}
+				// if the maximum length is reached, get off the loop
+				if($totalLength >= $length) {
+					break;
+				}
+			}
+		}
+
+		if(!$splitWords){
+			// Don't split words
+			$spacePosition = strrpos($output, ' ');
+			if(isset($spacePosition)){
+				// Cut text at last occurance of space
+				$output = substr($output, 0, $spacePosition);
+			}
+		}
+
+		// Append ending string
+		$output .= $ending;
+		if($handleHTML){
+			// Close remaining HTML tags
+			foreach($openTags as $tag){
+				$output .= '</'.$tag.'>';
+			}
+		}
+
+		return $output;
 	}
 
-
 	/**
-	 * @return \Markdown	The Markdown parsing instance
+	 * @return \dflydev\markdown\MarkdownExtraParser	The Markdown parsing instance
 	 */
-	protected function get_markdown(){
+	protected function getMarkdown(){
 		if(!isset($this->markdown)){
-			$this->markdown	= new \Markdown();
+			$this->markdown	= new \Michelf\MarkdownExtra();
 		}
 
 		return $this->markdown;
 	}
 
 	/**
-	 * @return \phpTypograhy	The phpTypography instance
+	 * @return \PHPTypography\PHPTypograhy	The PHPTypography instance
 	 */
-	protected function get_typography(){
+	protected function getTypography(){
 		if(!isset($this->typography)){
-			$this->typography	= new \phpTypography();
+			$this->typography	= new \PHPTypography\PHPTypography();
 		}
 
 		return $this->typography;
-	}
-
-	/**
-	 * @return \TruncateHTML	The TruncateHTML instance
-	 */
-	protected function get_truncator(){
-		if(!isset($this->truncator)){
-			$this->truncator	= new \TruncateHTML();
-		}
-
-		return $this->truncator;
 	}
 };

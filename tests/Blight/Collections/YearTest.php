@@ -1,5 +1,5 @@
 <?php
-namespace Blight\Collections;
+namespace Blight\Models\Collections;
 
 require_once(__DIR__.'/CollectionTest.php');
 
@@ -8,15 +8,15 @@ class YearTest extends CollectionTest {
 	protected $collection_slug	= 2013;
 
 	static public function setUpBeforeClass(){
-		static::$class	= '\Blight\Collections\Year';
+		static::$class	= '\Blight\Models\Collections\Year';
 	}
 
 	/**
-	 * @covers \Blight\Collections\Year::get_url
+	 * @covers \Blight\Models\Collections\Year::getURL
 	 */
 	public function testGetURL(){
 		$y	= date('Y');
-		$year	= new \Blight\Collections\Year($this->blog, $y);
-		$this->assertEquals($year->get_url(), $this->blog->get_url().'archive/'.$y);
+		$year	= new \Blight\Models\Collections\Year($this->blog, $y);
+		$this->assertEquals($year->getURL(), $this->blog->getURL().'archive/'.$y);
 	}
 };

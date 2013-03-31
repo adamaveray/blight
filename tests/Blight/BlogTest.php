@@ -44,162 +44,171 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_root
+	 * @covers \Blight\Blog::getPathRoot
 	 */
 	public function testGetPathRoot(){
-		$this->assertEquals($this->root_path, $this->blog->get_path_root());
+		$this->assertEquals($this->root_path, $this->blog->getPathRoot());
 
-		$this->assertEquals($this->root_path.'test', $this->blog->get_path_root('test'));
+		$this->assertEquals($this->root_path.'test', $this->blog->getPathRoot('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_cache
+	 * @covers \Blight\Blog::getPathCache
 	 */
 	public function testGetPathCache(){
-		$this->assertEquals($this->root_path.$this->config['paths']['cache'], $this->blog->get_path_cache());
+		$this->assertEquals($this->root_path.$this->config['paths']['cache'], $this->blog->getPathCache());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['cache'].'test', $this->blog->get_path_cache('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['cache'].'test', $this->blog->getPathCache('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_app
+	 * @covers \Blight\Blog::getPathApp
 	 */
 	public function testGetPathApp(){
 		$path	= 'Blight.phar/';
 
-		$this->assertEquals('phar://'.$this->root_path.$path, $this->blog->get_path_app());
+		$this->assertEquals('phar://'.$this->root_path.$path, $this->blog->getPathApp());
 
-		$this->assertEquals('phar://'.$this->root_path.$path.'test', $this->blog->get_path_app('test'));
+		$this->assertEquals('phar://'.$this->root_path.$path.'test', $this->blog->getPathApp('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_templates
+	 * @covers \Blight\Blog::getPathThemes
 	 */
-	public function testGetPathTemplates(){
-		$this->assertEquals($this->root_path.$this->config['paths']['templates'], $this->blog->get_path_templates());
+	public function testGetPathThemes(){
+		$this->assertEquals($this->root_path.$this->config['paths']['themes'], $this->blog->getPathThemes());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['templates'].'test', $this->blog->get_path_templates('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['themes'].'test', $this->blog->getPathThemes('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_plugins
+	 * @covers \Blight\Blog::getPathPlugins
 	 */
 	public function testGetPathPlugins(){
-		$this->assertEquals($this->root_path.$this->config['paths']['plugins'], $this->blog->get_path_plugins());
+		$this->assertEquals($this->root_path.$this->config['paths']['plugins'], $this->blog->getPathPlugins());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['plugins'].'test', $this->blog->get_path_plugins('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['plugins'].'test', $this->blog->getPathPlugins('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_pages
+	 * @covers \Blight\Blog::getPathPages
 	 */
 	public function testGetPathPages(){
-		$this->assertEquals($this->root_path.$this->config['paths']['pages'], $this->blog->get_path_pages());
+		$this->assertEquals($this->root_path.$this->config['paths']['pages'], $this->blog->getPathPages());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['pages'].'test', $this->blog->get_path_pages('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['pages'].'test', $this->blog->getPathPages('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_posts
+	 * @covers \Blight\Blog::getPathPosts
 	 */
 	public function testGetPathPosts(){
-		$this->assertEquals($this->root_path.$this->config['paths']['posts'], $this->blog->get_path_posts());
+		$this->assertEquals($this->root_path.$this->config['paths']['posts'], $this->blog->getPathPosts());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['posts'].'test', $this->blog->get_path_posts('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['posts'].'test', $this->blog->getPathPosts('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_drafts
+	 * @covers \Blight\Blog::getPathAssets
+	 */
+	public function testGetPathAssets(){
+		$this->assertEquals($this->root_path.$this->config['paths']['assets'], $this->blog->getPathAssets());
+
+		$this->assertEquals($this->root_path.$this->config['paths']['assets'].'test', $this->blog->getPathAssets('test'));
+	}
+
+	/**
+	 * @covers \Blight\Blog::getPathDrafts
 	 */
 	public function testGetPathDrafts(){
-		$this->assertEquals($this->root_path.$this->config['paths']['drafts'], $this->blog->get_path_drafts());
+		$this->assertEquals($this->root_path.$this->config['paths']['drafts'], $this->blog->getPathDrafts());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['drafts'].'test', $this->blog->get_path_drafts('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['drafts'].'test', $this->blog->getPathDrafts('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_drafts_web
+	 * @covers \Blight\Blog::getPathDraftsWeb
 	 */
 	public function testGetPathDraftsWeb(){
-		$this->assertEquals($this->root_path.$this->config['paths']['drafts-web'], $this->blog->get_path_drafts_web());
+		$this->assertEquals($this->root_path.$this->config['paths']['drafts-web'], $this->blog->getPathDraftsWeb());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['drafts-web'].'test', $this->blog->get_path_drafts_web('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['drafts-web'].'test', $this->blog->getPathDraftsWeb('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_path_www
+	 * @covers \Blight\Blog::getPathWWW
 	 */
 	public function testGetPathWWW(){
-		$this->assertEquals($this->root_path.$this->config['paths']['web'], $this->blog->get_path_www());
+		$this->assertEquals($this->root_path.$this->config['paths']['web'], $this->blog->getPathWWW());
 
-		$this->assertEquals($this->root_path.$this->config['paths']['web'].'test', $this->blog->get_path_www('test'));
+		$this->assertEquals($this->root_path.$this->config['paths']['web'].'test', $this->blog->getPathWWW('test'));
 	}
 
 	/**
 	 * @covers \Blight\Blog::test_url
 	 */
 	public function testGetURL(){
-		$this->assertEquals($this->config['site']['url'], $this->blog->get_url());
+		$this->assertEquals($this->config['site']['url'], $this->blog->getURL());
 
-		$this->assertEquals($this->config['site']['url'].'test', $this->blog->get_url('test'));
+		$this->assertEquals($this->config['site']['url'].'test', $this->blog->getURL('test'));
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_name
+	 * @covers \Blight\Blog::getName
 	 */
 	public function testGetName(){
-		$this->assertEquals($this->config['site']['name'], $this->blog->get_name());
+		$this->assertEquals($this->config['site']['name'], $this->blog->getName());
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_description
+	 * @covers \Blight\Blog::getDescription
 	 */
 	public function testGetDescription(){
-		$this->assertEquals($this->config['site']['description'], $this->blog->get_description());
+		$this->assertEquals($this->config['site']['description'], $this->blog->getDescription());
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_feed_url
+	 * @covers \Blight\Blog::getFeedURL
 	 */
 	public function testGetFeedUrl(){
-		$this->assertEquals($this->config['site']['url'].'feed', $this->blog->get_feed_url());
+		$this->assertEquals($this->config['site']['url'].'feed', $this->blog->getFeedURL());
 	}
 
 	/**
-	 * @covers \Blight\Blog::is_linkblog
+	 * @covers \Blight\Blog::isLinkblog
 	 */
 	public function testIsLinkblog(){
-		$this->assertEquals($this->config['linkblog']['linkblog'], $this->blog->is_linkblog());
+		$this->assertEquals($this->config['linkblog']['linkblog'], $this->blog->isLinkblog());
 
 		$config	= $this->config;
 
 		$config['linkblog']['linkblog']	= false;
 		$blog	= new \Blight\Blog($config);
-		$this->assertFalse($blog->is_linkblog());
+		$this->assertFalse($blog->isLinkblog());
 
 		$config['linkblog']['linkblog']	= true;
 		$blog	= new \Blight\Blog($config);
-		$this->assertTrue($blog->is_linkblog());
+		$this->assertTrue($blog->isLinkblog());
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_file_system
+	 * @covers \Blight\Blog::getFileSystem
 	 */
 	public function testGetFileSystem(){
-		$this->assertInstanceOf('\Blight\FileSystem', $this->blog->get_file_system());
+		$this->assertInstanceOf('\Blight\FileSystem', $this->blog->getFileSystem());
 
 		// Should be same instance
-		$this->assertEquals($this->blog->get_file_system(), $this->blog->get_file_system());
+		$this->assertEquals($this->blog->getFileSystem(), $this->blog->getFileSystem());
 	}
 
 	/**
-	 * @covers \Blight\Blog::get_package_manager
+	 * @covers \Blight\Blog::getPackageManager
 	 */
 	public function testGetPackageManager(){
-		$this->assertInstanceOf('\Blight\PackageManager', $this->blog->get_package_manager());
+		$this->assertInstanceOf('\Blight\PackageManager', $this->blog->getPackageManager());
 
 		// Should be same instance
-		$this->assertEquals($this->blog->get_package_manager(), $this->blog->get_package_manager());
+		$this->assertEquals($this->blog->getPackageManager(), $this->blog->getPackageManager());
 	}
 
 	/**

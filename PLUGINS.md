@@ -15,9 +15,9 @@ A basic package is structured as follows:
 
 The package can contain any number of supporting files, however must contain a PHP file with the same name as the package.
 
-This file must contain a class of the same name, extending `\Blight\Packages\Package`. The file should implement whichever of the following interfaces are appropriate:
+This file must contain a class of the same name, extending `\Blight\Models\Packages\Package`. The file should implement whichever of the following interfaces are appropriate:
 
-- `\Blight\Interfaces\Packages\Plugin`: Plugin hooks will be called on the class
+- `\Blight\Interfaces\Models\Packages\Plugin`: Plugin hooks will be called on the class
 
 
 ### Hooks
@@ -41,7 +41,7 @@ Packages cannot override the `__construct()` method, and instead should implemen
 	<?php
 	namespace \Example;
 
-	class ExamplePlugin extends \Blight\Packages\Packages implements \Blight\Interfaces\Packages\Plugin {
+	class ExamplePlugin extends \Blight\Models\Packages\Packages implements \Blight\Interfaces\Models\Packages\Plugin {
 		public function setup(){
 			// Prepare plugin
 		}

@@ -3,7 +3,7 @@ namespace Blight\Tests;
 
 class UtilitiesTest extends \PHPUnit_Framework_TestCase {
 	/**
-	 * @covers \Blight\Utilities::array_multi_merge
+	 * @covers \Blight\Utilities::arrayMultiMerge
 	 */
 	public function testArrayMultiMerge(){
 		$array_one	= array(
@@ -26,7 +26,7 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase {
 			'more'	=> array(
 				'six'	=> 6
 			)
-		), \Blight\Utilities::array_multi_merge($array_one, $array_two));
+		), \Blight\Utilities::arrayMultiMerge($array_one, $array_two));
 
 
 		$array_one['more']	= 'not an array';
@@ -39,7 +39,7 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase {
 				'not an array',
 				'six'	=> 6
 			)
-		), \Blight\Utilities::array_multi_merge($array_one, $array_two));
+		), \Blight\Utilities::arrayMultiMerge($array_one, $array_two));
 
 
 		$array_three	= array(
@@ -55,6 +55,6 @@ class UtilitiesTest extends \PHPUnit_Framework_TestCase {
 				'six'	=> 6
 			),
 			'seven'	=> true
-		), \Blight\Utilities::array_multi_merge($array_one, $array_two, $array_three));
+		), \Blight\Utilities::arrayMultiMerge($array_one, $array_two, $array_three));
 	}
 };

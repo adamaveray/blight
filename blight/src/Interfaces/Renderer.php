@@ -2,27 +2,84 @@
 namespace Blight\Interfaces;
 
 interface Renderer {
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager);
+	/**
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @param \Blight\Interfaces\Manager $manager
+	 * @throws \RuntimeException	Web or templates directory cannot be found
+	 */
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager, \Blight\Interfaces\Models\Packages\Theme $theme);
 
-	public function render_page(Page $page);
+	/**
+	 * @param \Blight\Interfaces\Models\Page $page	The page to generate an HTML page from
+	 */
+	public function renderPage(\Blight\Interfaces\Models\Page $page);
 
-	public function render_pages();
+	public function renderPages();
 
-	public function render_post(Post $post);
+	/**
+	 * @param \Blight\Interfaces\Models\Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Models\Post|null $prev	The adjacent previous/older post to the given post
+	 * @param \Blight\Interfaces\Models\Post|null $next	The adjacent next/newer post to the given post
+	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Models\Post
+	 */
+	public function renderPost(\Blight\Interfaces\Models\Post $post);
 
-	public function render_drafts();
+	public function renderDrafts();
 
-	public function render_archives($options = null);
+	/**
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see renderYear
+	 */
+	public function renderArchives($options = null);
 
-	public function render_year(\Blight\Interfaces\Collection $year, $options = null);
+	/**
+	 * @param \Blight\Interfaces\Models\Collection $year	The archive year to render
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 *
+	 * @see renderArchives
+	 */
+	public function renderYear(\Blight\Interfaces\Models\Collection $year, $options = null);
 
-	public function render_tags($options = null);
+	/**
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 */
+	public function renderTags($options = null);
 
-	public function render_categories($options = null);
+	/**
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
+	 */
+	public function renderCategories($options = null);
 
-	public function render_home($options = null);
+	/**
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]
+	 */
+	public function renderHome($options = null);
 
-	public function render_feeds($options = null);
+	/**
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		in 'limit':		The number of posts to include. 0 includes all posts [Default: 20]
+	 * 		bool 'subfeed':	Whether to generate feeds for categories and tags [Default: true]
+	 */
+	public function renderFeeds($options = null);
 
-	public function render_sitemap($options = null);
+	/**
+	 * @param array|null $options	An array of options to alter the rendered document
+	 */
+	public function renderSitemap($options = null);
+
+	public function updateUserAssets();
+
+	public function updateThemeAssets();
 };

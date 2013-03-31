@@ -17,51 +17,51 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 		$this->mock_pages	= $pages;
 	}
 
-	public function get_pages(){
+	public function getPages(){
 		return $this->mock_pages;
 	}
 
-	public function get_draft_posts(){
+	public function getDraftPosts(){
 		return $this->mock_posts['drafts'];
 	}
 
-	public function get_posts($filters = null){
+	public function getPosts($filters = null){
 		return $this->mock_posts['posts'];
 	}
 
-	public function get_posts_by_year(){
-		$posts	= $this->get_posts();
+	public function getPostsByYear(){
+		$posts	= $this->getPosts();
 		$years	= array();
 
 		foreach($posts as $post){
-			/** @var \Blight\Post $post  */
-			$y	= $post->get_date()->format('Y');
+			/** @var \Blight\Models\Post $post  */
+			$y	= $post->getDate()->format('Y');
 			if(!isset($years[$y])){
-				$years[$y]	= new \Blight\Collections\Year($this->blog, $y);
+				$years[$y]	= new \Blight\Models\Collections\Year($this->blog, $y);
 			}
 
-			$years[$y]->add_post($post);
+			$years[$y]->addPost($post);
 		}
 
 		return $years;
 	}
 
-	public function get_posts_by_tag(){
-		$posts	= $this->get_posts();
-		$tag_names	= array_map('trim', explode(',', $posts[0]->get_meta('tags')));
-		$tag	= new \Blight\Collections\Tag($this->blog, current($tag_names));
-		$tag->set_posts($posts);
+	public function getPostsByTag(){
+		$posts	= $this->getPosts();
+		$tag_names	= array_map('trim', explode(',', $posts[0]->getMeta('tags')));
+		$tag	= new \Blight\Models\Collections\Tag($this->blog, current($tag_names));
+		$tag->setPosts($posts);
 
 		return array($tag);
 	}
 
-	public function get_posts_by_category(){
-		$posts	= $this->get_posts();
-		$category	= new \Blight\Collections\Category($this->blog, $posts[0]->get_meta('category'));
-		$category->set_posts($posts);
+	public function getPostsByCategory(){
+		$posts	= $this->getPosts();
+		$category	= new \Blight\Models\Collections\Category($this->blog, $posts[0]->getMeta('category'));
+		$category->setPosts($posts);
 
 		return array($category);
 	}
 
-	public function cleanup_drafts(){}
+	public function cleanupDrafts(){}
 };

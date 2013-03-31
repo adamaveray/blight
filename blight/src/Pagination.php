@@ -21,11 +21,11 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 		}
 		if(isset($items[0]) && !isset($items[count($items)])){
 			// 0-indexed - convert
-			$new_items	= array();
+			$newItems	= array();
 			foreach($items as $key => $item){
-				$new_items[$key+1]	= $item;
+				$newItems[$key+1]	= $item;
 			}
-			$items	= $new_items;
+			$items	= $newItems;
 		}
 
 		if(!isset($position)){
@@ -43,8 +43,8 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	 *
 	 * @return mixed	The item before the current item
 	 */
-	public function get_prev(){
-		return $this->get_index($this->position-1);
+	public function getPrev(){
+		return $this->getIndex($this->position-1);
 	}
 
 	/**
@@ -52,8 +52,8 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	 *
 	 * @return mixed	The item after the current item
 	 */
-	public function get_next(){
-		return $this->get_index($this->position+1);
+	public function getNext(){
+		return $this->getIndex($this->position+1);
 	}
 
 	/**
@@ -61,7 +61,7 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	 *
 	 * @return int	The number of items
 	 */
-	public function get_count(){
+	public function getCount(){
 		return count($this->items);
 	}
 
@@ -70,8 +70,8 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	 *
 	 * @return mixed	The current item
 	 */
-	public function get_current(){
-		return $this->get_index($this->position);
+	public function getCurrent(){
+		return $this->getIndex($this->position);
 	}
 
 	/**
@@ -79,7 +79,7 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	 *
 	 * @return int	The current position
 	 */
-	public function get_position(){
+	public function getPosition(){
 		return $this->position;
 	}
 
@@ -90,8 +90,8 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	 * @return mixed	The item at the given index
 	 * @throws \OutOfRangeException	No item exists at the given position
 	 */
-	public function get_index($i){
-		if($i < 1 || $i > $this->get_count()){
+	public function getIndex($i){
+		if($i < 1 || $i > $this->getCount()){
 			throw new \OutOfRangeException('Invalid position requested');
 		}
 
@@ -100,26 +100,26 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 
 
 	// Iterator
-	protected $iterator_position	= 1;
+	protected $iteratorPosition	= 1;
 
 	public function rewind(){
-		$this->iterator_position	= 1;
+		$this->iteratorPosition	= 1;
 	}
 
 	public function current(){
-		return $this->items[$this->iterator_position];
+		return $this->items[$this->iteratorPosition];
 	}
 
 	public function key(){
-		return $this->iterator_position;
+		return $this->iteratorPosition;
 	}
 
 	public function next(){
-		$this->iterator_position++;
+		$this->iteratorPosition++;
 	}
 
 	public function valid(){
-		return ($this->iterator_position >= 1 && $this->iterator_position <= $this->get_count());
+		return ($this->iteratorPosition >= 1 && $this->iteratorPosition <= $this->getCount());
 	}
 
 
@@ -143,6 +143,6 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 
 	// Countable
 	public function count(){
-		return $this->get_count();
+		return $this->getCount();
 	}
 };

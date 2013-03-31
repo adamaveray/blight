@@ -2,6 +2,7 @@
 namespace Blight\Tests;
 
 require_once(__DIR__.'/mock/RendererTestManager.php');
+require_once(__DIR__.'/mock/Theme.php');
 
 class RendererTest extends \PHPUnit_Framework_TestCase {
 	static public function setUpBeforeClass(){
@@ -39,6 +40,8 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 	protected $blog;
 	/** @var \Blight\Tests\Mock\RendererTestManager */
 	protected $manager;
+	/** @var \Blight\Tests\Mock\Theme */
+	protected $theme;
 	/** @var \Blight\Renderer */
 	protected $renderer;
 
@@ -47,7 +50,6 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 		$test_config	= $config;
 		$test_config['paths']['web']		= __DIR__.'/files/web/';
 		$test_config['paths']['drafts-web']	= __DIR__.'/files/web/_drafts/';
-		$test_config['paths']['templates']	= __DIR__.'/files/templates/';
 		$this->blog		= new \Blight\Blog($test_config);
 
 		$this->manager	= new \Blight\Tests\Mock\RendererTestManager($this->blog);
@@ -61,15 +63,20 @@ Category: General
 Test content
 EOD;
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-post-1'),
-			new \Blight\Post($this->blog, $content, 'test-post-2'),
-			new \Blight\Post($this->blog, $content, 'test-post-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-post-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-post-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-post-3')
 		);
 		$this->manager->set_mock_posts($posts, 'posts');
 		$this->manager->set_mock_posts($posts, 'drafts');
 		$this->manager->set_mock_posts($posts, 'drafts');
 
-		$this->renderer	= new \Blight\Renderer($this->blog, $this->manager);
+
+		$this->theme	= new \Blight\Tests\Mock\Theme($this->blog, array(
+			'path'	=> __DIR__.'/files/'
+		));
+
+		$this->renderer	= new \Blight\Renderer($this->blog, $this->manager, $this->theme);
 
 	}
 
@@ -77,25 +84,12 @@ EOD;
 	 * @covers \Blight\Renderer::__construct
 	 */
 	public function testConstruct(){
-		$renderer	= new \Blight\Renderer($this->blog, $this->manager);
+		$renderer	= new \Blight\Renderer($this->blog, $this->manager, $this->theme);
 		$this->assertInstanceOf('\Blight\Interfaces\Renderer', $renderer);
 	}
 
 	/**
-	 * @covers \Blight\Renderer::__construct
-	 * @expectedException \RuntimeException
-	 */
-	public function testInvalidConstruct(){
-		global $config;
-		$test_config	= $config;
-		$test_config['paths']['templates']	= 'nonexistent';
-
-		$blog	= new \Blight\Blog($test_config);
-		new \Blight\Renderer($blog, new \Blight\Manager($blog));
-	}
-
-	/**
-	 * @covers \Blight\Renderer::render_page
+	 * @covers \Blight\Renderer::renderPage
 	 */
 	public function testRenderPage(){
 		$content	= <<<EOD
@@ -106,17 +100,17 @@ Date: 2013-02-01
 Test content
 EOD;
 
-		$page	= new \Blight\Page($this->blog, $content, 'test-page');
+		$page	= new \Blight\Models\Page($this->blog, $content, 'test-page');
 
-		$this->renderer->render_page($page);
+		$this->renderer->renderPage($page);
 
-		$path	= $this->blog->get_path_www($page->get_relative_permalink().'.html');
+		$path	= $this->blog->getPathWWW($page->getRelativePermalink().'.html');
 
 		$this->assertTrue(file_exists($path));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_pages
+	 * @covers \Blight\Renderer::renderPages
 	 */
 	public function testRenderPages(){
 		$content	= <<<EOD
@@ -128,24 +122,24 @@ Test content
 EOD;
 
 		$pages	= array(
-			new \Blight\Page($this->blog, $content, 'test-1'),
-			new \Blight\Page($this->blog, $content, 'test-2')
+			new \Blight\Models\Page($this->blog, $content, 'test-1'),
+			new \Blight\Models\Page($this->blog, $content, 'test-2')
 		);
 
 		$this->manager->set_mock_pages($pages);
 
-		$this->renderer->render_pages();
+		$this->renderer->renderPages();
 
-		$path	= $this->blog->get_path_www();
+		$path	= $this->blog->getPathWWW();
 
 		foreach($pages as $page){
-			/** @var \Blight\Interfaces\Page $page */
-			$this->assertTrue(file_exists($path.$page->get_relative_permalink().'.html'));
+			/** @var \Blight\Interfaces\Models\Page $page */
+			$this->assertTrue(file_exists($path.$page->getRelativePermalink().'.html'));
 		}
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_post
+	 * @covers \Blight\Renderer::renderPost
 	 */
 	public function testRenderPost(){
 		$content	= <<<EOD
@@ -160,14 +154,14 @@ EOD;
 
 EOD;
 
-		$post	= new \Blight\Post($this->blog, $content, 'test-post');
-		$this->renderer->render_post($post);
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$this->renderer->renderPost($post);
 
-		$this->assertEquals($rendered_content, file_get_contents($this->blog->get_path_www($post->get_relative_permalink().'.html')));
+		$this->assertEquals($rendered_content, file_get_contents($this->blog->getPathWWW($post->getRelativePermalink().'.html')));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_post
+	 * @covers \Blight\Renderer::renderPost
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testInvalidRenderPost(){
@@ -183,12 +177,12 @@ EOD;
 
 EOD;
 
-		$post	= new \Blight\Post($this->blog, $content, 'test-post');
-		$this->renderer->render_post($post, '(not a post)');
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$this->renderer->renderPost($post, '(not a post)');
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_drafts
+	 * @covers \Blight\Renderer::renderDrafts
 	 */
 	public function testRenderDrafts(){
 		$content	= <<<EOD
@@ -200,22 +194,22 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1', true),
-			new \Blight\Post($this->blog, $content, 'test-2', true),
-			new \Blight\Post($this->blog, $content, 'test-3', true)
+			new \Blight\Models\Post($this->blog, $content, 'test-1', true),
+			new \Blight\Models\Post($this->blog, $content, 'test-2', true),
+			new \Blight\Models\Post($this->blog, $content, 'test-3', true)
 		);
 		$this->manager->set_mock_posts($posts, 'drafts');
 
-		$this->renderer->render_drafts();
+		$this->renderer->renderDrafts();
 
-		$output_dir	= $this->blog->get_path_drafts_web();
+		$output_dir	= $this->blog->getPathDraftsWeb();
 		$files	= glob($output_dir.'*');
 
 		$this->assertEquals(count($posts), count($files));
 
 		foreach($posts as $post){
 			// Check each post had file created with same slug
-			$this->assertTrue(in_array($output_dir.$post->get_slug().'.html', $files));
+			$this->assertTrue(in_array($output_dir.$post->getSlug().'.html', $files));
 		}
 	}
 
@@ -232,9 +226,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$date_counts	= array(
@@ -248,15 +242,15 @@ EOD;
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$this->renderer->render_archives();
+		$this->renderer->renderArchives();
 
-		$output_dir	= $this->blog->get_path_www().'archive/';
+		$output_dir	= $this->blog->getPathWWW().'archive/';
 		$files	= glob($output_dir.'*');
 		$this->assertEquals(count($date_counts), count($files));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_year
+	 * @covers \Blight\Renderer::renderYear
 	 */
 	public function testRenderYear(){
 		$content	= <<<EOD
@@ -268,22 +262,22 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$years	= $this->manager->get_posts_by_year();
+		$years	= $this->manager->getPostsByYear();
 		foreach($years as $year){
-			if($year->get_name() == '2012'){
-				$this->renderer->render_year($year);
+			if($year->getName() == '2012'){
+				$this->renderer->renderYear($year);
 				break;
 			}
 		}
 
-		$this->assertTrue(file_exists($this->blog->get_path_www().'archive/2012.html'));
+		$this->assertTrue(file_exists($this->blog->getPathWWW().'archive/2012.html'));
 	}
 
 	/**
@@ -300,9 +294,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
@@ -311,9 +305,9 @@ EOD;
 			'test-tag'	=> 3
 		);
 
-		$dir	= $this->blog->get_path_www('tag/');
+		$dir	= $this->blog->getPathWWW('tag/');
 
-		$this->renderer->render_tags();
+		$this->renderer->renderTags();
 
 		foreach($tag_counts as $tag => $count){
 			$this->assertTrue(file_exists($dir.$tag.'.html'));
@@ -321,7 +315,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_categories
+	 * @covers \Blight\Renderer::renderCategories
 	 */
 	public function testRenderCategories(){
 		$content	= <<<EOD
@@ -334,9 +328,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
@@ -345,9 +339,9 @@ EOD;
 			'general'	=> 3
 		);
 
-		$dir	= $this->blog->get_path_www('category/');
+		$dir	= $this->blog->getPathWWW('category/');
 
-		$this->renderer->render_categories();
+		$this->renderer->renderCategories();
 
 		foreach($category_counts as $category => $count){
 			$this->assertTrue(file_exists($dir.$category.'.html'));
@@ -355,7 +349,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_home
+	 * @covers \Blight\Renderer::renderHome
 	 */
 	public function testRenderHome(){
 		$content	= <<<EOD
@@ -367,20 +361,20 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
-		$this->renderer->render_home();
+		$this->renderer->renderHome();
 
-		$path	= $this->blog->get_path_www('index.html');
+		$path	= $this->blog->getPathWWW('index.html');
 
 		$this->assertTrue(file_exists($path));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_feeds
+	 * @covers \Blight\Renderer::renderFeeds
 	 */
 	public function testRenderFeeds(){
 		$content	= <<<EOD
@@ -392,24 +386,24 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
 
-		$this->renderer->render_feeds(array(
+		$this->renderer->renderFeeds(array(
 			'subfeeds'	=> false
 		));
 
-		$path	= $this->blog->get_path_www('feed.xml');
+		$path	= $this->blog->getPathWWW('feed.xml');
 
 		$this->assertTrue(file_exists($path));
 	}
 
 	/**
-	 * @covers \Blight\Renderer::render_sitemap
+	 * @covers \Blight\Renderer::renderSitemap
 	 */
 	public function testRenderSitemap(){
 		$content	= <<<EOD
@@ -421,15 +415,15 @@ Test content
 EOD;
 
 		$pages	= array(
-			new \Blight\Page($this->blog, $content, 'test-1'),
-			new \Blight\Page($this->blog, $content, 'test-2')
+			new \Blight\Models\Page($this->blog, $content, 'test-1'),
+			new \Blight\Models\Page($this->blog, $content, 'test-2')
 		);
 
 		$this->manager->set_mock_pages($pages);
 
-		$this->renderer->render_sitemap();
+		$this->renderer->renderSitemap();
 
-		$path	= $this->blog->get_path_www('sitemap.xml');
+		$path	= $this->blog->getPathWWW('sitemap.xml');
 
 		$this->assertTrue(file_exists($path));
 	}

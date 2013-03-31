@@ -5,19 +5,27 @@ namespace Blight;
  * Stores configuration data for the blog
  */
 class Blog implements \Blight\Interfaces\Blog {
+	const VERSION	= '0.7.0';
+	const FILE_AUTHORS	= 'authors.json';
+
 	protected $config;
 
 	/** @var \Blight\Interfaces\FileSystem */
-	protected $file_system;
+	protected $fileSystem;
 
 	/** @var \Blight\Interfaces\PackageManager */
-	protected $package_manager;
+	protected $packageManager;
 
-	protected $root_path;
-	protected $app_path;
+	/** @var \Blight\Interfaces\Models\Packages\Theme */
+	protected $theme;
+
+
+	protected $rootPath;
+	protected $appPath;
 	protected $url;
 	protected $name;
 	protected $paths;
+	protected $authors;
 
 	/**
 	 * Processes all configuration settings for the blog
@@ -30,7 +38,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			throw new \InvalidArgumentException('Config must be provided as an array');
 		}
 
-		$this->root_path	= rtrim($config['root_path'], '/').'/';
+		$this->rootPath	= rtrim($config['root_path'], '/').'/';
 
 		if(!isset($config['site'])){
 			throw new \InvalidArgumentException('Config is missing `site`');
@@ -56,19 +64,20 @@ class Blog implements \Blight\Interfaces\Blog {
 			'pages'			=> 'pages',
 			'posts'			=> 'posts',
 			'drafts'		=> 'drafts',
-			'templates'		=> 'templates',
+			'themes'		=> 'themes',
 			'plugins'		=> 'plugins',
+			'assets'		=> 'assets',
 			'cache'			=> 'cache'
 		);
-		foreach($this->paths as $key => $config_key){
-			if(!isset($config['paths'][$config_key])){
-				throw new \InvalidArgumentException('Config is missing path `'.$config_key.'`');
+		foreach($this->paths as $key => $configKey){
+			if(!isset($config['paths'][$configKey])){
+				throw new \InvalidArgumentException('Config is missing path `'.$configKey.'`');
 			}
 
-			$path	= $config['paths'][$config_key];
+			$path	= $config['paths'][$configKey];
 
 			if($path[0] != '/'){
-				$path	= $this->get_path_root($path);
+				$path	= $this->getPathRoot($path);
 			}
 			$this->paths[$key]	= rtrim($path, '/').'/';
 		}
@@ -82,8 +91,8 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The root path, with the provided string appended
 	 */
-	public function get_path_root($append = ''){
-		return $this->root_path.$append;
+	public function getPathRoot($append = ''){
+		return $this->rootPath.$append;
 	}
 
 	/**
@@ -92,7 +101,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The cache directory path, with the provided string appended
 	 */
-	public function get_path_cache($append = ''){
+	public function getPathCache($append = ''){
 		return $this->paths['cache'].$append;
 	}
 
@@ -103,10 +112,10 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_app($append = ''){
-		if(!isset($this->app_path)){
+	public function getPathApp($append = ''){
+		if(!isset($this->appPath)){
 			$dir	= __DIR__;
-			$path	= $this->get_path_root();
+			$path	= $this->getPathRoot();
 			if(class_exists('\Phar') && \Phar::running()){
 				// Phar
 				$path	= \Phar::running();
@@ -115,20 +124,20 @@ class Blog implements \Blight\Interfaces\Blog {
 				$stub	= explode('/', trim(str_replace($dir, '', $dir), '/'));
 				$path	.= current($stub);
 			}
-			$this->app_path	= $path.'/';
+			$this->appPath	= $path.'/';
 		}
-		return $this->app_path.$append;
+		return $this->appPath.$append;
 	}
 
 	/**
-	 * Returns the path to the templates directory
+	 * Returns the path to the themes directory
 	 *
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_templates($append = ''){
-		return $this->paths['templates'].$append;
+	public function getPathThemes($append = ''){
+		return $this->paths['themes'].$append;
 	}
 
 	/**
@@ -138,7 +147,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_plugins($append = ''){
+	public function getPathPlugins($append = ''){
 		return $this->paths['plugins'].$append;
 	}
 
@@ -149,7 +158,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_pages($append = ''){
+	public function getPathPages($append = ''){
 		return $this->paths['pages'].$append;
 	}
 
@@ -160,8 +169,19 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_posts($append = ''){
+	public function getPathPosts($append = ''){
 		return $this->paths['posts'].$append;
+	}
+
+	/**
+	 * Returns the path to the assets directory
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function getPathAssets($append = ''){
+		return $this->paths['assets'].$append;
 	}
 
 	/**
@@ -171,7 +191,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_drafts($append = ''){
+	public function getPathDrafts($append = ''){
 		return $this->paths['drafts'].$append;
 	}
 
@@ -182,7 +202,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_drafts_web($append = ''){
+	public function getPathDraftsWeb($append = ''){
 		return $this->paths['drafts-web'].$append;
 	}
 
@@ -193,7 +213,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see get_root_path()
 	 */
-	public function get_path_www($append = ''){
+	public function getPathWWW($append = ''){
 		return $this->paths['www'].$append;
 	}
 
@@ -203,29 +223,29 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @param string $append	An additonal URL fragment to append to the path
 	 * @return string			The URL, with the provided string appended
 	 */
-	public function get_url($append = ''){
+	public function getURL($append = ''){
 		return $this->url.$append;
 	}
 
 	/**
 	 * @return string	The blog name
 	 */
-	public function get_name(){
+	public function getName(){
 		return $this->name;
 	}
 
 	/**
 	 * @return string|null	The blog description if set, or null
 	 */
-	public function get_description(){
+	public function getDescription(){
 		return isset($this->config['site']['description']) ? $this->config['site']['description'] : null;
 	}
 
 	/**
 	 * @return string	The URL to the site feed
 	 */
-	public function get_feed_url(){
-		return $this->get_url().'feed';
+	public function getFeedURL(){
+		return $this->getURL().'feed';
 	}
 
 	/**
@@ -233,29 +253,40 @@ class Blog implements \Blight\Interfaces\Blog {
 	 *
 	 * @return \Blight\Interfaces\FileSystem	The common FileSystem object
 	 */
-	public function get_file_system(){
-		if(!isset($this->file_system)){
-			$this->file_system	= new FileSystem($this);
+	public function getFileSystem(){
+		if(!isset($this->fileSystem)){
+			$this->fileSystem	= new \Blight\FileSystem($this);
 		}
 
-		return $this->file_system;
+		return $this->fileSystem;
 	}
 
 	/**
 	 * @return \Blight\Interfaces\PackageManager
 	 */
-	public function get_package_manager(){
-		if(!isset($this->package_manager)){
-			$this->package_manager	= new \Blight\PackageManager($this);
+	public function getPackageManager(){
+		if(!isset($this->packageManager)){
+			$this->packageManager	= new \Blight\PackageManager($this);
 		}
 
-		return $this->package_manager;
+		return $this->packageManager;
+	}
+
+	/**
+	 * @return \Blight\Interfaces\Models\Packages\Theme
+	 */
+	public function getTheme(){
+		if(!isset($this->theme)){
+			$this->theme	= $this->getPackageManager()->getTheme($this->get('name', 'theme'));
+		}
+
+		return $this->theme;
 	}
 
 	/**
 	 * @return bool	Whether the blog is a linkblog
 	 */
-	public function is_linkblog(){
+	public function isLinkblog(){
 		return (bool)$this->get('linkblog', 'linkblog', false);
 	}
 
@@ -266,15 +297,59 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
 	 *
 	 * 		$value	= 1;
-	 * 		do_hook('hook_name', array(
+	 * 		doHook('hook_name', array(
 	 * 			'param'	=> &$value
 	 *  	));
 	 *
-	 * @see \Blight\PackageManager::do_hook
+	 * @see \Blight\PackageManager::doHook
 	 */
-	public function do_hook($hook, $params = null){
-		$this->get_package_manager()->do_hook($hook, $params);
+	public function doHook($hook, $params = null){
+		$this->getPackageManager()->doHook($hook, $params);
 	}
+
+	/**
+	 * @param string|null $name	The name of the author to retrieve, or null for the site owner
+	 * @return \Blight\Interfaces\Models\Author|null	The author, or null if not found
+	 */
+	public function getAuthor($name = null){
+		$authors	= $this->getAuthors();
+		$name		= (isset($name) ? $name : $this->get('name', 'author', $this->get('author')));
+		if(!isset($name)){
+			throw new \RuntimeException('No author set for site');
+		}
+
+		$name	= \Blight\Utilities::convertNameToSlug($name);
+		if(!isset($authors[$name])){
+			// Author not found
+			return null;
+		}
+
+		return $authors[$name];
+	}
+
+	protected function getAuthors(){
+		if(!isset($this->authors)){
+			$rawAuthors	= array();
+
+			// Load authors from file
+			$file	= $this->getPathRoot(self::FILE_AUTHORS);
+			if(file_exists($file)){
+				$config	= new \Blight\Config();
+				$rawAuthors	= $config->unserialize($this->getFileSystem()->loadFile($file));
+			}
+
+			// Load config author
+			$siteAuthor	= $this->get('author');
+			if(isset($siteAuthor) && is_array($siteAuthor)){
+				$rawAuthors[]	= $siteAuthor;
+			}
+
+			$this->authors	= \Blight\Models\Author::arraysToAuthors($this, $rawAuthors);
+		}
+
+		return $this->authors;
+	}
+
 
 	/**
 	 * Retrieves settings from the blog configation

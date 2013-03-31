@@ -1,6 +1,6 @@
 <?php
-function input_error($input_name, $errors){
-	if(isset($errors[$input_name]) && $errors[$input_name]){
+function input_error($inputName, $errors){
+	if(isset($errors[$inputName]) && $errors[$inputName]){
 		echo ' class="invalid"';
 	}
 }

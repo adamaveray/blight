@@ -4,11 +4,14 @@ date_default_timezone_set('UTC');
 global $root_path;
 $root_path	= realpath(__DIR__.'/../../').'/';
 
+require('phar://'.$root_path.'Blight.phar/vendor/autoload.php');
 require('phar://'.$root_path.'Blight.phar/src/autoload.php');
 
 global $config;
 $config	= array(
 	'root_path'	=>	$root_path,
+
+	'author'	=> 'Sam Pell',
 
 	'site'	=> array(
 		'name'	=> 'Test Blog',
@@ -20,8 +23,9 @@ $config	= array(
 		'pages'			=> 'blog-data/pages/',
 		'posts'			=> 'blog-data/posts/',
 		'drafts'		=> 'blog-data/drafts/',
-		'templates'		=> 'blog-data/templates/',
+		'themes'		=> 'blog-data/themes/',
 		'plugins'		=> 'blog-data/plugins/',
+		'assets'		=> 'blog-data/assets/',
 		'web'			=> 'www/_blog/',
 		'drafts-web'	=> 'www/_drafts/',
 		'cache'			=> 'cache/'

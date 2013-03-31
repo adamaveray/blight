@@ -11,6 +11,7 @@ Copy the `Blight.phar` file alongside your web directory. Then, copy the `index.
 After installation, your directory structure should look like the following:
 
 	config.json
+	authors.json
 
 	Blight.phar
 	
@@ -21,6 +22,7 @@ After installation, your directory structure should look like the following:
 		posts/
 		templates/
 		plugins/
+		assets/
 	
 	www/
 		.htaccess
@@ -60,9 +62,17 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 
 	`Date: 2013-01-01 12:00:00`
 
+- **Date Updated**: The date the last updates were made to the post. If not set, defaults to the post file's modification time.
+
+	`Date Updated: 2013-01-01 12:00:00`
+
 - **Link**: Allows you to create linked posts, where the main link for the article in both the article lists and RSS feed links to the URL provided, while the permalink links to the post itself.
 
 	`Link: http://www.example.com/`
+
+- **Author**: The name of the post author. If not set, the author will default to the site author.
+
+	`Author: Sam Pell`
 
 - **Tags**: A comma-separated list of tags to group the post under. Tags should be written in a human-readable format, as URL-friendly versions will be generated automatically.
 
@@ -71,6 +81,10 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 - **Category**: A category to group the post under. Similar to _tags_, it should be written in a human-readable format, as a URL-friendly versions will be generated automatically.
 
 	`Category: General`
+
+- **Summary**: A summary of the post's content, in a single line of plaintext
+
+	`Summary: A look back on the history of blogging, and the digital soapbox`
 
 - **RSS Only**: Only display the post in RSS feeds. It will not appear on any rendered HTML files, but will still have a standalone post HTML file generated.
 
@@ -95,59 +109,16 @@ Once the pages are built, the page will automatically reload showing the generat
 When published, original post Markdown files will be organised into date folders, such as `posts/2013/02/2013-02-02-post.md`. To make changes to a previous post, just locate the post in these date folders, make any changes, and trigger a rebuild of the site.
 
 
-## Templates
+### Media
 
-Templates are written using [Twig](http://twig.sensiolabs.org), or alternatively can be written in regular PHP, and are contained in the `blog-data/templates/` directory. All templates must exist for the site to generate correctly.
+Any additional files accompanying posts, such as images, should be stored in the `assets/` directory. These files will then be available at the web root.
 
-The following variables are available to both PHP and Twig templates:
+eg:	`blog-data/assets/img/photo.jpg` → `http://www.example.com/img/photo.jpg`
 
-- **$blog**: An instance of the Blog class, providing access to site-wide URLs and other config settings.
-- **$text**: An instance of the TextProcessor class, for converting raw posts to Markdown, etc
-- **$archives**: An array of the years posts exist for
 
-Twig templates have the following filters available:
+## Themes
 
-- **md**: Converts the provided Markdown text into HTML
-- **typo**: Performs a number of typographical enhancements on the provided text, such as converting quotes to curly quotes
-- **truncate**(length = 100, ending = '...'): Truncates the provided HTML to a certain length.
-
-Specific templates exist for individual pages, and have specific variables available to them:
-
-### List
-
-The **list** template handles pages with a collection of posts, excluding the home page. Archive pages for each year, pages for each tag, and pages for each category are generated using this template.
-
-The following variables are available to list pages:
-
-- **$posts**: An array containing posts for the current page
-
-For each of the different listing types, the page's `Collection` object itself will also be provided:
-
-- Year archive pages: **$year**
-- Tag pages: **$tag**
-- Collection pages: **$collection**
-
-Additionally, if pagination is enabled in the `config.ini` file, the following variables are available:
-
-- **$pagination**: A `Pagination` instance. If this parameter is not set, pagination is disabled
-
-### Post
-
-The **post** template displays individual posts on separate pages, where their permalinks will point to.
-
-The following variables are available to post pages:
-
-- **$post**: The Post instance for the current page
-- **$post_prev**: The previous/older post neighboring the current post, useful for adding next/prev post links. This value may not always be set.
-- **$post_next**: The next/newer post neighboring the current post. This value may not always be set.
-
-### Page
-
-The **page** template displays individual pages
-
-The following variables are available to page-pages:
-
-- **$page**: The Page instance for the current page
+The blog's appearence can be customised through themes. View [the themes documentation](THEMES.md) for more information.
 
 
 ## Config
@@ -160,12 +131,20 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 - **url**: The URL to the blog, including any directories if appropriate
 - **description**: The blog's description, used in the RSS feed and available in templates
 
+### Author
+
+The default author for the blog. The value must be the name of one of the authors stored in [the authors file](AUTHORS.md).
+
+### Theme
+
+- **name**: The name of the theme to render the site with
+
 ### Paths
 
 - **pages**: The path to the page source files directory
 - **posts**: The path to the posts directory
 - **drafts**: The path to the drafts directory
-- **templates**: The path to the templates directory
+- **themes**: The path to the themes directory
 - **web**: The path to output rendered files to
 - **drafts_web**: The path to output rendered draft post files to
 - **cache**: The path various cache files can be written to
@@ -192,6 +171,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 ### Output
 
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
+- **feed_format**: The format to build feeds, of either `atom` or `rss`
 
 
 ## Plugins
@@ -201,5 +181,5 @@ Plugins can be installed to extend the platform. View [the plugins documentation
 
 ## Building
 
-Building the Phar from the source files is accomplished by running `php build.php` from the terminal.
+Dependencies are installed using [Composer](http://getcomposer.org). If you don't have Composer installed, run `curl -sS https://getcomposer.org/installer | php` from the terminal, then `php composer.phar install`. Building the Phar from the source files is then accomplished by running `php build.php`.
 

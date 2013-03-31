@@ -1,5 +1,5 @@
 <?php
-namespace Blight\Collections;
+namespace Blight\Models\Collections;
 
 class CollectionTest extends \PHPUnit_Framework_TestCase {
 	protected static $class;
@@ -20,7 +20,7 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::__construct
+	 * @covers \Blight\Models\Collections\Collection::__construct
 	 */
 	public function testConstruct(){
 		$name	= 'Test';
@@ -29,28 +29,28 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::get_name
+	 * @covers \Blight\Models\Collections\Collection::getName
 	 */
 	public function testGetName(){
-		$this->assertEquals($this->collection->get_name(), $this->collection_name);
+		$this->assertEquals($this->collection->getName(), $this->collection_name);
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::get_slug
+	 * @covers \Blight\Models\Collections\Collection::getSlug
 	 */
 	public function testGetSlug(){
-		$this->assertEquals($this->collection->get_slug(), $this->collection_slug);
+		$this->assertEquals($this->collection->getSlug(), $this->collection_slug);
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::get_url
+	 * @covers \Blight\Models\Collections\Collection::getURL
 	 */
 	public function testGetURL(){
-		$this->assertEquals($this->collection->get_url(), $this->blog->get_url().$this->collection_slug);
+		$this->assertEquals($this->collection->getURL(), $this->blog->getURL().$this->collection_slug);
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::set_posts
+	 * @covers \Blight\Models\Collections\Collection::setPosts
 	 */
 	public function testSetPosts(){
 		$content	= <<<EOD
@@ -62,14 +62,14 @@ EOD;
 		$slug	= 'test-post';
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, $slug)
+			new \Blight\Models\Post($this->blog, $content, $slug)
 		);
 
-		$this->collection->set_posts($posts);
+		$this->collection->setPosts($posts);
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::set_posts
+	 * @covers \Blight\Models\Collections\Collection::setPosts
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testInvalidSetPosts(){
@@ -77,16 +77,16 @@ EOD;
 			'Not a post'
 		);
 
-		$this->collection->set_posts($posts);
+		$this->collection->setPosts($posts);
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::get_posts
+	 * @covers \Blight\Models\Collections\Collection::getPosts
 	 * @depends testSetPosts
 	 */
 	public function testGetPosts(){
 		// No posts initially
-		$this->assertEquals($this->collection->get_posts(), array());
+		$this->assertEquals($this->collection->getPosts(), array());
 
 		$content	= <<<EOD
 Test Post
@@ -97,17 +97,17 @@ EOD;
 		$slug	= 'test-post';
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, $slug)
+			new \Blight\Models\Post($this->blog, $content, $slug)
 		);
 
-		$this->collection->set_posts($posts);
+		$this->collection->setPosts($posts);
 
 		// After adding posts
-		$this->assertEquals($this->collection->get_posts(), $posts);
+		$this->assertEquals($this->collection->getPosts(), $posts);
 	}
 
 	/**
-	 * @covers \Blight\Collections\Collection::add_post
+	 * @covers \Blight\Models\Collections\Collection::addPost
 	 * @depends testGetPosts
 	 */
 	public function testAddPost(){
@@ -119,10 +119,10 @@ Test Content
 EOD;
 		$slug	= 'test-post';
 
-		$post	= new \Blight\Post($this->blog, $content, $slug);
+		$post	= new \Blight\Models\Post($this->blog, $content, $slug);
 
-		$this->collection->add_post($post);
+		$this->collection->addPost($post);
 
-		$this->assertEquals($this->collection->get_posts(), array($post));
+		$this->assertEquals($this->collection->getPosts(), array($post));
 	}
 };

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+    <meta charset="utf-8">
+    {% block head %}
+        <title>{% if page_title is defined %}{{ page_title|e }} • {% endif %}{{ blog.name|e }}</title>
+
+        <meta name="viewport" content="width=device-width,initial-scale=1" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
+
+        <link rel="stylesheet" href="{{ blog.url|e }}css/main.css" />
+
+        <link type="application/rss+xml" rel="alternate" title="RSS Feed" href="{{ blog.feedURL|e }}" />
+        {% if post is defined or page is defined %}
+        <link rel="canonical" href="{% if post is defined %}{{ post.permalink }}{% else %}{{ page.permalink }}{% endif %}" />
+        {% endif %}
+
+        {{ styles() }}
+    {% endblock %}
+</head>
+<body>
+<header role="banner">
+	<h1><a href="{{ blog.url|e }}">{{ blog.name|e|typo }}</a></h1>
+
+	<p class="description">{{ blog.description|e|typo }}</p>
+</header>
+
+<div id="main" role="main">
+    {% block content %}{% endblock %}
+
+    {% if pagination is defined %}
+    <footer>
+        <ol class="pagination">
+            {% for page, url in pagination %}
+                {% set is_current = (page == pagination.current) %}
+            <li{% if is_current %} class="current"{% endif %}>
+                {% if is_current %}
+                    <span>{{ page|e }}</span>
+                {% else %}
+                    <a href="{{ url|e }}">{{ page|e }}</a>
+                {% endif %}
+            </li>
+            {% endfor %}
+        </ol>
+    </footer>
+    {% endif %}
+
+	<aside>
+        {% if archives is not empty %}
+		<nav class="archives">
+			<h2>Archives</h2>
+			<ol>
+                {% for year in archives %}
+				<li>
+					<a href="{{ year.url|e }}">{{ year.name|e|typo }}</a>
+				</li>
+				{% endfor %}
+			</ol>
+		</nav>
+		{% endif %}
+
+        {% if categories is not empty %}
+		<nav class="categories">
+			<h2>Categories</h2>
+			<ol>
+                {% for category in categories %}
+				<li>
+					<a href="{{ category.url|e }}">{{ category.name|e|typo }}</a>
+				</li>
+				{% endfor %}
+			</ol>
+		</nav>
+		{% endif %}
+	</aside>
+</div>
+
+<footer role="contentinfo">
+    {% block footer %}
+        <p class="copyright">Copyright {{ 'now'|date('Y') }} – All Rights Reserved</p>
+        <p><a href="{{ blog.feedURL|e }}">RSS</a></p>
+    {% endblock %}
+</footer>
+
+{{ scripts() }}
+</body>
+</html>

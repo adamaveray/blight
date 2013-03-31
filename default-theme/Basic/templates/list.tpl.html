@@ -1,0 +1,26 @@
+{% extends "inc/base.tpl.html" %}
+
+{% block content %}
+<h1>{{ page_title|e|typo }}</h1>
+<ol class="posts_list">
+    {% for post in posts %}
+	<li>
+		<article>
+			<header>
+                <a href="{{ post.link|e }}">
+                    <h2>{{ post.title|e|typo }}</h2>
+				</a>
+
+				<p>
+                    <time datetime="{{ post.date|date('c') }}" pubdate="pubdate">{{ post.date|date('F j, Y') }}</time>
+					•
+                    <a class="permalink" title="Permalink" href="{{ post.permalink|e }}">∞</a>
+				</p>
+			</header>
+
+            {{ post.content|md }}
+		</article>
+	</li>
+	{% endfor %}
+</ol>
+{% endblock %}

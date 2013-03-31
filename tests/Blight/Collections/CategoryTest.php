@@ -1,19 +1,19 @@
 <?php
-namespace Blight\Collections;
+namespace Blight\Models\Collections;
 
 require_once(__DIR__.'/CollectionTest.php');
 
 class CategoryTest extends CollectionTest {
 	static public function setUpBeforeClass(){
-		static::$class	= '\Blight\Collections\Category';
+		static::$class	= '\Blight\Models\Collections\Category';
 	}
 
 	/**
-	 * @covers \Blight\Collections\Category::get_url
+	 * @covers \Blight\Models\Collections\Category::getURL
 	 */
 	public function testGetURL(){
 		$name	= 'Test Name';
-		$category	= new \Blight\Collections\Category($this->blog, $name);
-		$this->assertEquals($category->get_url(), $this->blog->get_url().'category/test-name');
+		$category	= new \Blight\Models\Collections\Category($this->blog, $name);
+		$this->assertEquals($category->getURL(), $this->blog->getURL().'category/test-name');
 	}
 };

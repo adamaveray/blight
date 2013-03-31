@@ -17,7 +17,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
 
-		$packages	= $this->load_packages($blog->get_path_plugins());
+		$packages	= $this->loadPackages($blog->getPathPlugins());
 		$this->packages	= $packages['package'];
 		$this->plugins	= $packages['plugin'];
 	}
@@ -31,46 +31,46 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * 			'plugins'	=> ...,	// Plugins only
 	 * 		)
 	 */
-	protected function load_packages($dir){
+	protected function loadPackages($dir){
 		$packages	= array();
 
-		$package_types	= array(
-			'package'	=> '\Blight\Interfaces\Packages\Package',
-			'plugin'	=> '\Blight\Interfaces\Packages\Plugin'
+		$packageTypes	= array(
+			'package'	=> '\Blight\Interfaces\Models\Packages\Package',
+			'plugin'	=> '\Blight\Interfaces\Models\Packages\Plugin'
 		);
 
-		foreach($package_types as $type => $interface){
+		foreach($packageTypes as $type => $interface){
 			$packages[$type]	= array();
 		}
 
-		$packge_dirs	= glob(rtrim($dir,'/').'/*');
-		foreach($packge_dirs as $dir){
-			$is_phar	= (pathinfo($dir, \PATHINFO_EXTENSION) == 'phar');
-			if(!$is_phar && !is_dir($dir)){
+		$packgeDirs	= glob(rtrim($dir,'/').'/*');
+		foreach($packgeDirs as $dir){
+			$isPhar	= (pathinfo($dir, \PATHINFO_EXTENSION) == 'phar');
+			if(!$isPhar && !is_dir($dir)){
 				// Not a valid plugin
 				continue;
 			}
 
-			$package_name	= basename($dir);
+			$packageName	= basename($dir);
 
-			if($is_phar){
-				$package_name	= substr($package_name, 0, -1*strlen('.phar'));
+			if($isPhar){
+				$packageName	= substr($packageName, 0, -1*strlen('.phar'));
 				$dir	= 'phar://'.$dir;
 			}
 
 			try {
-				$package	= $this->initialise_package($package_name, $dir);
+				$package	= $this->initialisePackage($packageName, $dir);
 			} catch(\Exception $e){
 				continue;
 			}
 
 			// Group package
-			foreach($package_types as $type => $interface){
+			foreach($packageTypes as $type => $interface){
 				if(!($package instanceof $interface)){
 					continue;
 				}
 
-				$packages[$type][$package_name]	= $package;
+				$packages[$type][$packageName]	= $package;
 			}
 		}
 
@@ -82,34 +82,42 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 *
 	 * @param string $name		The name of the package
 	 * @param string $directory	The directory of the package files
-	 * @return \Blight\Interfaces\Packages\Package
+	 * @return \Blight\Interfaces\Models\Packages\Package
 	 * @throws \RuntimeException	Package is missing required files
-	 * @throws \RuntimeException	Package does not implement \Blight\Interfaces\Packages\Package
+	 * @throws \RuntimeException	Package does not implement \Blight\Interfaces\Models\Packages\Package
 	 */
-	protected function initialise_package($name, $directory){
+	protected function initialisePackage($name, $directory){
 		$directory	= rtrim($directory, '/');
-		$package_initialiser	= $directory.'/'.$name.'.php';
-		$package_manifest		= $directory.'/'.self::MANIFEST_FILE;
+		$packageInitialiser	= $directory.'/'.$name.'.php';
+		$packageManifest	= $directory.'/'.self::MANIFEST_FILE;
 
-		if(!file_exists($package_initialiser) || !file_exists($package_manifest)){
+		if(!file_exists($packageInitialiser) || !file_exists($packageManifest)){
 			// Plugin missing initialisation file
 			throw new \RuntimeException('Package files missing');
 		}
 
 		// Parse manifest
-		$config	= \Blight\Utilities::array_multi_merge(array(
-			'namespace'	=> '\\'
-		), $this->parse_manifest($this->blog->get_file_system()->load_file($package_manifest)));
+		$config	= \Blight\Utilities::arrayMultiMerge(array(
+			'package'	=> array(
+				'namespace'	=> '\\'
+			)
+		), $this->parseManifest($this->blog->getFileSystem()->loadFile($packageManifest)));
 
-		$class	= rtrim($config['namespace'], '\\').'\\'.$name;
+		$minVersion	= $config['compatibility']['minimum'];
+		if(version_compare($minVersion, \Blight\Blog::VERSION, '>')){
+			// Needs newer version
+			throw new \RuntimeException('Package requires version '.$config['package']['version']);
+		}
+
+		$class	= rtrim($config['package']['namespace'], '\\').'\\'.$name;
 
 		$config['path']	= $directory.'/';
 
 		// Initialise plugin
-		include($package_initialiser);
+		include($packageInitialiser);
 		$instance	= new $class($this->blog, $config);
 
-		if(!($instance instanceof \Blight\Interfaces\Packages\Package)){
+		if(!($instance instanceof \Blight\Interfaces\Models\Packages\Package)){
 			// Invalid class
 			throw new \RuntimeException('Invalid package class type');
 		}
@@ -121,9 +129,33 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * @param string $content	The raw content from the manifest file
 	 * @return array			The processed manifest data
 	 */
-	protected function parse_manifest($content){
+	protected function parseManifest($content){
 		$parser	= new \Blight\Config();
 		return $parser->unserialize($content);
+	}
+
+	/**
+	 * @param string $themeName	The name of the theme to retrieve
+	 * @return \Blight\Interfaces\Models\Packages\Theme
+	 * @throws \RuntimeException	Theme not found
+	 * @throws \RuntimeException	Invalid theme package
+	 */
+	public function getTheme($themeName){
+		$path	= $this->blog->getPathThemes($themeName.'.phar');
+		if(!file_exists($path)){
+			throw new \RuntimeException('Theme `'.$themeName.'` not found');
+		}
+
+		$isPhar	= (pathinfo($path, \PATHINFO_EXTENSION) == 'phar');
+		if($isPhar){
+			$path	= 'phar://'.$path;
+		}
+		$theme	= $this->initialisePackage($themeName, $path);
+		if(!($theme instanceof \Blight\Interfaces\Models\Packages\Theme)){
+			throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Models\Packages\Theme');
+		}
+
+		return $theme;
 	}
 
 	/**
@@ -133,16 +165,16 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
 	 *
 	 * 		$value	= 1;
-	 * 		do_hook('hook_name', array(
+	 * 		doHook('hook_name', array(
 	 * 			'param'	=> &$value
 	 *  	));
 	 */
-	public function do_hook($hook, $params = null){
-		$callback_name	= static::HOOK_FUNCTION_PREFIX.$hook;
+	public function doHook($hook, $params = null){
+		$callbackName	= static::HOOK_FUNCTION_PREFIX.$hook;
 
 		foreach($this->plugins as $plugin){
 			// Run hook
-			$callback	= array($plugin, $callback_name);
+			$callback	= array($plugin, $callbackName);
 			if(is_callable($callback)){
 				call_user_func($callback, $params);
 			}

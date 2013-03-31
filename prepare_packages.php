@@ -1,26 +1,41 @@
 <?php
-$base_dir	= __DIR__.'/blog-data/plugins/';
-$dirs		= glob($base_dir.'/*');
-
-$phar_dirs	= array();
-
-foreach($dirs as $dir){
-	if(!is_dir($dir)){
-		continue;
-	}
-
-	$name	= basename($dir).'.phar';
+function buildPackage($source, $target_dir){
+	$name	= basename($source).'.phar';
 
 	try {
-		$phar = new Phar($base_dir.'/'.$name, 0, $name);
-		$phar->buildFromDirectory($dir);
+		$phar = new Phar($target_dir.'/'.$name, 0, $name);
+		$phar->buildFromDirectory($source);
 		$phar->setStub('<?php __HALT_COMPILER();');
 		unset($phar);
 
 	} catch(\Exception $e){
 		echo 'Could not package `'.$name.'` (Exception: '.$e->getMessage().' ['.$e->getFile().'#'.$e->getLine().'])'.PHP_EOL;
-		continue;
+		return;
 	}
 
-	echo 'Packaged `'.$name.'`'.PHP_EOL;
+	echo 'Packaged "'.$name.'"'.PHP_EOL;
+}
+
+// Build default theme
+$defaultTheme	= __DIR__.'/default-theme/Basic/';
+if(is_dir($defaultTheme)){
+	buildPackage($defaultTheme, __DIR__.'/blog-data/themes/');
+}
+
+// Build additional packages
+$baseDirs	= array(
+	__DIR__.'/blog-data/plugins/',
+	__DIR__.'/blog-data/themes/'
+);
+
+foreach($baseDirs as $baseDir){
+	$dirs	= glob($baseDir.'/*');
+
+	foreach($dirs as $dir){
+		if(!is_dir($dir)){
+			continue;
+		}
+
+		buildPackage($dir, $baseDir);
+	}
 }
