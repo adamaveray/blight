@@ -9,6 +9,8 @@ class Author implements \Blight\Interfaces\Models\Author {
 	protected $email;
 	protected $url;
 
+	protected $attributes;
+
 
 	/**
 	 * @param \Blight\Interfaces\Blog $blog
@@ -40,6 +42,12 @@ class Author implements \Blight\Interfaces\Models\Author {
 			}
 
 			$this->$field	= $data[$field];
+			unset($data[$field]);
+		}
+
+		$this->attributes	= array();
+		foreach($data as $key => $value){
+			$this->attributes[\Blight\Utilities::convertNameToSlug($key)]	= $value;
 		}
 	}
 
@@ -75,6 +83,20 @@ class Author implements \Blight\Interfaces\Models\Author {
 	}
 
 	/**
+	 * @param string $name	The name of the attribute to retrieve
+	 * @return mixed		The attribute value
+	 * @throws \RuntimeException	The author does not have the requested attribute set
+	 */
+	public function getAttribute($name){
+		if(!$this->hasAttribute($name)){
+			throw new \RuntimeException('Author does not have attribute `'.$name.'`');
+		}
+
+		$name	= \Blight\Utilities::convertNameToSlug($name);
+		return $this->attributes[$name];
+	}
+
+	/**
 	 * @return bool	Whether the author has an email address set
 	 */
 	public function hasEmail(){
@@ -86,6 +108,15 @@ class Author implements \Blight\Interfaces\Models\Author {
 	 */
 	public function hasURL(){
 		return isset($this->url);
+	}
+
+	/**
+	 * @param string $name	The name of the attribute to check for
+	 * @return bool	Whether the attribute exists
+	 */
+	public function hasAttribute($name){
+		$name	= \Blight\Utilities::convertNameToSlug($name);
+		return isset($this->attributes[$name]);
 	}
 
 

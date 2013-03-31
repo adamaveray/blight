@@ -34,6 +34,13 @@ interface Author {
 	public function getURL();
 
 	/**
+	 * @param string $name	The name of the attribute to retrieve
+	 * @return mixed		The attribute value
+	 * @throws \RuntimeException	The author does not have the requested attribute set
+	 */
+	public function getAttribute($name);
+
+	/**
 	 * @return bool	Whether the author has an email address set
 	 */
 	public function hasEmail();
@@ -42,4 +49,10 @@ interface Author {
 	 * @return bool	Whether the author has a URL set
 	 */
 	public function hasURL();
+
+	/**
+	 * @param string $name	The name of the attribute to check for
+	 * @return bool	Whether the attribute exists
+	 */
+	public function hasAttribute($name);
 };

@@ -73,6 +73,21 @@ class AuthorTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Models\Author::getAttribute
+	 */
+	public function testGetAttribute(){
+		$attributeName	= 'Something';
+		$attributeValue	= 'The Value';
+
+		$author	= new \Blight\Models\Author($this->blog, array(
+			'name'	=> $this->authorName,
+			$attributeName	=> $attributeValue
+		));
+		$this->assertEquals($attributeValue, $author->getAttribute($attributeName));
+		$this->assertEquals($attributeValue, $author->getAttribute(strtolower($attributeName)));
+	}
+
+	/**
 	 * @covers \Blight\Models\Author::getEmail
 	 * @expectedException \RuntimeException
 	 */
@@ -88,12 +103,23 @@ class AuthorTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\Models\Author::getURL
 	 * @expectedException \RuntimeException
 	 */
-	public function testInvalidGet(){
+	public function testInvalidGetURL(){
 		$author	= new \Blight\Models\Author($this->blog, array(
 			'name'	=> $this->authorName
 		));
 
 		$author->getURL();
+	}
+
+	/**
+	 * @covers \Blight\Models\Author::getAttribute
+	 * @expectedException \RuntimeException
+	 */
+	public function testInvalidGetAttribute(){
+		$author	= new \Blight\Models\Author($this->blog, array(
+			'name'	=> $this->authorName
+		));
+		$author->getAttribute('(nonexistent)');
 	}
 
 	/**
@@ -118,5 +144,24 @@ class AuthorTest extends \PHPUnit_Framework_TestCase {
 			'name'	=> $this->authorName
 		));
 		$this->assertFalse($author->hasEmail());
+	}
+
+
+	/**
+	 * @covers \Blight\Models\Author::hasAttribute
+	 */
+	public function testHasAttribute(){
+		$attributeName	= 'Something';
+		$attributeValue	= 'The Value';
+
+		$this->assertFalse($this->author->hasAttribute($attributeName));
+		$this->assertFalse($this->author->hasAttribute(strtolower($attributeName)));
+
+		$author	= new \Blight\Models\Author($this->blog, array(
+			'name'	=> $this->authorName,
+			$attributeName	=> $attributeValue
+		));
+		$this->assertTrue($author->hasAttribute($attributeName));
+		$this->assertTrue($author->hasAttribute(strtolower($attributeName)));
 	}
 };
