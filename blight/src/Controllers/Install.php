@@ -14,6 +14,7 @@ class Install {
 	protected $urlBase	= 'index.php?/install/';
 
 	protected $configFile;
+	protected $authorsFile;
 
 	public function __construct($rootPath, $appPath, $webPath, $file){
 		session_start();
@@ -24,6 +25,7 @@ class Install {
 		$this->templatesDir	= $this->appPath.'src/views/install/';
 
 		$this->configFile	= $file;
+		$this->authorsFile	= $rootPath.'authors.json';
 	}
 
 	public function setup(){
@@ -292,6 +294,20 @@ class Install {
 
 		if(count($feedback) > 0){
 			return $feedback;
+		}
+
+		// Set site author
+		if(isset($config['author'])){
+			$author	= $config['author'];
+			$config['author']	= $author['name'];
+
+			$authorText	= $this->buildSetup($author);
+			$result	= file_put_contents($this->authorsFile, $authorText);
+			if(!$result){
+				$feedback['file_authors']		= $authorText;
+				$feedback['file_authors_path']	= $this->authorsFile;
+				return $feedback;
+			}
 		}
 
 		if(!isset($config['output'])){
