@@ -17,10 +17,7 @@ $createNode	= function(\DOMDocument $document, \DOMElement $parent, $nodeName, $
 };
 
 $now	= new \DateTime();
-$blogAuthor	= $blog->get('author');
-if(isset($blogAuthor)){
-	$blogAuthor	= (object)$blogAuthor;
-}
+$blogAuthor	= $blog->getAuthor();
 
 
 // Create XML file
@@ -46,7 +43,7 @@ $root->setAttribute('xml:lang', 'en-US');
 	$createNode($dom, $root, 'id', $blog->getFeedURL());
 	$createNode($dom, $root, 'updated', $now->format('c'));
 	if(isset($blogAuthor)){
-		$createNode($dom, $root, 'rights', 'Copyright © '.$now->format('Y').' '.$blogAuthor->name);
+		$createNode($dom, $root, 'rights', 'Copyright © '.$now->format('Y').' '.$blogAuthor->getName());
 	}
 
 	foreach($posts as $post){
@@ -59,10 +56,7 @@ $root->setAttribute('xml:lang', 'en-US');
 			$dateUpdated	= $post->getDateUpdated();
 			$guid	= $post->getPermalink();
 			$guidIsPermalink	= true;
-			$author	= $blog->get('author');
-			if(isset($author)){
-				$author	= (object)$author;
-			}
+			$author	= $blog->getAuthor();
 
 			// Build post content
 			$summary	= $post->getSummary();
@@ -101,14 +95,12 @@ $root->setAttribute('xml:lang', 'en-US');
 			$createNode($dom, $entry, 'updated', $dateUpdated->format('c'));
 			if(isset($author)){
 				$createNode($dom, $entry, 'author', null, null, function(\DOMElement $authorElement, \DOMDocument $dom) use($createNode, $post, $author){
-					if(isset($author->name)){
-						$createNode($dom, $authorElement, 'name', $author->name);
+					$createNode($dom, $authorElement, 'name', $author->getName());
+					if($author->hasEmail()){
+						$createNode($dom, $authorElement, 'email', $author->hasEmail());
 					}
-					if(isset($author->email)){
-						$createNode($dom, $authorElement, 'email', $author->email);
-					}
-					if(isset($author->url)){
-						$createNode($dom, $authorElement, 'uri', $author->url);
+					if($author->hasURL()){
+						$createNode($dom, $authorElement, 'uri', $author->hasURL());
 					}
 				});
 			}

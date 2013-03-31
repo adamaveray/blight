@@ -47,10 +47,7 @@ $channel	= $dom->createElement('channel');
 			$dateUpdated	= $post->getDateUpdated();
 			$guid	= $post->getPermalink();
 			$guidIsPermalink	= true;
-			$author	= $blog->get('author');
-			if(isset($author)){
-				$author	= (object)$author;
-			}
+			$author	= $blog->getAuthor();
 
 			// Build post content
 			$content	= $post->getContent();
@@ -83,8 +80,8 @@ $channel	= $dom->createElement('channel');
 			));
 			$createNode($dom, $item, 'pubDate', $date->format('r'));
 			$createNode($dom, $item, 'description', ($processContent ? $text->processMarkdown($content) : $content).$append);
-			if(isset($author->email)){
-				$createNode($dom, $item, 'author', $author->email.(isset($author->name) ? ' ('.$author->name.')' : ''));
+			if(isset($author) && $author->hasEmail()){
+				$createNode($dom, $item, 'author', $author->getEmail().' ('.$author->getName().')');
 			}
 
 		$channel->appendChild($item);
