@@ -87,5 +87,27 @@ class Author implements \Blight\Interfaces\Models\Author {
 	public function hasURL(){
 		return isset($this->url);
 	}
+
+
+	/**
+	 * @param \Blight\Interfaces\Blog $blog
+	 * @param array $array	An array of associative-arrays for each author
+	 * @return array		An array of \Blight\Models\Authors
+	 */
+	public static function arraysToAuthors(\Blight\Interfaces\Blog $blog, $array){
+		$authors	= array();
+
+		foreach($array as $rawAuthor){
+			try {
+				$author	= new \Blight\Models\Author($blog, $rawAuthor);
+			} catch(\Exception $e){
+				continue;
+			}
+
+			$authors[\Blight\Utilities::convertNameToSlug($author->getName())]	= $author;
+		}
+
+		return $authors;
+	}
 };
 

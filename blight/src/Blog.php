@@ -6,6 +6,7 @@ namespace Blight;
  */
 class Blog implements \Blight\Interfaces\Blog {
 	const VERSION	= '0.6.0';
+	const FILE_AUTHORS	= 'authors.json';
 
 	protected $config;
 
@@ -24,6 +25,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	protected $url;
 	protected $name;
 	protected $paths;
+	protected $authors;
 
 	/**
 	 * Processes all configuration settings for the blog
@@ -304,6 +306,50 @@ class Blog implements \Blight\Interfaces\Blog {
 	public function doHook($hook, $params = null){
 		$this->getPackageManager()->doHook($hook, $params);
 	}
+
+	/**
+	 * @param string|null $name	The name of the author to retrieve, or null for the site owner
+	 * @return \Blight\Interfaces\Models\Author|null	The author, or null if not found
+	 */
+	public function getAuthor($name = null){
+		$authors	= $this->getAuthors();
+		$name		= (isset($name) ? $name : $this->get('name', 'author', $this->get('author')));
+		if(!isset($name)){
+			throw new \RuntimeException('No author set for site');
+		}
+
+		$name	= \Blight\Utilities::convertNameToSlug($name);
+		if(!isset($authors[$name])){
+			// Author not found
+			return null;
+		}
+
+		return $authors[$name];
+	}
+
+	protected function getAuthors(){
+		if(!isset($this->authors)){
+			$rawAuthors	= array();
+
+			// Load authors from file
+			$file	= $this->getPathRoot(self::FILE_AUTHORS);
+			if(file_exists($file)){
+				$config	= new \Blight\Config();
+				$rawAuthors	= $config->unserialize($this->getFileSystem()->loadFile($file));
+			}
+
+			// Load config author
+			$siteAuthor	= $this->get('author');
+			if(isset($siteAuthor) && is_array($siteAuthor)){
+				$rawAuthors[]	= $siteAuthor;
+			}
+
+			$this->authors	= \Blight\Models\Author::arraysToAuthors($this, $rawAuthors);
+		}
+
+		return $this->authors;
+	}
+
 
 	/**
 	 * Retrieves settings from the blog configation
