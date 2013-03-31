@@ -5,4 +5,5 @@ www/_blog/
 www/_drafts/
 Blight.phar
 config.json
+authors.json
 blight/vendor/
