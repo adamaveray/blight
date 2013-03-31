@@ -27,13 +27,13 @@ include('inc/header.php');?>
 
 				<p class="description">Linkblogs feature linked posts as the majority of posts.</p>
 			</li>
-			<li class="linkblog_enabled_options single">
+			<li class="linkblog_disabled_options single">
                 <label for="input_linkblog_link_character">Link Character</label>
                 <input name="linkblog_link_character" id="input_linkblog_link_character" value="→"<?php input_error('linkblog_link_character', $errors);?> />
 
                 <p class="description">This character will be added before linked post titles</p>
 			</li>
-			<li class="linkblog_disabled_options single">
+			<li class="linkblog_enabled_options single">
                 <label for="input_linkblog_post_character">Post Character</label>
                 <input name="linkblog_post_character" id="input_linkblog_post_character" value="★"<?php input_error('linkblog_post_character', $errors);?> />
 
