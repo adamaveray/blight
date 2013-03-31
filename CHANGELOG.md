@@ -1,6 +1,21 @@
 Release Notes
 =============
 
+## 0.7
+
+_31 Mar 2013_
+
+- [Themes](THEMES.md)
+- [Authors](AUTHORS.md)
+- Switched to [Composer](http://getcomposer.org) dependency management
+- Added support for user asset files
+- Added single-process locking
+- Added Atom feed format support
+- Added post summary support
+- Added post date modified/updated support
+- Updated coding to match [PSR-1 standard](https://github.com/php-fig/fig-standards/blob/master/accepted/PSR-1-basic-coding-standard.md)
+
+
 ## 0.6
 
 _16 Mar 2013_
