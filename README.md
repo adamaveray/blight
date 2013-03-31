@@ -61,6 +61,10 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 
 	`Date: 2013-01-01 12:00:00`
 
+- **Date Updated**: The date the last updates were made to the post. If not set, defaults to the post file's modification time.
+
+	`Date Updated: 2013-01-01 12:00:00`
+
 - **Link**: Allows you to create linked posts, where the main link for the article in both the article lists and RSS feed links to the URL provided, while the permalink links to the post itself.
 
 	`Link: http://www.example.com/`
