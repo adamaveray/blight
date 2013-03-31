@@ -15,7 +15,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\PackageManager */
 	protected $packageManager;
 
-	/** @var \Blight\Interfaces\Packages\Theme */
+	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
 
 
@@ -253,7 +253,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getFileSystem(){
 		if(!isset($this->fileSystem)){
-			$this->fileSystem	= new FileSystem($this);
+			$this->fileSystem	= new \Blight\FileSystem($this);
 		}
 
 		return $this->fileSystem;
@@ -271,7 +271,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
-	 * @return \Blight\Interfaces\Packages\Theme
+	 * @return \Blight\Interfaces\Models\Packages\Theme
 	 */
 	public function getTheme(){
 		if(!isset($this->theme)){

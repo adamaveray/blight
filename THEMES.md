@@ -12,7 +12,7 @@ A theme follows the same base package format as a [plugin](PLUGIN.md), with addi
 
 ## Main Class
 
-Theme main classes must extend the `\Blight\Packages\Theme` class.
+Theme main classes must extend the `\Blight\Models\Packages\Theme` class.
 
 ### Overriding Templates
 

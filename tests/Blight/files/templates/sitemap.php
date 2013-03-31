@@ -3,7 +3,7 @@
 
 /** @var array $pages */
 foreach($pages as $page){
-	/** @var \Blight\Interfaces\Page $page */
+	/** @var \Blight\Interfaces\Models\Page $page */
 	?>
 	<p><a href="<?php echo $page->getPermalink();?>"><?php echo $page->getTitle();?></a></p>
 	<?php

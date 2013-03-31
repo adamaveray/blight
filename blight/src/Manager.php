@@ -99,7 +99,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * Converts a post file to a Post object
 	 *
 	 * @param string $rawPost	The path to a post file
-	 * @return \Blight\Interfaces\Post		The post built from the provided file
+	 * @return \Blight\Interfaces\Models\Post		The post built from the provided file
 	 */
 	protected function buildPost($rawPost){
 		$content	= $this->blog->getFileSystem()->loadFile($rawPost);
@@ -109,7 +109,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			$filename	= $matches[3];
 		}
 
-		$post	= new Post($this->blog, $content, $filename);
+		$post	= new \Blight\Models\Post($this->blog, $content, $filename);
 
 		// Modified time
 		try {
@@ -122,11 +122,11 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Moves a post source file to a more-logical location. Moves files to YYYY/MM/YYYY-MM-DD-post.md
 	 *
-	 * @param \Blight\Interfaces\Post $post	The post to move
+	 * @param \Blight\Interfaces\Models\Post $post	The post to move
 	 * @param string $currentPath	The current path to the post's file
 	 * @return bool	Whether the post file was moved to be published
 	 */
-	protected function organisePostFile(\Blight\Interfaces\Post $post, $currentPath){
+	protected function organisePostFile(\Blight\Interfaces\Models\Post $post, $currentPath){
 		// Check for special headers
 		$hasDate	= $post->hasMeta('date');
 		$hasPublish	= $post->hasMeta('publish-now');
@@ -186,7 +186,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all pages found as Page objects
 	 *
-	 * @return array	An array of \Blight\Page objects
+	 * @return array	An array of \Blight\Models\Page objects
 	 */
 	public function getPages(){
 		if(!isset($this->pages)){
@@ -206,7 +206,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 				// Create page object
 				try {
-					$page	= new \Blight\Page($this->blog, $content, preg_replace('/^(.*?)\.\w+?$/', '$1', str_replace($dir, '', $file)));
+					$page	= new \Blight\Models\Page($this->blog, $content, preg_replace('/^(.*?)\.\w+?$/', '$1', str_replace($dir, '', $file)));
 				} catch(\Exception $e){
 					continue;
 				}
@@ -225,7 +225,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all draft posts found as Post objects
 	 *
-	 * @return array	An array of \Blight\Page objects
+	 * @return array	An array of \Blight\Models\Page objects
 	 */
 	public function getDraftPosts(){
 		if(!isset($this->draftPosts)){
@@ -243,7 +243,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 				// Create post object
 				try {
-					$post	= new Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
+					$post	= new \Blight\Models\Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
 				} catch(\Exception $e){
 					continue;
 				}
@@ -305,7 +305,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				$posts[]	= $post;
 			}
 
-			usort($posts, function(Post $a, Post $b){
+			usort($posts, function(\Blight\Interfaces\Models\Post $a, \Blight\Interfaces\Models\Post $b){
 				$aDate	= $a->getDate();
 				$bDate	= $b->getDate();
 
@@ -324,7 +324,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 		$posts	= array();
 		foreach($this->posts as $post){
-			/** @var \Blight\Interfaces\Post $post */
+			/** @var \Blight\Interfaces\Models\Post $post */
 			if($filters['rss'] !== true){
 				$isRSSOnly	= $post->getMeta('rss-only');
 				if($filters['rss'] === 'only' && !$isRSSOnly){

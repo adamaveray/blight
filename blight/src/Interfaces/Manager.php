@@ -9,12 +9,12 @@ interface Manager {
 	public function __construct(\Blight\Interfaces\Blog $blog);
 
 	/**
-	 * @return array	An array of \Blight\Page objects
+	 * @return array	An array of \Blight\Models\Page objects
 	 */
 	public function getPages();
 
 	/**
-	 * @return array	An array of \Blight\Page objects
+	 * @return array	An array of \Blight\Models\Page objects
 	 */
 	public function getDraftPosts();
 

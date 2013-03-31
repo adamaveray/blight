@@ -1,5 +1,5 @@
 <?php
-namespace Blight\Interfaces\Packages;
+namespace Blight\Interfaces\Models\Packages;
 
 interface Package {
 	/**

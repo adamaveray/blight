@@ -9,7 +9,7 @@ _Editable parameters for hooks can be modified from within the callback to chang
 
 	### Params
 
-	- \Blight\Interfaces\Post **post**: The post being published
+	- \Blight\Interfaces\Models\Post **post**: The post being published
 
 
 - ## did_publish_post
@@ -18,7 +18,7 @@ _Editable parameters for hooks can be modified from within the callback to chang
 
 	### Params
 
-	- \Blight\Interfaces\Post **post**: The post being published
+	- \Blight\Interfaces\Models\Post **post**: The post being published
 
 	### Notes
 
@@ -32,7 +32,7 @@ _Editable parameters for hooks can be modified from within the callback to chang
 	### Params
 
 	- string **feed_type**: The feed format type – either `'atom'` or `'rss'`
-	- \Blight\Interfaces\Post **post**: The post being rendered
+	- \Blight\Interfaces\Models\Post **post**: The post being rendered
 	- string **title**: _(editable)_ The title of the post
 	- string **link**: _(editable)_ The URL for the post to link to. For linked posts, this defaults to the external link.
 	- \stdClass **author**: _(editable)_ The author of the post. An object with the properties `name`, `url` and `email`
@@ -52,8 +52,8 @@ _Editable parameters for hooks can be modified from within the callback to chang
 
 	### Params
 
-	- \Blight\Interfaces\Packages\Theme **theme**: The current theme
-	- \Blight\Interfaces\Template **template**: The current template
+	- \Blight\Interfaces\Models\Packages\Theme **theme**: The current theme
+	- \Blight\Interfaces\Models\Template **template**: The current template
 	- string **name**: The name of the template being rendered
 	- array **styles**: _(editable)_ An array of styles
 
@@ -73,8 +73,8 @@ _Editable parameters for hooks can be modified from within the callback to chang
 
 	### Params
 
-	- \Blight\Interfaces\Packages\Theme **theme**: The current theme
-	- \Blight\Interfaces\Template **template**: The current template
+	- \Blight\Interfaces\Models\Packages\Theme **theme**: The current theme
+	- \Blight\Interfaces\Models\Template **template**: The current template
 	- string **name**: The name of the template being rendered
 	- array **scripts**: _(editable)_ An array of scripts
 

@@ -9,7 +9,7 @@ interface PackageManager {
 
 	/**
 	 * @param string $themeName	The name of the theme to retrieve
-	 * @return \Blight\Interfaces\Packages\Theme
+	 * @return \Blight\Interfaces\Models\Packages\Theme
 	 * @throws \RuntimeException	Theme not found
 	 * @throws \RuntimeException	Invalid theme package
 	 */

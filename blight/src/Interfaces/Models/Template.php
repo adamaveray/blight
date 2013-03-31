@@ -1,5 +1,5 @@
 <?php
-namespace Blight\Interfaces;
+namespace Blight\Interfaces\Models;
 
 interface Template {
 	/**
@@ -8,7 +8,7 @@ interface Template {
 	 * @param string $dir			The directory to look for templates in
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Packages\Theme $theme, $name);
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Models\Packages\Theme $theme, $name);
 
 	/**
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template

@@ -14,9 +14,9 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	protected $template_content;
 	protected $template_content_variable;
 
-	/** @var \Blight\Interfaces\Template */
+	/** @var \Blight\Interfaces\Models\Template */
 	protected $template_php;
-	/** @var \Blight\Interfaces\Template */
+	/** @var \Blight\Interfaces\Models\Template */
 	protected $template_twig;
 
 	public function setUp(){
@@ -33,36 +33,36 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 		$this->template_content				= 'Template'."\n".'No Variable';
 		$this->template_content_variable	= 'Template'."\n".'Variable: %s';
 
-		$this->template_php		= new \Blight\Template($this->blog, $this->theme, $this->template_php_name);
-		$this->template_twig	= new \Blight\Template($this->blog, $this->theme, $this->template_twig_name);
+		$this->template_php		= new \Blight\Models\Template($this->blog, $this->theme, $this->template_php_name);
+		$this->template_twig	= new \Blight\Models\Template($this->blog, $this->theme, $this->template_twig_name);
 	}
 
 	/**
-	 * @covers \Blight\Template::__construct
+	 * @covers \Blight\Models\Template::__construct
 	 */
 	public function testPHPConstruct(){
-		$template	= new \Blight\Template($this->blog, $this->theme, $this->template_php_name);
-		$this->assertInstanceOf('\Blight\Template', $template);
+		$template	= new \Blight\Models\Template($this->blog, $this->theme, $this->template_php_name);
+		$this->assertInstanceOf('\Blight\Models\Template', $template);
 	}
 
 	/**
-	 * @covers \Blight\Template::__construct
+	 * @covers \Blight\Models\Template::__construct
 	 */
 	public function testTwigConstruct(){
-		$template	= new \Blight\Template($this->blog, $this->theme, $this->template_twig_name);
-		$this->assertInstanceOf('\Blight\Template', $template);
+		$template	= new \Blight\Models\Template($this->blog, $this->theme, $this->template_twig_name);
+		$this->assertInstanceOf('\Blight\Models\Template', $template);
 	}
 
 	/**
-	 * @covers \Blight\Template::__construct
+	 * @covers \Blight\Models\Template::__construct
 	 * @expectedException \RuntimeException
 	 */
 	public function testNonexistentConstruct(){
-		new \Blight\Template($this->blog, $this->theme, 'nonexistent');
+		new \Blight\Models\Template($this->blog, $this->theme, 'nonexistent');
 	}
 
 	/**
-	 * @covers \Blight\Template::render
+	 * @covers \Blight\Models\Template::render
 	 */
 	public function testPHPRender(){
 		// No params
@@ -75,7 +75,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Template::render
+	 * @covers \Blight\Models\Template::render
 	 */
 	public function testTwigRender(){
 		// No params
@@ -88,7 +88,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Template
+	 * @covers \Blight\Models\Template
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testInvalidRender(){

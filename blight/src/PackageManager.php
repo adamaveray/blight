@@ -35,8 +35,8 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 		$packages	= array();
 
 		$packageTypes	= array(
-			'package'	=> '\Blight\Interfaces\Packages\Package',
-			'plugin'	=> '\Blight\Interfaces\Packages\Plugin'
+			'package'	=> '\Blight\Interfaces\Models\Packages\Package',
+			'plugin'	=> '\Blight\Interfaces\Models\Packages\Plugin'
 		);
 
 		foreach($packageTypes as $type => $interface){
@@ -82,9 +82,9 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 *
 	 * @param string $name		The name of the package
 	 * @param string $directory	The directory of the package files
-	 * @return \Blight\Interfaces\Packages\Package
+	 * @return \Blight\Interfaces\Models\Packages\Package
 	 * @throws \RuntimeException	Package is missing required files
-	 * @throws \RuntimeException	Package does not implement \Blight\Interfaces\Packages\Package
+	 * @throws \RuntimeException	Package does not implement \Blight\Interfaces\Models\Packages\Package
 	 */
 	protected function initialisePackage($name, $directory){
 		$directory	= rtrim($directory, '/');
@@ -117,7 +117,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 		include($packageInitialiser);
 		$instance	= new $class($this->blog, $config);
 
-		if(!($instance instanceof \Blight\Interfaces\Packages\Package)){
+		if(!($instance instanceof \Blight\Interfaces\Models\Packages\Package)){
 			// Invalid class
 			throw new \RuntimeException('Invalid package class type');
 		}
@@ -136,7 +136,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 
 	/**
 	 * @param string $themeName	The name of the theme to retrieve
-	 * @return \Blight\Interfaces\Packages\Theme
+	 * @return \Blight\Interfaces\Models\Packages\Theme
 	 * @throws \RuntimeException	Theme not found
 	 * @throws \RuntimeException	Invalid theme package
 	 */
@@ -151,8 +151,8 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 			$path	= 'phar://'.$path;
 		}
 		$theme	= $this->initialisePackage($themeName, $path);
-		if(!($theme instanceof \Blight\Interfaces\Packages\Theme)){
-			throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Packages\Theme');
+		if(!($theme instanceof \Blight\Interfaces\Models\Packages\Theme)){
+			throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Models\Packages\Theme');
 		}
 
 		return $theme;

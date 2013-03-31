@@ -1,10 +1,10 @@
 <?php
-namespace Blight;
+namespace Blight\Models;
 
 /**
  * A blog post
  */
-class Post extends \Blight\Page implements \Blight\Interfaces\Post {
+class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post {
 	protected $year;
 	protected $tags;
 	protected $category;
@@ -121,11 +121,11 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	/**
 	 * Creates a collection for the year the post was authored
 	 *
-	 * @return \Blight\Collections\Year    The Year collection the post belongs in
+	 * @return \Blight\Models\Collections\Year    The Year collection the post belongs in
 	 */
 	public function getYear(){
 		if(!isset($this->year)){
-			$this->year = new \Blight\Collections\Year($this->blog, $this->getDate()->format('Y'));
+			$this->year = new \Blight\Models\Collections\Year($this->blog, $this->getDate()->format('Y'));
 		}
 
 		return $this->year;
@@ -144,7 +144,7 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 			if($this->hasMeta('tags')){
 				$tags = array_map('trim', explode(',', $this->getMeta('tags')));
 				$this->tags = array_map(function ($item){
-					return new \Blight\Collections\Tag($this->blog, $item);
+					return new \Blight\Models\Collections\Tag($this->blog, $item);
 				}, array_unique($tags));
 			} else {
 				// No tags
@@ -160,11 +160,11 @@ class Post extends \Blight\Page implements \Blight\Interfaces\Post {
 	 *
 	 * If the post has no category assigned, null will be returned
 	 *
-	 * @return \Blight\Collections\Category|null    The Category collection the post belongs in, or null
+	 * @return \Blight\Models\Collections\Category|null    The Category collection the post belongs in, or null
 	 */
 	public function getCategory(){
 		if(!isset($this->category) && $this->hasMeta('category')){
-			$this->category = new \Blight\Collections\Category($this->blog, $this->getMeta('category'));
+			$this->category = new \Blight\Models\Collections\Category($this->blog, $this->getMeta('category'));
 		}
 
 		return $this->category;

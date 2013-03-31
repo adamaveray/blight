@@ -50,7 +50,7 @@ $root->setAttribute('xml:lang', 'en-US');
 	}
 
 	foreach($posts as $post){
-		/** @var \Blight\Interfaces\Post $post */
+		/** @var \Blight\Interfaces\Models\Post $post */
 		$entry	= $dom->createElement('entry');
 
 			$title	= $post->getTitle();

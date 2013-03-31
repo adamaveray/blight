@@ -1,5 +1,5 @@
 <?php
 namespace BlightThemes;
 
-class Basic extends \Blight\Packages\Theme {
+class Basic extends \Blight\Models\Packages\Theme {
 };

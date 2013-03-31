@@ -1,7 +1,7 @@
 <?php
-namespace Blight\Interfaces\Packages;
+namespace Blight\Interfaces\Models\Packages;
 
-interface Theme extends \Blight\Interfaces\Packages\Package {
+interface Theme extends \Blight\Interfaces\Models\Packages\Package {
 	/**
 	 * @param string $name			The template to use
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template

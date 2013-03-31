@@ -1,5 +1,5 @@
 <?php
-namespace Blight\Interfaces;
+namespace Blight\Interfaces\Models;
 
 interface Page {
 	/**

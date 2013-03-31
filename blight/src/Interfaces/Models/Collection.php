@@ -1,5 +1,5 @@
 <?php
-namespace Blight\Interfaces;
+namespace Blight\Interfaces\Models;
 
 interface Collection {
 	/**
@@ -31,9 +31,9 @@ interface Collection {
 	public function setPosts($posts);
 
 	/**
-	 * @param \Blight\Interfaces\Post $post	The post to add
+	 * @param \Blight\Interfaces\Models\Post $post	The post to add
 	 */
-	public function addPost(\Blight\Interfaces\Post $post);
+	public function addPost(\Blight\Interfaces\Models\Post $post);
 
 	/**
 	 * @return array	An array of Post objects

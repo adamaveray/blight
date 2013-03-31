@@ -1,7 +1,7 @@
 <?php
-namespace Blight\Packages;
+namespace Blight\Models\Packages;
 
-abstract class Theme extends Package implements \Blight\Interfaces\Packages\Theme {
+abstract class Theme extends Package implements \Blight\Interfaces\Models\Packages\Theme {
 	protected $templates	= array();
 
 	/**
@@ -16,7 +16,7 @@ abstract class Theme extends Package implements \Blight\Interfaces\Packages\Them
 		// Check if template cached
 		if(!isset($this->templates[$name])){
 			// Create template
-			$this->templates[$name]	= new \Blight\Template($this->blog, $this, $name);
+			$this->templates[$name]	= new \Blight\Models\Template($this->blog, $this, $name);
 		}
 
 		return $this->templates[$name]->render($params);

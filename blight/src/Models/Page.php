@@ -1,7 +1,7 @@
 <?php
-namespace Blight;
+namespace Blight\Models;
 
-class Page implements \Blight\Interfaces\Page {
+class Page implements \Blight\Interfaces\Models\Page {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 

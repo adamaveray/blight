@@ -52,7 +52,7 @@ $root->setAttribute('xmlns', 'http://www.sitemaps.org/schemas/sitemap/0.9');
 
 // Create URLs
 foreach($pages as $page){
-	/** @var \Blight\Interfaces\Page $page */
+	/** @var \Blight\Interfaces\Models\Page $page */
 	$node	= $createURL($dom, $page->getPermalink(), $page->getDate());
 	$root->appendChild($node);
 }

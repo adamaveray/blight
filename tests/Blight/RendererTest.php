@@ -63,9 +63,9 @@ Category: General
 Test content
 EOD;
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-post-1'),
-			new \Blight\Post($this->blog, $content, 'test-post-2'),
-			new \Blight\Post($this->blog, $content, 'test-post-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-post-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-post-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-post-3')
 		);
 		$this->manager->set_mock_posts($posts, 'posts');
 		$this->manager->set_mock_posts($posts, 'drafts');
@@ -100,7 +100,7 @@ Date: 2013-02-01
 Test content
 EOD;
 
-		$page	= new \Blight\Page($this->blog, $content, 'test-page');
+		$page	= new \Blight\Models\Page($this->blog, $content, 'test-page');
 
 		$this->renderer->renderPage($page);
 
@@ -122,8 +122,8 @@ Test content
 EOD;
 
 		$pages	= array(
-			new \Blight\Page($this->blog, $content, 'test-1'),
-			new \Blight\Page($this->blog, $content, 'test-2')
+			new \Blight\Models\Page($this->blog, $content, 'test-1'),
+			new \Blight\Models\Page($this->blog, $content, 'test-2')
 		);
 
 		$this->manager->set_mock_pages($pages);
@@ -133,7 +133,7 @@ EOD;
 		$path	= $this->blog->getPathWWW();
 
 		foreach($pages as $page){
-			/** @var \Blight\Interfaces\Page $page */
+			/** @var \Blight\Interfaces\Models\Page $page */
 			$this->assertTrue(file_exists($path.$page->getRelativePermalink().'.html'));
 		}
 	}
@@ -154,7 +154,7 @@ EOD;
 
 EOD;
 
-		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->renderer->renderPost($post);
 
 		$this->assertEquals($rendered_content, file_get_contents($this->blog->getPathWWW($post->getRelativePermalink().'.html')));
@@ -177,7 +177,7 @@ EOD;
 
 EOD;
 
-		$post	= new \Blight\Post($this->blog, $content, 'test-post');
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->renderer->renderPost($post, '(not a post)');
 	}
 
@@ -194,9 +194,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1', true),
-			new \Blight\Post($this->blog, $content, 'test-2', true),
-			new \Blight\Post($this->blog, $content, 'test-3', true)
+			new \Blight\Models\Post($this->blog, $content, 'test-1', true),
+			new \Blight\Models\Post($this->blog, $content, 'test-2', true),
+			new \Blight\Models\Post($this->blog, $content, 'test-3', true)
 		);
 		$this->manager->set_mock_posts($posts, 'drafts');
 
@@ -226,9 +226,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$date_counts	= array(
@@ -262,9 +262,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
@@ -294,9 +294,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
@@ -328,9 +328,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
@@ -361,9 +361,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->renderer->renderHome();
@@ -386,9 +386,9 @@ Test content
 EOD;
 
 		$posts	= array(
-			new \Blight\Post($this->blog, $content, 'test-1'),
-			new \Blight\Post($this->blog, $content, 'test-2'),
-			new \Blight\Post($this->blog, $content, 'test-3')
+			new \Blight\Models\Post($this->blog, $content, 'test-1'),
+			new \Blight\Models\Post($this->blog, $content, 'test-2'),
+			new \Blight\Models\Post($this->blog, $content, 'test-3')
 		);
 
 		$this->manager->set_mock_posts($posts, 'posts');
@@ -415,8 +415,8 @@ Test content
 EOD;
 
 		$pages	= array(
-			new \Blight\Page($this->blog, $content, 'test-1'),
-			new \Blight\Page($this->blog, $content, 'test-2')
+			new \Blight\Models\Page($this->blog, $content, 'test-1'),
+			new \Blight\Models\Page($this->blog, $content, 'test-2')
 		);
 
 		$this->manager->set_mock_pages($pages);

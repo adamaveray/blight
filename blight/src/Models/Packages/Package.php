@@ -1,7 +1,7 @@
 <?php
-namespace Blight\Packages;
+namespace Blight\Models\Packages;
 
-abstract class Package implements \Blight\Interfaces\Packages\Package {
+abstract class Package implements \Blight\Interfaces\Models\Packages\Package {
 	const TWITTER_URL	= 'https://twitter.com/%s';
 
 	/** @var \Blight\Interfaces\Blog $blog */

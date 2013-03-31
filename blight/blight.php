@@ -101,7 +101,7 @@ debugOutput('Renderer initialised');
 
 	// Render posts and archives
 	foreach($archive as $year){
-		/** @var \Blight\Collections\Year $year */
+		/** @var \Blight\Models\Collections\Year $year */
 		// Render posts
 		$posts		= $year->getPosts();
 		$noPosts	= count($posts);

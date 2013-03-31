@@ -34,10 +34,10 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 		$years	= array();
 
 		foreach($posts as $post){
-			/** @var \Blight\Post $post  */
+			/** @var \Blight\Models\Post $post  */
 			$y	= $post->getDate()->format('Y');
 			if(!isset($years[$y])){
-				$years[$y]	= new \Blight\Collections\Year($this->blog, $y);
+				$years[$y]	= new \Blight\Models\Collections\Year($this->blog, $y);
 			}
 
 			$years[$y]->addPost($post);
@@ -49,7 +49,7 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 	public function getPostsByTag(){
 		$posts	= $this->getPosts();
 		$tag_names	= array_map('trim', explode(',', $posts[0]->getMeta('tags')));
-		$tag	= new \Blight\Collections\Tag($this->blog, current($tag_names));
+		$tag	= new \Blight\Models\Collections\Tag($this->blog, current($tag_names));
 		$tag->setPosts($posts);
 
 		return array($tag);
@@ -57,7 +57,7 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 
 	public function getPostsByCategory(){
 		$posts	= $this->getPosts();
-		$category	= new \Blight\Collections\Category($this->blog, $posts[0]->getMeta('category'));
+		$category	= new \Blight\Models\Collections\Category($this->blog, $posts[0]->getMeta('category'));
 		$category->setPosts($posts);
 
 		return array($category);

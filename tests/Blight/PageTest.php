@@ -11,7 +11,7 @@ class PageTest extends \PHPUnit_Framework_TestCase {
 	protected $content_metadata;
 	protected $content;
 
-	/** @var \Blight\Interfaces\Page */
+	/** @var \Blight\Interfaces\Models\Page */
 	protected $page;
 
 	public function setUp(){
@@ -42,51 +42,51 @@ $meta
 $this->content_text
 EOD;
 
-		$this->page	= new \Blight\Page($this->blog, $this->content, $this->content_slug);
+		$this->page	= new \Blight\Models\Page($this->blog, $this->content, $this->content_slug);
 	}
 
 	/**
-	 * @covers \Blight\Page::__construct
+	 * @covers \Blight\Models\Page::__construct
 	 */
 	public function testConstruct(){
-		$post	= new \Blight\Page($this->blog, $this->content, $this->content_slug);
-		$this->assertInstanceOf('\Blight\Page', $post);
+		$post	= new \Blight\Models\Page($this->blog, $this->content, $this->content_slug);
+		$this->assertInstanceOf('\Blight\Models\Page', $post);
 	}
 
 	/**
-	 * @covers \Blight\Page::__construct
+	 * @covers \Blight\Models\Page::__construct
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testInvalidPageConstruct(){
 		$content	= <<<EOD
 Not A Page
 EOD;
-		new \Blight\Page($this->blog, $content, 'test');
+		new \Blight\Models\Page($this->blog, $content, 'test');
 	}
 
 	/**
-	 * @covers \Blight\Page::getTitle
+	 * @covers \Blight\Models\Page::getTitle
 	 */
 	public function testGetTitle(){
 		$this->assertEquals($this->content_title, $this->page->getTitle(true));
 	}
 
 	/**
-	 * @covers \Blight\Page::getSlug
+	 * @covers \Blight\Models\Page::getSlug
 	 */
 	public function testGetSlug(){
 		$this->assertEquals($this->content_slug, $this->page->getSlug());
 	}
 
 	/**
-	 * @covers \Blight\Page::getDate
+	 * @covers \Blight\Models\Page::getDate
 	 */
 	public function testGetDate(){
 		$this->assertEquals($this->content_date, $this->page->getDate());
 	}
 
 	/**
-	 * @covers \Blight\Page::setDate
+	 * @covers \Blight\Models\Page::setDate
 	 */
 	public function testSetDate(){
 		$date	= new \DateTime('now');
@@ -95,7 +95,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getDateUpdated
+	 * @covers \Blight\Models\Page::getDateUpdated
 	 */
 	public function testGetDateUpdated(){
 		// Should default to date created
@@ -103,7 +103,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::setDateUpdated
+	 * @covers \Blight\Models\Page::setDateUpdated
 	 */
 	public function testSetDateUpdated(){
 		$date	= new \DateTime('now');
@@ -112,14 +112,14 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getContent
+	 * @covers \Blight\Models\Page::getContent
 	 */
 	public function testGetContent(){
 		$this->assertEquals($this->content_text, $this->page->getContent());
 	}
 
 	/**
-	 * @covers \Blight\Page::getMetadata
+	 * @covers \Blight\Models\Page::getMetadata
 	 */
 	public function testGetMetadata(){
 		$meta	= array(
@@ -131,7 +131,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getMeta
+	 * @covers \Blight\Models\Page::getMeta
 	 */
 	public function testGetMeta(){
 		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->getMeta('Test Meta'));
@@ -142,7 +142,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::hasMeta
+	 * @covers \Blight\Models\Page::hasMeta
 	 */
 	public function testHasMeta(){
 		$this->assertTrue($this->page->hasMeta('Test Meta'));
@@ -151,7 +151,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getLink
+	 * @covers \Blight\Models\Page::getLink
 	 */
 	public function testGetLink(){
 		$url	= $this->blog->getURL($this->content_slug);
@@ -159,7 +159,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getPermalink
+	 * @covers \Blight\Models\Page::getPermalink
 	 */
 	public function testGetPermalink(){
 		$url	= $this->blog->getURL($this->content_slug);
@@ -167,7 +167,7 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Page::getRelativePermalink
+	 * @covers \Blight\Models\Page::getRelativePermalink
 	 */
 	public function testGetRelativePermalink(){
 		$url	= $this->content_slug;

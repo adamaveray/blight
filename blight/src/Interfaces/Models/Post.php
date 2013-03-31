@@ -1,7 +1,7 @@
 <?php
-namespace Blight\Interfaces;
+namespace Blight\Interfaces\Models;
 
-interface Post extends \Blight\Interfaces\Page {
+interface Post extends \Blight\Interfaces\Models\Page {
 	/**
 	 * @param \Blight\Interfaces\Blog $blog
 	 * @param string $content	The raw Markdown content for the post
@@ -18,7 +18,7 @@ interface Post extends \Blight\Interfaces\Page {
 	public function getTitle($raw = false);
 
 	/**
-	 * @return \Blight\Collections\Year	The Year collection the post belongs in
+	 * @return \Blight\Models\Collections\Year	The Year collection the post belongs in
 	 */
 	public function getYear();
 
@@ -28,7 +28,7 @@ interface Post extends \Blight\Interfaces\Page {
 	public function getTags();
 
 	/**
-	 * @return \Blight\Collections\Category|null	The Category collection the post belongs in, or null
+	 * @return \Blight\Models\Collections\Category|null	The Category collection the post belongs in, or null
 	 */
 	public function getCategory();
 

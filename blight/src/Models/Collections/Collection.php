@@ -1,7 +1,7 @@
 <?php
-namespace Blight\Collections;
+namespace Blight\Models\Collections;
 
-abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
+abstract class Collection implements \Blight\Interfaces\Models\Collection, \Iterator {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
@@ -66,8 +66,8 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 			throw new \InvalidArgumentException('Posts must be an array');
 		}
 		foreach($posts as $post){
-			if(!($post instanceof \Blight\Interfaces\Post)){
-				throw new \InvalidArgumentException('Posts must be instances of \Blight\Interfaces\Post');
+			if(!($post instanceof \Blight\Interfaces\Models\Post)){
+				throw new \InvalidArgumentException('Posts must be instances of \Blight\Interfaces\Models\Post');
 			}
 		}
 
@@ -78,9 +78,9 @@ abstract class Collection implements \Blight\Interfaces\Collection, \Iterator {
 	 * Adds a post to the collection's Posts.
 	 * Duplicates are not checked for
 	 *
-	 * @param \Blight\Interfaces\Post $post	The post to add
+	 * @param \Blight\Interfaces\Models\Post $post	The post to add
 	 */
-	public function addPost(\Blight\Interfaces\Post $post){
+	public function addPost(\Blight\Interfaces\Models\Post $post){
 		if(!isset($this->posts)){
 			$this->posts	= array();
 		}

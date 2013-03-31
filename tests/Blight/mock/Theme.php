@@ -1,7 +1,7 @@
 <?php
 namespace Blight\Tests\Mock;
 
-class Theme implements \Blight\Interfaces\Packages\Theme {
+class Theme implements \Blight\Interfaces\Models\Packages\Theme {
 	protected $blog;
 	protected $config;
 	protected $path;
@@ -18,7 +18,7 @@ class Theme implements \Blight\Interfaces\Packages\Theme {
 	}
 
 	public function renderTemplate($name, $params = null){
-		$template	= new \Blight\Template($this->blog, $this, $name);
+		$template	= new \Blight\Models\Template($this->blog, $this, $name);
 		return $template->render($params);
 	}
 

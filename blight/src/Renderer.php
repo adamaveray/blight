@@ -22,7 +22,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @param \Blight\Interfaces\Manager $manager
 	 * @throws \RuntimeException	Web or templates directory cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager, \Blight\Interfaces\Packages\Theme $theme){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Manager $manager, \Blight\Interfaces\Models\Packages\Theme $theme){
 		$this->blog		= $blog;
 		$this->manager	= $manager;
 		$this->theme	= $theme;
@@ -60,7 +60,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 
 		} elseif(isset($this->inbuiltTemplates[$name])){
 			// Use default template
-			$template	= new \Blight\Template($this->blog, $this->theme, $name, $this->inbuiltTemplates[$name]);
+			$template	= new \Blight\Models\Template($this->blog, $this->theme, $name, $this->inbuiltTemplates[$name]);
 			return $template->render($params);
 
 		} else {
@@ -101,9 +101,9 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static file for the given page
 	 *
-	 * @param \Blight\Interfaces\Page $page	The page to generate an HTML page from
+	 * @param \Blight\Interfaces\Models\Page $page	The page to generate an HTML page from
 	 */
-	public function renderPage(\Blight\Interfaces\Page $page){
+	public function renderPage(\Blight\Interfaces\Models\Page $page){
 		$path	= $this->blog->getPathWWW($page->getRelativePermalink().'.html');
 
 		$this->renderTemplateToFile('page', $path, array(
@@ -120,7 +120,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$pages	= $this->manager->getPages();
 
 		foreach($pages as $page){
-			/** @var \Blight\Interfaces\Page $page */
+			/** @var \Blight\Interfaces\Models\Page $page */
 			$this->renderPage($page);
 		}
 	}
@@ -128,12 +128,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static file for the given post
 	 *
-	 * @param \Blight\Interfaces\Post $post	The post to generate the page for
-	 * @param \Blight\Interfaces\Post|null $prev	The adjacent previous/older post to the given post
-	 * @param \Blight\Interfaces\Post|null $next	The adjacent next/newer post to the given post
-	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Post
+	 * @param \Blight\Interfaces\Models\Post $post	The post to generate the page for
+	 * @param \Blight\Interfaces\Models\Post|null $prev	The adjacent previous/older post to the given post
+	 * @param \Blight\Interfaces\Models\Post|null $next	The adjacent next/newer post to the given post
+	 * @throws \InvalidArgumentException	Previous or next posts are not instances of \Blight\Interfaces\Models\Post
 	 */
-	public function renderPost(\Blight\Interfaces\Post $post, $prev = null, $next = null){
+	public function renderPost(\Blight\Interfaces\Models\Post $post, $prev = null, $next = null){
 		if($post->isBeingPublished()){
 			$this->blog->doHook('will_publish_post', array(
 				'post'	=> $post
@@ -147,14 +147,14 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			'page_title'	=> $post->getTitle()
 		);
 		if(isset($prev)){
-			if(!($prev instanceof \Blight\Interfaces\Post)){
-				throw new \InvalidArgumentException('Previous post must be instance of \Blight\Interfaces\Post');
+			if(!($prev instanceof \Blight\Interfaces\Models\Post)){
+				throw new \InvalidArgumentException('Previous post must be instance of \Blight\Interfaces\Models\Post');
 			}
 			$params['post_prev']	= $prev;
 		}
 		if(isset($next)){
-			if(!($next instanceof \Blight\Interfaces\Post)){
-				throw new \InvalidArgumentException('Next post must be instance of \Blight\Interfaces\Post');
+			if(!($next instanceof \Blight\Interfaces\Models\Post)){
+				throw new \InvalidArgumentException('Next post must be instance of \Blight\Interfaces\Models\Post');
 			}
 			$params['post_next']	= $next;
 		}
@@ -177,7 +177,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$outputPath	= $this->blog->getPathDraftsWeb();
 
 		foreach($drafts as $draftPost){
-			/** @var \Blight\Interfaces\Post $draftPost */
+			/** @var \Blight\Interfaces\Models\Post $draftPost */
 			$path	= $outputPath.$draftPost->getSlug().'.html';
 			$this->renderTemplateToFile('post', $path, array(
 				'post'			=> $draftPost,
@@ -204,7 +204,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static files for posts in the provided year
 	 *
-	 * @param \Blight\Interfaces\Collection $year	The archive year to render
+	 * @param \Blight\Interfaces\Models\Collection $year	The archive year to render
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 0 (no pagination)]
@@ -212,7 +212,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @see renderArchives
 	 * @see renderCollection
 	 */
-	public function renderYear(\Blight\Interfaces\Collection $year, $options = null){
+	public function renderYear(\Blight\Interfaces\Models\Collection $year, $options = null){
 		$this->renderCollection($year, 'year', 'Archive '.$year->getName(), $options);
 	}
 
@@ -247,7 +247,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static files for posts grouped by the provided collections
 	 *
-	 * @param array $collections	An array of \Blight\Interfaces\Collection objects
+	 * @param array $collections	An array of \Blight\Interfaces\Models\Collection objects
 	 * @param string $collectionType	The name of collection, used to assign it as a template variable
 	 * @param string $titleFormat	A sprintf-formatted string for each collection's page title. The collection
 	 * 								name will be passed in (replacing %s)
@@ -257,7 +257,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 */
 	protected function renderCollections($collections, $collectionType, $titleFormat, $options = null){
 		foreach($collections as $collection){
-			/** @var \Blight\Interfaces\Collection $collection */
+			/** @var \Blight\Interfaces\Models\Collection $collection */
 			$this->renderCollection($collection, $collectionType, sprintf($titleFormat, $collection->getName()), $options);
 		}
 	}
@@ -265,12 +265,12 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static file for posts within the provided collection
 	 *
-	 * @param \Blight\Interfaces\Collection $collection	The collection to render
+	 * @param \Blight\Interfaces\Models\Collection $collection	The collection to render
 	 * @param string $collectionType	The name of collection, used to assign it as a template variable
 	 * @param string $pageTitle			The title to be used for the rendered collection page
 	 * @param array|null $options		An array of options to alter the rendered pages
 	 */
-	protected function renderCollection(\Blight\Interfaces\Collection $collection, $collectionType, $pageTitle, $options = null){
+	protected function renderCollection(\Blight\Interfaces\Models\Collection $collection, $collectionType, $pageTitle, $options = null){
 		$options	= array_merge(array(
 			'per_page'	=> 0	// Default to no pagination
 		), (array)$options);
@@ -303,7 +303,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * 			)
 	 *		)
 	 */
-	protected function paginateCollection(\Blight\Interfaces\Collection $collection, $perPage){
+	protected function paginateCollection(\Blight\Interfaces\Models\Collection $collection, $perPage){
 		$returnPages	= array();
 
 		$posts	= $collection->getPosts();
@@ -387,14 +387,14 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			// Category feeds
 			$categories	= $this->manager->getPostsByCategory();
 			foreach($categories as $category){
-				/** @var \Blight\Interfaces\Collection $category */
+				/** @var \Blight\Interfaces\Models\Collection $category */
 				$this->renderFeed('category/'.$category->getSlug(), $category->getPosts(), $options);
 			}
 
 			// Tag feeds
 			$tags	= $this->manager->getPostsByTag();
 			foreach($tags as $tag){
-				/** @var \Blight\Interfaces\Collection $tag */
+				/** @var \Blight\Interfaces\Models\Collection $tag */
 				$this->renderFeed('tag/'.$tag->getSlug(), $tag->getPosts(), $options);
 			}
 		}
@@ -404,7 +404,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * Generates and saves the static XML file for an RSS feed.
 	 *
 	 * @param string $path	The path to save the XML file to
-	 * @param array $posts	An array of \Blight\Interfaces\Post objects
+	 * @param array $posts	An array of \Blight\Interfaces\Models\Post objects
 	 * @param array|null $options	An array of options to alter the rendered pages
 	 *
 	 * 		'limit':	An int specifying the number of posts to include. 0 includes all posts [Default: 20]

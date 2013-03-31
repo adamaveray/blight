@@ -38,7 +38,7 @@ $channel	= $dom->createElement('channel');
 	));
 
 	foreach($posts as $post){
-		/** @var \Blight\Interfaces\Post $post */
+		/** @var \Blight\Interfaces\Models\Post $post */
 		$item	= $dom->createElement('item');
 
 			$title	= $post->getTitle();

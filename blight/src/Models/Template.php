@@ -1,7 +1,7 @@
 <?php
-namespace Blight;
+namespace Blight\Models;
 
-class Template implements \Blight\Interfaces\Template {
+class Template implements \Blight\Interfaces\Models\Template {
 	const TYPE_PHP	= 'php';
 	const TYPE_TWIG	= 'twig';
 
@@ -11,7 +11,7 @@ class Template implements \Blight\Interfaces\Template {
 
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
-	/** @var \Blight\Interfaces\Packages\Theme */
+	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
 	protected $dir;
 	protected $name;
@@ -26,7 +26,7 @@ class Template implements \Blight\Interfaces\Template {
 	 * @param string $dir			The directory to look for templates in
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Packages\Theme $theme, $name, $dir = null){
+	public function __construct(\Blight\Interfaces\Blog $blog, \Blight\Interfaces\Models\Packages\Theme $theme, $name, $dir = null){
 		$this->blog		= $blog;
 		$this->theme	= $theme;
 
@@ -106,7 +106,7 @@ class Template implements \Blight\Interfaces\Template {
 	protected function renderPHP($params){
 		$params['blog']		= $this->blog;
 		$params['theme']	= $this->theme;
-		$params['text']		= new TextProcessor($this->blog);
+		$params['text']		= new \Blight\TextProcessor($this->blog);
 
 		extract($params);
 		ob_start();
@@ -156,7 +156,7 @@ class Template implements \Blight\Interfaces\Template {
 
 			// Set up filters
 			$blog	= $this->blog;
-			$textProcessor	= new TextProcessor($this->blog);
+			$textProcessor	= new \Blight\TextProcessor($this->blog);
 
 			// Markdown filter
 			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){

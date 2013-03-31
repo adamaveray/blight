@@ -115,7 +115,7 @@ interface Blog {
 	public function getPackageManager();
 
 	/**
-	 * @return \Blight\Interfaces\Packages\Theme
+	 * @return \Blight\Interfaces\Models\Packages\Theme
 	 */
 	public function getTheme();
 

@@ -135,7 +135,7 @@ EOD;
 		$this->assertTrue(is_array($pages));
 		$this->assertEquals(count($pages), self::$pages_count);
 		foreach($pages as $page){
-			$this->assertInstanceOf('\Blight\Interfaces\Page', $page);
+			$this->assertInstanceOf('\Blight\Interfaces\Models\Page', $page);
 		}
 	}
 
@@ -147,7 +147,7 @@ EOD;
 		$this->assertTrue(is_array($posts));
 		$this->assertEquals(count($posts), self::$drafts_count);
 		foreach($posts as $post){
-			$this->assertInstanceOf('\Blight\Interfaces\Post', $post);
+			$this->assertInstanceOf('\Blight\Interfaces\Models\Post', $post);
 			$this->assertTrue($post->isDraft());
 		}
 	}
@@ -160,7 +160,7 @@ EOD;
 		$this->assertTrue(is_array($posts));
 		$this->assertEquals(count($posts), self::$posts_count);
 		foreach($posts as $post){
-			$this->assertInstanceOf('\Blight\Interfaces\Post', $post);
+			$this->assertInstanceOf('\Blight\Interfaces\Models\Post', $post);
 			$this->assertFalse($post->isDraft());
 		}
 	}
@@ -173,7 +173,7 @@ EOD;
 		$this->assertTrue(is_array($archive));
 		$this->assertEquals(self::$collection_count_year, count($archive));
 		foreach($archive as $year){
-			$this->assertInstanceOf('\Blight\Collections\Year', $year);
+			$this->assertInstanceOf('\Blight\Models\Collections\Year', $year);
 		}
 	}
 
@@ -185,7 +185,7 @@ EOD;
 		$this->assertTrue(is_array($tags));
 		$this->assertEquals(self::$collection_count_tag, count($tags));
 		foreach($tags as $tag){
-			$this->assertInstanceOf('\Blight\Collections\Tag', $tag);
+			$this->assertInstanceOf('\Blight\Models\Collections\Tag', $tag);
 		}
 	}
 
@@ -197,7 +197,7 @@ EOD;
 		$this->assertTrue(is_array($categories));
 		$this->assertEquals(self::$collection_count_category, count($categories));
 		foreach($categories as $category){
-			$this->assertInstanceOf('\Blight\Collections\Category', $category);
+			$this->assertInstanceOf('\Blight\Models\Collections\Category', $category);
 		}
 	}
 
