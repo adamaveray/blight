@@ -148,6 +148,7 @@ The default author for the blog. The value must be the name of one of the author
 - **web**: The path to output rendered files to
 - **drafts_web**: The path to output rendered draft post files to
 - **cache**: The path various cache files can be written to
+- **log**: The path to write the system log it. If not set, logging will not occur.
 
 ### Limits
 
