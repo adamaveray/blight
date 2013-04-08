@@ -258,10 +258,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getFileSystem(){
 		if(!isset($this->fileSystem)){
-			$this->fileSystem	= new \Blight\FileSystem($this);
+			throw new \RuntimeException('File system has not been set');
 		}
 
 		return $this->fileSystem;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\FileSystem $fileSystem
+	 */
+	public function setFileSystem(\Blight\Interfaces\FileSystem $fileSystem){
+		$this->fileSystem	= $fileSystem;
 	}
 
 	/**
@@ -269,10 +276,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getPackageManager(){
 		if(!isset($this->packageManager)){
-			$this->packageManager	= new \Blight\PackageManager($this);
+			throw new \RuntimeException('Package manager has not been set');
 		}
 
 		return $this->packageManager;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\PackageManager $packageManager
+	 */
+	public function setPackageManager(\Blight\Interfaces\PackageManager $packageManager){
+		$this->packageManager	= $packageManager;
 	}
 
 	/**
@@ -280,16 +294,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getLogger(){
 		if(!isset($this->logger)){
-			$this->logger	= new \Monolog\Logger(trim(__NAMESPACE__,'\\'));
-			$this->logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
-
-			$logPath	= $this->get('log', 'paths');
-			if(isset($logPath)){
-				$this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->getPathRoot($logPath), \Monolog\Logger::INFO));
-			}
+			throw new \RuntimeException('Logger has not been set');
 		}
 
 		return $this->logger;
+	}
+
+	/**
+	 * @param \Psr\Log\LoggerInterface $logger
+	 */
+	public function setLogger(\Psr\Log\LoggerInterface $logger){
+		$this->logger	= $logger;
 	}
 
 	/**

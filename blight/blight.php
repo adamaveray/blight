@@ -69,6 +69,18 @@ $config	= $parser->unserialize(file_get_contents($configFile));
 $config['root_path']	= $rootPath;
 $blog	= new \Blight\Blog($config);
 
+// Set dependencies
+$blog->setFileSystem(new \Blight\FileSystem($blog));
+$blog->setPackageManager(new \Blight\PackageManager($blog));
+	$logger	= new \Monolog\Logger('Blight');
+	$logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
+
+	$logPath	= $blog->get('log', 'paths');
+	if(isset($logPath)){
+		$logger->pushHandler(new \Monolog\Handler\StreamHandler($blog->getPathRoot($logPath), \Monolog\Logger::INFO));
+	}
+$blog->setLogger($logger);
+
 // Load posts
 $manager	= new \Blight\Manager($blog);
 $blog->getLogger()->debug('Manager initialised');

@@ -192,26 +192,6 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
-	 * @covers \Blight\Blog::getFileSystem
-	 */
-	public function testGetFileSystem(){
-		$this->assertInstanceOf('\Blight\FileSystem', $this->blog->getFileSystem());
-
-		// Should be same instance
-		$this->assertEquals($this->blog->getFileSystem(), $this->blog->getFileSystem());
-	}
-
-	/**
-	 * @covers \Blight\Blog::getPackageManager
-	 */
-	public function testGetPackageManager(){
-		$this->assertInstanceOf('\Blight\PackageManager', $this->blog->getPackageManager());
-
-		// Should be same instance
-		$this->assertEquals($this->blog->getPackageManager(), $this->blog->getPackageManager());
-	}
-
-	/**
 	 * @covers \Blight\Blog::get
 	 */
 	public function testGet(){
