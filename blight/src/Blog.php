@@ -281,6 +281,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	public function getLogger(){
 		if(!isset($this->logger)){
 			$this->logger	= new \Monolog\Logger(trim(__NAMESPACE__,'\\'));
+			$this->logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
 
 			$logPath	= $this->get('log', 'paths');
 			if(isset($logPath)){
