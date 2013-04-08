@@ -46,7 +46,6 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 		);
 		$result	= $this->getCachedOutput($cacheKey);
 		if($result){
-			\debugOutput('• Cache Hit');
 			return $result;
 		}
 

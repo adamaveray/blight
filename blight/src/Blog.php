@@ -16,6 +16,9 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Blight\Interfaces\PackageManager */
 	protected $packageManager;
 
+	/** @var \Psr\Log\LoggerInterface */
+	protected $logger;
+
 	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
 
@@ -270,6 +273,23 @@ class Blog implements \Blight\Interfaces\Blog {
 		}
 
 		return $this->packageManager;
+	}
+
+	/**
+	 * @return \Psr\Log\LoggerInterface	The logger instance
+	 */
+	public function getLogger(){
+		if(!isset($this->logger)){
+			$this->logger	= new \Monolog\Logger(trim(__NAMESPACE__,'\\'));
+			$this->logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
+
+			$logPath	= $this->get('log', 'paths');
+			if(isset($logPath)){
+				$this->logger->pushHandler(new \Monolog\Handler\StreamHandler($this->getPathRoot($logPath), \Monolog\Logger::INFO));
+			}
+		}
+
+		return $this->logger;
 	}
 
 	/**
