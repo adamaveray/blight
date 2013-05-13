@@ -69,6 +69,25 @@ $config	= $parser->unserialize(file_get_contents($configFile));
 $config['root_path']	= $rootPath;
 $blog	= new \Blight\Blog($config);
 
+if(IS_CLI){
+	if(isset($_SERVER['argv'][1])){
+		$command	= $_SERVER['argv'][1];
+
+		if(preg_match('~config:(.*)~', $command, $matches)){
+			$config	= explode('.', $matches[1], 2);
+			if(!isset($config[1])){
+				array_unshift($config, null);
+			}
+
+			$value	= $blog->get($config[1], $config[0]);
+
+			echo $value;
+		}
+
+		exit;
+	}
+}
+
 // Set dependencies
 $blog->setFileSystem(new \Blight\FileSystem($blog));
 $blog->setPackageManager(new \Blight\PackageManager($blog));
