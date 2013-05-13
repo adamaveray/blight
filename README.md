@@ -97,11 +97,13 @@ Loading the `index.php` file causes the site to be rebuilt. Once the site is bui
 
 The simplest way to reload the site is to manually enter `index.php` into your address bar.
 
-Alternatively, deleting the entire `{www}/_blogs/` directory will cause home page requests to again go through the PHP file.
+Alternatively, deleting the entire `{www}/_blogs/` directory will cause home page requests to again go through the PHP file, causing the site to rebuild on the next request.
+
+Once the pages are built, the page will automatically reload showing the generated static home page. Rebuilding the site should take only a few seconds.
 
 A site rebuild can also be triggered from the command line, by navigating to the directory the system is installed to, and running the command `php Blight.phar`. The optional flag `-v` outputs additional information as the site is built.
 
-Once the pages are built, the page will automatically reload showing the generated static home page. Rebuilding the site should take only a few seconds.
+The most advanced way to rebuild the site is to run the `run.sh` script from the terminal. If `inotify` is installed on the server, the script will monitor the directories, and automatically rebuild the site when any post or page is changed, including drafts.
 
 
 ### Updating
