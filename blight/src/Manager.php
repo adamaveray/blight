@@ -58,7 +58,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			$rawFiles	= glob($dir.'/*');
 			foreach($rawFiles as $file){
 				if(is_dir($file)){
-					$files	= array_merge($files, get_sub_pages($file));
+					$files	= array_merge($files, getSubPages($file));
 				} else {
 					$files[]	= $file;
 				}
@@ -372,9 +372,9 @@ class Manager implements \Blight\Interfaces\Manager {
 			}
 
 			// Group post by category
-			$category	= $post->getCategory();
-			if(isset($category)){
-				$slug		= $category->getSlug();
+			$categories	= $post->getCategories();
+			foreach($categories as $category){
+				$slug	= $category->getSlug();
 				if(!isset($this->postsByCategory[$slug])){
 					$this->postsByCategory[$slug]	= $category;
 				}

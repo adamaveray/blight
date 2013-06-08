@@ -78,9 +78,11 @@ Simple pages in the same format as posts can be saved to the `pages/` directory,
 
 	`Tags: Example Tag, Other Tag`
 
-- **Category**: A category to group the post under. Similar to _tags_, it should be written in a human-readable format, as a URL-friendly versions will be generated automatically.
+- **Category**/**Categories**: A category or categories to group the post under. Similar to _tags_, it should be written in a human-readable format, as a URL-friendly versions will be generated automatically.
 
 	`Category: General`
+
+	`Categories: General, Special`
 
 - **Summary**: A summary of the post's content, in a single line of plaintext
 

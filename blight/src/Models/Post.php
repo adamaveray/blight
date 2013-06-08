@@ -7,7 +7,7 @@ namespace Blight\Models;
 class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post {
 	protected $year;
 	protected $tags;
-	protected $category;
+	protected $categories;
 	protected $isDraft;
 	protected $link;
 	protected $isBeingPublished;
@@ -134,8 +134,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	/**
 	 * Creates collections for each tag assigned to the post.
 	 *
-	 * The post could have no tags assigned, which would result in an
-	 * empty array being returned.
+	 * If the post has no tags assigned, an empty array will be returned
 	 *
 	 * @return array    An array of Tag collections
 	 */
@@ -156,18 +155,31 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	}
 
 	/**
-	 * Creates a collection for the category the post has assigned.
+	 * Creates collections for each category assigned to the post.
 	 *
-	 * If the post has no category assigned, null will be returned
+	 * If the post has no categories assigned, an empty array will be returned
 	 *
-	 * @return \Blight\Models\Collections\Category|null    The Category collection the post belongs in, or null
+	 * @return array	An array of Category collections
 	 */
-	public function getCategory(){
-		if(!isset($this->category) && $this->hasMeta('category')){
-			$this->category = new \Blight\Models\Collections\Category($this->blog, $this->getMeta('category'));
+	public function getCategories(){
+		if(!isset($this->categories)){
+			$rawCategories	= null;
+			if($this->hasMeta('categories')){
+				$rawCategories	= explode(',', $this->getMeta('categories'));
+			} elseif($this->hasMeta('category')){
+				$rawCategories	= array($this->getMeta('category'));
+			}
+
+			if(isset($rawCategories)){
+				$this->categories	= array_map(function($item){
+					return new \Blight\Models\Collections\Category($this->blog, $item);
+				}, array_unique(array_map('trim', $rawCategories)));
+			} else {
+				$this->categories	= array();
+			}
 		}
 
-		return $this->category;
+		return $this->categories;
 	}
 
 	/**

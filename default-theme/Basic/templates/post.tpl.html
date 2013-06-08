@@ -36,10 +36,17 @@
 			</p>
 		{% endif %}
 
-        {% set category = post.category %}
-        {% if category is not empty %}
-			<p class="category">
-				<strong>Category:</strong> <a href="{{ category.url|e }}">{{ category.name|e|typo }}</a>
+        {% set categories = post.category %}
+        {% if categories is not empty %}
+			<p class="categories">
+				<strong>Categories:</strong>
+                <ul>
+                {% for category in categories %}
+                    <li>
+                        <a href="{{ category.url|e }}">{{ category.name|e|typo }}</a>
+                    </li>
+                {% endfor %}
+                </ul>
 			</p>
 		{% endif %}
 

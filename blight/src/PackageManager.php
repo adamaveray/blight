@@ -93,7 +93,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 
 		if(!file_exists($packageInitialiser) || !file_exists($packageManifest)){
 			// Plugin missing initialisation file
-			throw new \RuntimeException('Package files missing');
+			throw new \RuntimeException('Package files missing ('.$packageInitialiser.': '.(file_exists($packageInitialiser) ? 1 : 0).', '.$packageManifest.': '.(file_exists($packageManifest) ? 1 : 0).')');
 		}
 
 		// Parse manifest

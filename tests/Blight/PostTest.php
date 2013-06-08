@@ -254,13 +254,14 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Models\Post::getCategory
+	 * @covers \Blight\Models\Post::getCategories
 	 */
-	public function testGetCategory(){
-		$category	= $this->post->getCategory();
-		$this->assertInstanceOf('\Blight\Models\Collections\Category', $category);
+	public function testGetCategories(){
+		$categories	= $this->post->getCategories();
+		$this->assertTrue(count($categories) > 0);
+		$this->assertInstanceOf('\Blight\Models\Collections\Category', current($categories));
 
-		$this->assertEquals($this->content_category, $category->getName());
+		$this->assertEquals($this->content_category, current($categories)->getName());
 	}
 
 	/**
@@ -292,9 +293,9 @@ EOD;
 	}
 
 	/**
-	 * @covers \Blight\Models\Post::getCategory
+	 * @covers \Blight\Models\Post::getCategories
 	 */
-	public function testNoCategoryGetCategory(){
+	public function testNoCategoryGetCategories(){
 		$content	= <<<EOD
 Test Post
 =========
@@ -303,8 +304,10 @@ Date: 2013-01-01
 Test content
 EOD;
 		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
-		$category	= $post->getCategory();
-		$this->assertNull($category);
+		$categories	= $post->getCategories();
+
+		$this->assertTrue(is_array($categories));
+		$this->assertEmpty($categories);
 	}
 
 	/**
