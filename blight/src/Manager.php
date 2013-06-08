@@ -465,10 +465,12 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * Deletes any rendered drafts without an associated draft post
 	 */
 	public function cleanupDrafts(){
+		$renderedExt	= 'html';
+
 		$postsDir	= $this->blog->getPathDrafts();
-		$files	= glob($this->blog->getPathDraftsWeb('*.html'));
+		$files	= glob($this->blog->getPathDraftsWeb('*.'.$renderedExt));
 		foreach($files as $file){
-			$slug	= pathinfo($file, \PATHINFO_BASENAME);
+			$slug	= preg_replace('~\.'.$renderedExt.'$~i', '', pathinfo($file, \PATHINFO_BASENAME));
 
 			$found	= false;
 			foreach($this->allowedExtensions as $ext){
