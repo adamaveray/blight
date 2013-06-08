@@ -99,6 +99,9 @@ interface Blog {
 	 */
 	public function getDescription();
 
+	/** @return \DateTimezone	The blog publishing timezone */
+	public function getTimezone();
+
 	/**
 	 * @return string	The URL to the site feed
 	 */

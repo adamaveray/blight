@@ -11,16 +11,20 @@ class PageTest extends \PHPUnit_Framework_TestCase {
 	protected $content_metadata;
 	protected $content;
 
+	protected $timezone;
+
 	/** @var \Blight\Interfaces\Models\Page */
 	protected $page;
 
 	public function setUp(){
 		global $config;
+		$this->timezone	= new \DateTimezone($config['site']['timezone']);
+
 		$this->blog	= new \Blight\Blog($config);
 
 		$this->content_title	= 'Test Page';
 		$this->content_slug		= 'test-page';
-		$this->content_date		= new \DateTime();
+		$this->content_date		= new \DateTime('now', $this->timezone);
 		$this->content_metadata	= array(
 			'Date'		=> $this->content_date->format('Y-m-d H:i:s'),
 			'Test Meta'	=> 'Test Value'
@@ -89,7 +93,7 @@ EOD;
 	 * @covers \Blight\Models\Page::setDate
 	 */
 	public function testSetDate(){
-		$date	= new \DateTime('now');
+		$date	= new \DateTime('now', $this->timezone);
 		$this->page->setDate($date);
 		$this->assertEquals($date, $this->page->getDate());
 	}
@@ -106,7 +110,7 @@ EOD;
 	 * @covers \Blight\Models\Page::setDateUpdated
 	 */
 	public function testSetDateUpdated(){
-		$date	= new \DateTime('now');
+		$date	= new \DateTime('now', $this->timezone);
 		$this->page->setDateUpdated($date);
 		$this->assertEquals($date, $this->page->getDateUpdated());
 	}

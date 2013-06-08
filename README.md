@@ -134,6 +134,7 @@ Additional fine-tuning of the site's behaviour can be made in the `config.json` 
 - **name**: The blog's name, used in the RSS feed and available in templates
 - **url**: The URL to the blog, including any directories if appropriate
 - **description**: The blog's description, used in the RSS feed and available in templates
+- **timezone**: The timezone posts are written in (from [this list](http://php.net/manual/en/timezones.php))
 
 ### Author
 

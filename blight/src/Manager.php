@@ -113,7 +113,9 @@ class Manager implements \Blight\Interfaces\Manager {
 
 		// Modified time
 		try {
-			$post->setDateUpdated(new \DateTime('@'.filemtime($rawPost)));
+			$date	= new \DateTime('@'.filemtime($rawPost));
+			$date->setTimezone($this->blog->getTimezone());
+			$post->setDateUpdated($date);
 		} catch(\Exception $e){}
 
 		return $post;
@@ -153,7 +155,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 			if(!$hasDate && ($hasPublish || !$post->isDraft())){
 				// Add date header
-				$now	= new \DateTime();
+				$now	= new \DateTime('now', $this->blog->getTimezone());
 				$post->setDate($now);
 				$dateLine	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
 				array_splice($lines, 2, 0, $dateLine);
@@ -211,7 +213,9 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				$page->setDateUpdated(new \DateTime('@'.filemtime($file)));
+				$date	= new \DateTime('@'.filemtime($file));
+				$date->setTimezone($this->blog->getTimezone());
+				$page->setDateUpdated($date);
 
 				$pages[]	= $page;
 			}
@@ -254,7 +258,9 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				$post->setDateUpdated(new \DateTime('@'.filemtime($file)));
+				$date	= new \DateTime('@'.filemtime($file));
+				$date->setTimezone($this->blog->getTimezone());
+				$post->setDateUpdated($date);
 
 				$posts[]	= $post;
 			}

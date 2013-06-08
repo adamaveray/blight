@@ -29,6 +29,8 @@ class Blog implements \Blight\Interfaces\Blog {
 	protected $name;
 	protected $paths;
 	protected $authors;
+	/** @var \DateTimezone */
+	protected $timezone;
 
 	/**
 	 * Processes all configuration settings for the blog
@@ -242,6 +244,20 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getDescription(){
 		return isset($this->config['site']['description']) ? $this->config['site']['description'] : null;
+	}
+
+	/** @return \DateTimezone	The blog publishing timezone */
+	public function getTimezone(){
+		if(!isset($this->timezone)){
+			$defaultTimezone	= 'UTC';
+			try {
+				$this->timezone	= new \DateTimezone($this->get('timezone', 'site', $defaultTimezone));
+			} catch(\Exception $e){
+				$this->timezone	= new \DateTimezone($defaultTimezone);
+			}
+		}
+
+		return $this->timezone;
 	}
 
 	/**

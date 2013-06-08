@@ -34,7 +34,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 
 		if($this->hasMeta('date')){
 			try {
-				$this->date = new \DateTime($this->getMeta('date'));
+				$this->date = new \DateTime($this->getMeta('date'), $this->blog->getTimezone());
 			} catch(\Exception $e){
 				throw new \InvalidArgumentException('Article date invalid');
 			}
@@ -76,7 +76,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 		if(!isset($this->date)){
 			if($this->isDraft()){
 				// Draft - use current date
-				return new \DateTime();
+				return new \DateTime('now', $this->blog->getTimezone());
 			} else {
 				throw new \RuntimeException('Post does not have date set');
 			}

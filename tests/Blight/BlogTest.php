@@ -168,6 +168,14 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Blog::getTimezone
+	 */
+	public function testGetTimezone(){
+		$this->assertInstanceOf('\DateTimezone', $this->blog->getTimezone());
+		$this->assertEquals($this->config['site']['timezone'], $this->blog->getTimezone()->getName());
+	}
+
+	/**
 	 * @covers \Blight\Blog::getFeedURL
 	 */
 	public function testGetFeedUrl(){

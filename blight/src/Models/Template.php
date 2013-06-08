@@ -147,6 +147,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader, array(
 				'cache' => ($this->blog->get('cache_twig', 'output', false) ? $this->blog->getPathCache('twig/') : null)
 			));
+			self::$twigEnvironments[$dir]->getExtension('core')->setTimezone($this->blog->get('timezone', 'site', 'UTC'));
 
 			// Add globals
 			self::$twigEnvironments[$dir]->addGlobal('blog', $this->blog);
