@@ -157,7 +157,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				// Add date header
 				$now	= new \DateTime('now', $this->blog->getTimezone());
 				$post->setDate($now);
-				$dateLine	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
+				$dateLine	= 'Date:'."\t".$now->format('Y-m-d H:i:s');
 				array_splice($lines, 2, 0, $dateLine);
 			}
 
