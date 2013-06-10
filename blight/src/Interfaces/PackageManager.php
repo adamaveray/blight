@@ -23,6 +23,8 @@ interface PackageManager {
 	 * 		doHook('hook_name', array(
 	 * 			'param'	=> &$value
 	 *  	));
+	 *
+	 * @param \Blight\Interfaces\Models\Packages\Plugin|null $theme	An optional theme to also apply hooks to
 	 */
-	public function doHook($hook, $params = null);
+	public function doHook($hook, $params = null, \Blight\Interfaces\Models\Packages\Plugin $theme = null);
 };

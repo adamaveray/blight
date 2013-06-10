@@ -19,6 +19,8 @@ This file must contain a class of the same name, extending `\Blight\Models\Packa
 
 - `\Blight\Interfaces\Models\Packages\Plugin`: Plugin hooks will be called on the class
 
+Themes can also be plugins, provided they also implement the above interface. If the interface is not implemented, no hooks will be called on the theme. _Only the active theme will have hooks called on it._
+
 
 ### Hooks
 

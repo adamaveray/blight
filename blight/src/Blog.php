@@ -355,7 +355,18 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @see \Blight\PackageManager::doHook
 	 */
 	public function doHook($hook, $params = null){
-		$this->getPackageManager()->doHook($hook, $params);
+		try {
+			$theme	= $this->getTheme();
+			if(!($theme instanceof \Blight\Interfaces\Models\Packages\Plugin)){
+				throw new \Exception();
+			}
+		} catch(\Exception $e){
+			$theme	= null;
+		}
+
+		try {
+			$this->getPackageManager()->doHook($hook, $params, $theme);
+		} catch(\Exception $e){}
 	}
 
 	/**

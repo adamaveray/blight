@@ -162,17 +162,24 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * Runs a hook through plugins
 	 *
 	 * @param string $hook	The name of the hook to run
-	 * @param array|null $params	An array of parameters to pass to plugins. Parameters must be passed by reference:
+	 * @param array|null $params	An array of parameters to pass to plugins. Editable parameters must be passed by reference:
 	 *
 	 * 		$value	= 1;
 	 * 		doHook('hook_name', array(
 	 * 			'param'	=> &$value
 	 *  	));
+	 *
+	 * @param \Blight\Interfaces\Models\Packages\Plugin|null $theme	An optional theme to also apply hooks to
 	 */
-	public function doHook($hook, $params = null){
+	public function doHook($hook, $params = null, \Blight\Interfaces\Models\Packages\Plugin $theme = null){
 		$callbackName	= static::HOOK_FUNCTION_PREFIX.$hook;
 
-		foreach($this->plugins as $plugin){
+		$plugins	= $this->plugins;
+		if(isset($theme)){
+			$plugins[]	= $theme;
+		}
+
+		foreach($plugins as $plugin){
 			// Run hook
 			$callback	= array($plugin, $callbackName);
 			if(is_callable($callback)){
