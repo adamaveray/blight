@@ -88,3 +88,10 @@ _Editable parameters for hooks can be modified from within the callback to chang
 			$styles[]	= 'alert("Scripts");';
 
 
+- ## process_typography
+
+	Called when applying typographical fixes and helper classes to a block of HTML
+
+	### Params
+
+	- string **html**: _(editable)_ The HTML being processed

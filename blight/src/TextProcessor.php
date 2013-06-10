@@ -96,6 +96,10 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 		$result	= $this->getTypography()->process($html);
 		error_reporting($errors);
 
+		$this->blog->doHook('process_typography', array(
+			'html'	=> &$result
+		));
+
 		return $result;
 	}
 
