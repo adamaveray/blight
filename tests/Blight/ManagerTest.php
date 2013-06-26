@@ -103,6 +103,8 @@ EOD;
 		$test_config['paths']['drafts_web']	= $this->dir.'drafts_web/';
 		$this->blog	= new \Blight\Blog($test_config);
 
+		$this->blog->setFileSystem(new \Blight\FileSystem($this->blog));
+
 		$this->manager	= new \Blight\Manager($this->blog);
 	}
 

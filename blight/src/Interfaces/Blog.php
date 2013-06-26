@@ -99,6 +99,9 @@ interface Blog {
 	 */
 	public function getDescription();
 
+	/** @return \DateTimezone	The blog publishing timezone */
+	public function getTimezone();
+
 	/**
 	 * @return string	The URL to the site feed
 	 */
@@ -110,9 +113,29 @@ interface Blog {
 	public function getFileSystem();
 
 	/**
+	 * @param \Blight\Interfaces\FileSystem $fileSystem
+	 */
+	public function setFileSystem(\Blight\Interfaces\FileSystem $fileSystem);
+
+	/**
 	 * @return \Blight\Interfaces\PackageManager
 	 */
 	public function getPackageManager();
+
+	/**
+	 * @param \Blight\Interfaces\PackageManager $packageManager
+	 */
+	public function setPackageManager(\Blight\Interfaces\PackageManager $packageManager);
+
+	/**
+	 * @return \Psr\Log\LoggerInterface	The logger instance
+	 */
+	public function getLogger();
+
+	/**
+	 * @param \Psr\Log\LoggerInterface $logger
+	 */
+	public function setLogger(\Psr\Log\LoggerInterface $logger);
 
 	/**
 	 * @return \Blight\Interfaces\Models\Packages\Theme

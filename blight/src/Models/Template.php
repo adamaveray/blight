@@ -91,7 +91,8 @@ class Template implements \Blight\Interfaces\Models\Template {
 		}
 
 		if($this->blog->get('minify_html', 'output', false)){
-			$output	= $this->minifyHTML($output);
+			$textProcessor	= new \Blight\TextProcessor($this->blog);
+			$output	= $textProcessor->minifyHTML($output);
 		}
 		return $output;
 	}
@@ -124,16 +125,6 @@ class Template implements \Blight\Interfaces\Models\Template {
 		return $this->getTwigEnvironment($this->dir)->render($this->filename, $params);
 	}
 
-	/**
-	 * Minifies the provided HTML by removing whitespace, etc
-	 *
-	 * @param string $html	The raw HTML to minify
-	 * @return string		The minified HTML
-	 */
-	protected function minifyHTML($html){
-		return \Minify_HTML::minify($html);
-	}
-
 
 	/**
 	 * Retrieves the standardised Twig environment object, with the correct template and cache paths set
@@ -144,7 +135,10 @@ class Template implements \Blight\Interfaces\Models\Template {
 	protected function getTwigEnvironment($dir){
 		if(!isset(self::$twigEnvironments[$dir])){
 			$loader	= new \Twig_Loader_Filesystem($dir);
-			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader);
+			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader, array(
+				'cache' => ($this->blog->get('cache_twig', 'output', false) ? $this->blog->getPathCache('twig/') : null)
+			));
+			self::$twigEnvironments[$dir]->getExtension('core')->setTimezone($this->blog->get('timezone', 'site', 'UTC'));
 
 			// Add globals
 			self::$twigEnvironments[$dir]->addGlobal('blog', $this->blog);

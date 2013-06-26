@@ -1,35 +1,44 @@
 Hooks
 =====
 
-_Editable parameters for hooks can be modified from within the callback to change the value outside the parameter._
+_See the [Plugins documentation](Plugins.md) for how to implement hooks._
 
-- ## will_publish_post
+_Parameters marked as 'editable' can be modified within the callback to change the value outside the plugin._
+
+
+Publishing
+----------
+
+- ### will_publish_post
 
 	Called before publishing a new post
 
-	### Params
+	#### Params
 
 	- \Blight\Interfaces\Models\Post **post**: The post being published
 
 
-- ## did_publish_post
+- ### did_publish_post
 
 	Called after publishing a new post
 
-	### Params
+	#### Params
 
 	- \Blight\Interfaces\Models\Post **post**: The post being published
 
-	### Notes
+	#### Notes
 
 	- The URL the post was published to can be accessed through the `$post->getPermalink()` method
 
 
-- ## feed_post
+Output
+------
+
+- ### feed_post
 
 	Called when building a post's content in an RSS feed
 
-	### Params
+	#### Params
 
 	- string **feed_type**: The feed format type – either `'atom'` or `'rss'`
 	- \Blight\Interfaces\Models\Post **post**: The post being rendered
@@ -46,11 +55,11 @@ _Editable parameters for hooks can be modified from within the callback to chang
 	- bool **process_content**: _(editable)_ Whether to process the content as Markdown
 
 
-- ## render_styles
+- ### render_styles
 
 	Allows adding styles to rendered pages
 
-	### Params
+	#### Params
 
 	- \Blight\Interfaces\Models\Packages\Theme **theme**: The current theme
 	- \Blight\Interfaces\Models\Template **template**: The current template
@@ -67,11 +76,11 @@ _Editable parameters for hooks can be modified from within the callback to chang
 			$styles[]	= 'body { background: #fff; }';
 
 
-- ## render_scripts
+- ### render_scripts
 
 	Allows adding scripts to rendered pages
 
-	### Params
+	#### Params
 
 	- \Blight\Interfaces\Models\Packages\Theme **theme**: The current theme
 	- \Blight\Interfaces\Models\Template **template**: The current template
@@ -88,3 +97,10 @@ _Editable parameters for hooks can be modified from within the callback to chang
 			$styles[]	= 'alert("Scripts");';
 
 
+- ### process_typography
+
+	Called when applying typographical fixes and helper classes to a block of HTML
+
+	#### Params
+
+	- string **html**: _(editable)_ The HTML being processed

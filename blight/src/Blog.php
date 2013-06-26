@@ -5,7 +5,7 @@ namespace Blight;
  * Stores configuration data for the blog
  */
 class Blog implements \Blight\Interfaces\Blog {
-	const VERSION	= '0.7.0';
+	const VERSION	= '0.8.0';
 	const FILE_AUTHORS	= 'authors.json';
 
 	protected $config;
@@ -15,6 +15,9 @@ class Blog implements \Blight\Interfaces\Blog {
 
 	/** @var \Blight\Interfaces\PackageManager */
 	protected $packageManager;
+
+	/** @var \Psr\Log\LoggerInterface */
+	protected $logger;
 
 	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
@@ -26,6 +29,8 @@ class Blog implements \Blight\Interfaces\Blog {
 	protected $name;
 	protected $paths;
 	protected $authors;
+	/** @var \DateTimezone */
+	protected $timezone;
 
 	/**
 	 * Processes all configuration settings for the blog
@@ -241,6 +246,20 @@ class Blog implements \Blight\Interfaces\Blog {
 		return isset($this->config['site']['description']) ? $this->config['site']['description'] : null;
 	}
 
+	/** @return \DateTimezone	The blog publishing timezone */
+	public function getTimezone(){
+		if(!isset($this->timezone)){
+			$defaultTimezone	= 'UTC';
+			try {
+				$this->timezone	= new \DateTimezone($this->get('timezone', 'site', $defaultTimezone));
+			} catch(\Exception $e){
+				$this->timezone	= new \DateTimezone($defaultTimezone);
+			}
+		}
+
+		return $this->timezone;
+	}
+
 	/**
 	 * @return string	The URL to the site feed
 	 */
@@ -255,10 +274,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getFileSystem(){
 		if(!isset($this->fileSystem)){
-			$this->fileSystem	= new \Blight\FileSystem($this);
+			throw new \RuntimeException('File system has not been set');
 		}
 
 		return $this->fileSystem;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\FileSystem $fileSystem
+	 */
+	public function setFileSystem(\Blight\Interfaces\FileSystem $fileSystem){
+		$this->fileSystem	= $fileSystem;
 	}
 
 	/**
@@ -266,10 +292,35 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getPackageManager(){
 		if(!isset($this->packageManager)){
-			$this->packageManager	= new \Blight\PackageManager($this);
+			throw new \RuntimeException('Package manager has not been set');
 		}
 
 		return $this->packageManager;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\PackageManager $packageManager
+	 */
+	public function setPackageManager(\Blight\Interfaces\PackageManager $packageManager){
+		$this->packageManager	= $packageManager;
+	}
+
+	/**
+	 * @return \Psr\Log\LoggerInterface	The logger instance
+	 */
+	public function getLogger(){
+		if(!isset($this->logger)){
+			throw new \RuntimeException('Logger has not been set');
+		}
+
+		return $this->logger;
+	}
+
+	/**
+	 * @param \Psr\Log\LoggerInterface $logger
+	 */
+	public function setLogger(\Psr\Log\LoggerInterface $logger){
+		$this->logger	= $logger;
 	}
 
 	/**
@@ -304,7 +355,18 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @see \Blight\PackageManager::doHook
 	 */
 	public function doHook($hook, $params = null){
-		$this->getPackageManager()->doHook($hook, $params);
+		try {
+			$theme	= $this->getTheme();
+			if(!($theme instanceof \Blight\Interfaces\Models\Packages\Plugin)){
+				throw new \Exception();
+			}
+		} catch(\Exception $e){
+			$theme	= null;
+		}
+
+		try {
+			$this->getPackageManager()->doHook($hook, $params, $theme);
+		} catch(\Exception $e){}
 	}
 
 	/**

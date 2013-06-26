@@ -1,5 +1,6 @@
 <?php
 /** @var \Blight\Interfaces\Blog $blog */
+/** @var \Blight\TextProcessor $text */
 $createNode	= function(\DOMDocument $document, \DOMElement $parent, $nodeName, $content, $attributes = null, $callback = null){
 	$node	= $document->createElement($nodeName);
 	if(is_array($attributes)){
@@ -79,7 +80,7 @@ $channel	= $dom->createElement('channel');
 				'isPermaLink'	=> ($guidIsPermalink ? 'true' : 'false')
 			));
 			$createNode($dom, $item, 'pubDate', $date->format('r'));
-			$createNode($dom, $item, 'description', ($processContent ? $text->processMarkdown($content) : $content).$append);
+			$createNode($dom, $item, 'description', ($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append));
 			if(isset($author) && $author->hasEmail()){
 				$createNode($dom, $item, 'author', $author->getEmail().' ('.$author->getName().')');
 			}

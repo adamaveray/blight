@@ -33,14 +33,14 @@ class Page implements \Blight\Interfaces\Models\Page {
 
 		if($this->hasMeta('date')){
 			try {
-				$this->date	= new \DateTime($this->getMeta('date'));
+				$this->date	= new \DateTime($this->getMeta('date'), $this->blog->getTimezone());
 			} catch(\Exception $e){
 				throw new \InvalidArgumentException('Created date invalid');
 			}
 		}
 		if($this->hasMeta('date-updated')){
 			try {
-				$this->DateUpdated	= new \DateTime($this->getMeta('date-updated'));
+				$this->DateUpdated	= new \DateTime($this->getMeta('date-updated'), $this->blog->getTimezone());
 			} catch(\Exception $e){
 				throw new \InvalidArgumentException('Modified date invalid');
 			}
@@ -128,7 +128,7 @@ class Page implements \Blight\Interfaces\Models\Page {
 	 */
 	public function getDate(){
 		if(!isset($this->date)){
-			return new \DateTime();
+			return new \DateTime('now', $this->blog->getTimezone());
 		}
 		return $this->date;
 	}
@@ -155,7 +155,7 @@ class Page implements \Blight\Interfaces\Models\Page {
 	 * @param \DateTime $date	The new modified date for the page
 	 */
 	public function setDateUpdated(\DateTime $date){
-		$this->DateUpdated	= $date;
+		$this->dateUpdated	= $date;
 	}
 
 	/**

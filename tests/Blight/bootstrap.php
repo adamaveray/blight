@@ -17,6 +17,7 @@ $config	= array(
 		'name'	=> 'Test Blog',
 		'url'	=> 'http://www.example.com/',
 		'description'	=> 'Test blog description',
+		'timezone'		=> 'America/New_York'
 	),
 
 	'paths'	=> array(

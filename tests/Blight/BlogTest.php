@@ -168,6 +168,14 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Blog::getTimezone
+	 */
+	public function testGetTimezone(){
+		$this->assertInstanceOf('\DateTimezone', $this->blog->getTimezone());
+		$this->assertEquals($this->config['site']['timezone'], $this->blog->getTimezone()->getName());
+	}
+
+	/**
 	 * @covers \Blight\Blog::getFeedURL
 	 */
 	public function testGetFeedUrl(){
@@ -189,26 +197,6 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 		$config['linkblog']['linkblog']	= true;
 		$blog	= new \Blight\Blog($config);
 		$this->assertTrue($blog->isLinkblog());
-	}
-
-	/**
-	 * @covers \Blight\Blog::getFileSystem
-	 */
-	public function testGetFileSystem(){
-		$this->assertInstanceOf('\Blight\FileSystem', $this->blog->getFileSystem());
-
-		// Should be same instance
-		$this->assertEquals($this->blog->getFileSystem(), $this->blog->getFileSystem());
-	}
-
-	/**
-	 * @covers \Blight\Blog::getPackageManager
-	 */
-	public function testGetPackageManager(){
-		$this->assertInstanceOf('\Blight\PackageManager', $this->blog->getPackageManager());
-
-		// Should be same instance
-		$this->assertEquals($this->blog->getPackageManager(), $this->blog->getPackageManager());
 	}
 
 	/**

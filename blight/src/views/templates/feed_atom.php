@@ -1,5 +1,6 @@
 <?php
 /** @var \Blight\Interfaces\Blog $blog */
+/** @var \Blight\TextProcessor $text */
 $createNode	= function(\DOMDocument $document, \DOMElement $parent, $nodeName, $content, $attributes = null, $callback = null){
 	$node	= $document->createElement($nodeName);
 	if(is_array($attributes)){
@@ -118,7 +119,7 @@ $root->setAttribute('xml:lang', 'en-US');
 				$node->setAttribute('xml:base', $base_url);
 				$node->setAttribute('xml:lang', 'en-US');
 
-				$node->appendChild($dom->createCDATASection(($processContent ? $text->processMarkdown($content) : $content).$append));
+				$node->appendChild($dom->createCDATASection(($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append));
 			$entry->appendChild($node);
 
 		$root->appendChild($entry);
@@ -128,11 +129,4 @@ $dom->appendChild($root);
 
 
 // Output XML
-$output	= $dom->saveXML();
-$newline	= PHP_EOL;
-$output	= preg_replace('/>\s*</',		'>'.$newline.'<',	$output);
-$output	= preg_replace('/(<\/.*?>)/',	'$1'.$newline.'',	$output);
-$output	= preg_replace('/\/>/',			'/>'.$newline.'',	$output);
-$output	= preg_replace('/('.$newline.')+'.'/',	''.$newline.'',	$output);
-$output	= preg_replace('/'.$newline.'/', PHP_EOL, $output);
-echo $output;
+echo $dom->saveXML();

@@ -52,6 +52,9 @@ class RendererTest extends \PHPUnit_Framework_TestCase {
 		$test_config['paths']['drafts-web']	= __DIR__.'/files/web/_drafts/';
 		$this->blog		= new \Blight\Blog($test_config);
 
+		$this->blog->setFileSystem(new \Blight\FileSystem($this->blog));
+		$this->blog->setPackageManager(new \Blight\PackageManager($this->blog));
+
 		$this->manager	= new \Blight\Tests\Mock\RendererTestManager($this->blog);
 		$content	= <<<EOD
 Test Post

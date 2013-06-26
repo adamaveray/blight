@@ -1,9 +1,8 @@
 <?php
 /**
  * Blight
- * v0.7
+ * v0.8
  */
-namespace Blight;
 
 define('IS_CLI', (PHP_SAPI === 'cli'));
 define('VERBOSE', isset($argv[0]) && in_array('-v', $argv));
@@ -14,17 +13,6 @@ date_default_timezone_set('UTC');
 
 require('vendor/autoload.php');
 require('src/autoload.php');
-
-function debugOutput($message){
-	if(!IS_CLI || !VERBOSE){
-		return;
-	}
-
-	$timestamp	= number_format(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT'], 4, '.', '');
-	$memstamp	= floor(memory_get_usage()/1024).'k';
-
-	echo $timestamp.'-'.$memstamp.': '.vsprintf($message, array_slice(func_get_args(), 1)).PHP_EOL;
-}
 
 $rootPath	= str_replace('phar://', '', dirname(__DIR__)).'/';
 $lockFile	= $rootPath.'blight-update.lock';
@@ -79,25 +67,56 @@ if(!file_exists($configFile) || isset($_COOKIE[\Blight\Controllers\Install::COOK
 $parser	= new \Blight\Config();
 $config	= $parser->unserialize(file_get_contents($configFile));
 $config['root_path']	= $rootPath;
-$blog	= new Blog($config);
+$blog	= new \Blight\Blog($config);
+
+if(IS_CLI){
+	if(isset($_SERVER['argv'][1])){
+		$command	= $_SERVER['argv'][1];
+
+		if(preg_match('~config:(.*)~', $command, $matches)){
+			$config	= explode('.', $matches[1], 2);
+			if(!isset($config[1])){
+				array_unshift($config, null);
+			}
+
+			$value	= $blog->get($config[1], $config[0]);
+
+			echo $value;
+		}
+
+		exit;
+	}
+}
+
+// Set dependencies
+$blog->setFileSystem(new \Blight\FileSystem($blog));
+$blog->setPackageManager(new \Blight\PackageManager($blog));
+	$logger	= new \Monolog\Logger('Blight');
+	$logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
+
+	$logPath	= $blog->get('log', 'paths');
+	if(isset($logPath)){
+		$logger->pushHandler(new \Monolog\Handler\StreamHandler($blog->getPathRoot($logPath), \Monolog\Logger::INFO));
+	}
+$blog->setLogger($logger);
 
 // Load posts
-$manager	= new Manager($blog);
-debugOutput('Manager initialised');
+$manager	= new \Blight\Manager($blog);
+$blog->getLogger()->debug('Manager initialised');
 $archive	= $manager->getPostsByYear();
-debugOutput('Archive built');
+$blog->getLogger()->debug('Archive built');
 
 // Begin rendering
-$renderer	= new Renderer($blog, $manager, $blog->getTheme());
-debugOutput('Renderer initialised');
+$renderer	= new \Blight\Renderer($blog, $manager, $blog->getTheme());
+$blog->getLogger()->debug('Renderer initialised');
 
 	// Render pages
 	$renderer->renderPages();
-	debugOutput('Pages rendered');
+	$blog->getLogger()->debug('Pages rendered');
 
 	// Render draft posts
 	$renderer->renderDrafts();
-	debugOutput('Drafts rendered');
+	$blog->getLogger()->debug('Drafts rendered');
 
 	// Render posts and archives
 	foreach($archive as $year){
@@ -110,13 +129,13 @@ debugOutput('Renderer initialised');
 			$next	= (isset($posts[$i-1]) ? $posts[$i-1] : null);
 			$renderer->renderPost($posts[$i], $prev, $next);
 		}
-		debugOutput('Year "%s" posts rendered', $year->getName());
+		$blog->getLogger()->debug(sprintf('Year "%s" posts rendered', $year->getName()));
 
 		// Render archive
 		$renderer->renderYear($year, array(
 			'per_page'	=> $blog->get('page', 'limits', 0)
 		));
-		debugOutput('Year "%s" archive rendered', $year->getName());
+		$blog->getLogger()->debug(sprintf('Year "%s" archive rendered', $year->getName()));
 	}
 
 	// Render RSS-only posts
@@ -126,52 +145,53 @@ debugOutput('Renderer initialised');
 	foreach($posts as $post){
 		$renderer->renderPost($post);
 	}
-	debugOutput('RSS-only posts rendered');
+	$blog->getLogger()->debug('RSS-only posts rendered');
 
 	// Render tag pages
 	$renderer->renderTags(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
-	debugOutput('Tags rendered');
+	$blog->getLogger()->debug('Tags rendered');
 
 	// Render category pages
 	$renderer->renderCategories(array(
 		'per_page'	=> $blog->get('page', 'limits', 0)
 	));
-	debugOutput('Categories rendered');
+	$blog->getLogger()->debug('Categories rendered');
 
 	// Render home page
 	$renderer->renderHome(array(
 		'limit'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
 	));
-	debugOutput('Home rendered');
+	$blog->getLogger()->debug('Home rendered');
 
 	// Render feeds
 	$renderer->renderFeeds(array(
 		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
 	));
-	debugOutput('Feeds rendered');
+	$blog->getLogger()->debug('Feeds rendered');
 
 	// Render sitemap
 	$renderer->renderSitemap(array(
 	));
-	debugOutput('Sitemap rendered');
+	$blog->getLogger()->debug('Sitemap rendered');
 
 	// Rendering completed
 
 // Copy theme assets
 $renderer->updateThemeAssets();
-debugOutput('Theme assets updated');
+$blog->getLogger()->debug('Theme assets updated');
 
 // Copy user assets
 $renderer->updateUserAssets();
-debugOutput('User assets updated');
+$blog->getLogger()->debug('User assets updated');
 
 // Remove old draft files
 $manager->cleanupDrafts();
 
-debugOutput('Build time: '.(microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s');
-debugOutput('Peak Memory: '.floor(memory_get_usage()/1024).'KB');
-if(IS_CLI){
-	echo 'Blog built'.PHP_EOL;
-}
+$blog->getLogger()->info('Blog built', array(
+	'Build Time'	=> (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s',
+	'Peak Memory'	=> floor(memory_get_peak_usage()/1024).'KB'
+));
+
+if(IS_CLI) echo 'Blog built'.PHP_EOL;

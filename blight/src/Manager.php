@@ -58,7 +58,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			$rawFiles	= glob($dir.'/*');
 			foreach($rawFiles as $file){
 				if(is_dir($file)){
-					$files	= array_merge($files, get_sub_pages($file));
+					$files	= array_merge($files, getSubPages($file));
 				} else {
 					$files[]	= $file;
 				}
@@ -113,7 +113,9 @@ class Manager implements \Blight\Interfaces\Manager {
 
 		// Modified time
 		try {
-			$post->setDateUpdated(new \DateTime('@'.filemtime($rawPost)));
+			$date	= new \DateTime('@'.filemtime($rawPost));
+			$date->setTimezone($this->blog->getTimezone());
+			$post->setDateUpdated($date);
 		} catch(\Exception $e){}
 
 		return $post;
@@ -129,12 +131,26 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected function organisePostFile(\Blight\Interfaces\Models\Post $post, $currentPath){
 		// Check for special headers
 		$hasDate	= $post->hasMeta('date');
-		$hasPublish	= $post->hasMeta('publish-now');
-		if(!$hasDate || $hasPublish){
+		$hasPublish		= $post->hasMeta('publish-now');
+		$willPublish	= $post->getMeta('publish-at');
+		if(isset($willPublish)){
+			try {
+				$willPublish	= new \DateTime($willPublish, $this->blog->getTimezone());
+				if($willPublish > new \DateTime('now', $this->blog->getTimezone())){
+					// Publish date in future - do not publish yet
+					$willPublish	= null;
+				}
+			} catch(\Exception $e){
+				$willPublish	= null;
+			}
+		}
+		if(!$hasDate || $hasPublish || isset($willPublish)){
 			$lines	= explode("\n", $this->blog->getFileSystem()->loadFile($currentPath));
 
-			if($hasPublish){
+			if($hasPublish || isset($willPublish)){
 				// Remove publish header
+				$searchLine	= ($hasPublish ? 'publish[- ]now' : 'publish[- ]at:.*?');
+
 				$count	= count($lines);
 				for($i = 2; $i < $count; $i++){
 					$line	= rtrim($lines[$i]);
@@ -143,7 +159,7 @@ class Manager implements \Blight\Interfaces\Manager {
 						break;
 					}
 
-					if(preg_match('/^publish[- ]now$/i', strtolower($line))){
+					if(preg_match('/^'.$searchLine.'$/i', strtolower($line))){
 						// Found header
 						array_splice($lines, $i, 1);
 						break;
@@ -151,11 +167,11 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 			}
 
-			if(!$hasDate && ($hasPublish || !$post->isDraft())){
+			if(!$hasDate && ($hasPublish || isset($willPublish) || !$post->isDraft())){
 				// Add date header
-				$now	= new \DateTime();
-				$post->setDate($now);
-				$dateLine	= 'Date:'."\t".$now->format(date('Y-m-d H:i:s'));
+				$date	= (isset($willPublish) ? $willPublish : new \DateTime('now', $this->blog->getTimezone()));
+				$post->setDate($date);
+				$dateLine	= 'Date:'."\t".$date->format('Y-m-d g:i:sa');
 				array_splice($lines, 2, 0, $dateLine);
 			}
 
@@ -211,7 +227,9 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				$page->setDateUpdated(new \DateTime('@'.filemtime($file)));
+				$date	= new \DateTime('@'.filemtime($file));
+				$date->setTimezone($this->blog->getTimezone());
+				$page->setDateUpdated($date);
 
 				$pages[]	= $page;
 			}
@@ -248,13 +266,27 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				if($post->hasMeta('publish-now')){
+				$willPublish	= $post->hasMeta('publish-now');
+				if(!$willPublish){
+					try {
+						$publishDate	= $post->getMeta('publish-at');
+						if(isset($publishDate)){
+							$publishDate	= new \DateTime($publishDate, $this->blog->getTimezone());
+							$willPublish	= ($publishDate < new \DateTime('now', $this->blog->getTimezone()));
+						}
+					} catch(\Exception $e){
+						$willPublish	= false;
+					}
+				}
+				if($willPublish){
 					// Move to publish directory
 					$this->blog->getFileSystem()->moveFile($file, str_replace($this->blog->getPathDrafts(), $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR), $file));
 					continue;
 				}
 
-				$post->setDateUpdated(new \DateTime('@'.filemtime($file)));
+				$date	= new \DateTime('@'.filemtime($file));
+				$date->setTimezone($this->blog->getTimezone());
+				$post->setDateUpdated($date);
 
 				$posts[]	= $post;
 			}
@@ -372,9 +404,9 @@ class Manager implements \Blight\Interfaces\Manager {
 			}
 
 			// Group post by category
-			$category	= $post->getCategory();
-			if(isset($category)){
-				$slug		= $category->getSlug();
+			$categories	= $post->getCategories();
+			foreach($categories as $category){
+				$slug	= $category->getSlug();
 				if(!isset($this->postsByCategory[$slug])){
 					$this->postsByCategory[$slug]	= $category;
 				}
@@ -402,7 +434,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		);
 	 */
 	public function getPostsByYear(){
-		if(!isset($this->postsByTag)){
+		if(!isset($this->postsByYear)){
 			$this->groupPosts();
 		}
 
@@ -459,10 +491,12 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * Deletes any rendered drafts without an associated draft post
 	 */
 	public function cleanupDrafts(){
+		$renderedExt	= 'html';
+
 		$postsDir	= $this->blog->getPathDrafts();
-		$files	= glob($this->blog->getPathDraftsWeb('*.html'));
+		$files	= glob($this->blog->getPathDraftsWeb('*.'.$renderedExt));
 		foreach($files as $file){
-			$slug	= pathinfo($file, \PATHINFO_BASENAME);
+			$slug	= preg_replace('~\.'.$renderedExt.'$~i', '', pathinfo($file, \PATHINFO_BASENAME));
 
 			$found	= false;
 			foreach($this->allowedExtensions as $ext){

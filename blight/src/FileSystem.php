@@ -113,16 +113,16 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	protected function matchFileOwnership($source, $target){
 		try {
 			// Update group
-			if(($sourceGroupID = filegroup($source)) === false) throw new \Exception('filegroup failed on source');
-			if(($targetGroupID = filegroup($target)) === false) throw new \Exception('filegroup failed on target');
+			if(($sourceGroupID = @filegroup($source)) === false) throw new \Exception('filegroup failed on source');
+			if(($targetGroupID = @filegroup($target)) === false) throw new \Exception('filegroup failed on target');
 			if($sourceGroupID != $targetGroupID){
 				// Group is different - update
 				if(!@chgrp($target, $sourceGroupID)) throw new \Exception('chgrp failed on target');
 			}
 
 			// Update user
-			if(($sourceUserID = fileowner($source)) === false) throw new \Exception('fileowner failed on source');
-			if(($targetUserID = fileowner($target)) === false) throw new \Exception('fileowner failed on target');
+			if(($sourceUserID = @fileowner($source)) === false) throw new \Exception('fileowner failed on source');
+			if(($targetUserID = @fileowner($target)) === false) throw new \Exception('fileowner failed on target');
 			if($sourceUserID != $targetUserID){
 				// User is different - update
 				if(!@chown($target, $sourceUserID)) throw new \Exception('chown failed on target');

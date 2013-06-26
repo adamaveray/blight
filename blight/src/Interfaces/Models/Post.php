@@ -28,9 +28,9 @@ interface Post extends \Blight\Interfaces\Models\Page {
 	public function getTags();
 
 	/**
-	 * @return \Blight\Models\Collections\Category|null	The Category collection the post belongs in, or null
+	 * @return array	An array of Category collections
 	 */
-	public function getCategory();
+	public function getCategories();
 
 	/**
 	 * @return bool	Whether the post has a summary or not

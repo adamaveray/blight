@@ -12,6 +12,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	/** @var \dflydev\markdown\MarkdownExtraParser */
 	protected $markdown;
 
+	protected $cache;
+
 	/**
 	 * Initialises the processor
 	 *
@@ -19,6 +21,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 */
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
+
+		$this->cache	= array();
 	}
 
 	/**
@@ -36,6 +40,15 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 * @see processTypography()
 	 */
 	public function process($raw, $filters = null){
+		$cacheKey	= array(
+			'src'		=> $raw,
+			'filters'	=> $filters
+		);
+		$result	= $this->getCachedOutput($cacheKey);
+		if($result){
+			return $result;
+		}
+
 		if(!is_array($filters)){
 			$filters	= array(
 				'markdown'		=> true,
@@ -56,6 +69,8 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 		if($filters['typography']){
 			$output	= $this->processTypography($output);
 		}
+
+		$this->setCachedOutput($cacheKey, $output);
 
 		return $output;
 	}
@@ -78,8 +93,13 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 */
 	public function processTypography($html){
 		$errors	= error_reporting(0);
+		$this->getTypography()->set_hyphenation($this->blog->get('generate_hypenation', 'output', true));
 		$result	= $this->getTypography()->process($html);
 		error_reporting($errors);
+
+		$this->blog->doHook('process_typography', array(
+			'html'	=> &$result
+		));
 
 		return $result;
 	}
@@ -196,6 +216,17 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	}
 
 	/**
+	 * Minifies the provided HTML by removing whitespace, etc
+	 *
+	 * @param string $html	The raw HTML to minify
+	 * @return string		The minified HTML
+	 */
+	public function minifyHTML($html){
+		return \Minify_HTML::minify($html);
+	}
+
+
+	/**
 	 * @return \dflydev\markdown\MarkdownExtraParser	The Markdown parsing instance
 	 */
 	protected function getMarkdown(){
@@ -215,5 +246,23 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 		}
 
 		return $this->typography;
+	}
+
+
+	/**
+	 * @param mixed $key	The unique key for the cached value
+	 * @return string|null	The pre-rendered value
+	 */
+	protected function getCachedOutput($key){
+		$key	= md5(print_r($key, true));
+		return isset($this->cache[$key]) ? $this->cache[$key] : null;
+	}
+
+	/**
+	 * @param mixed $key	The unique key for the value to be cached
+	 * @param string|null $value	The rendered value
+	 */
+	protected function setCachedOutput($key, $value){
+		$this->cache[md5(print_r($key, true))]	= $value;
 	}
 };
