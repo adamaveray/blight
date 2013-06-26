@@ -91,7 +91,8 @@ class Template implements \Blight\Interfaces\Models\Template {
 		}
 
 		if($this->blog->get('minify_html', 'output', false)){
-			$output	= $this->minifyHTML($output);
+			$textProcessor	= new \Blight\TextProcessor($this->blog);
+			$output	= $textProcessor->minifyHTML($output);
 		}
 		return $output;
 	}
@@ -122,16 +123,6 @@ class Template implements \Blight\Interfaces\Models\Template {
 	 */
 	protected function renderTwig($params){
 		return $this->getTwigEnvironment($this->dir)->render($this->filename, $params);
-	}
-
-	/**
-	 * Minifies the provided HTML by removing whitespace, etc
-	 *
-	 * @param string $html	The raw HTML to minify
-	 * @return string		The minified HTML
-	 */
-	protected function minifyHTML($html){
-		return \Minify_HTML::minify($html);
 	}
 
 

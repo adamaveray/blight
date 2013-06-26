@@ -216,6 +216,17 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	}
 
 	/**
+	 * Minifies the provided HTML by removing whitespace, etc
+	 *
+	 * @param string $html	The raw HTML to minify
+	 * @return string		The minified HTML
+	 */
+	public function minifyHTML($html){
+		return \Minify_HTML::minify($html);
+	}
+
+
+	/**
 	 * @return \dflydev\markdown\MarkdownExtraParser	The Markdown parsing instance
 	 */
 	protected function getMarkdown(){
