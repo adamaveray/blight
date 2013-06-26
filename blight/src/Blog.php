@@ -91,6 +91,13 @@ class Blog implements \Blight\Interfaces\Blog {
 	}
 
 	/**
+	 * @return bool	Whether the site is in debug mode
+	 */
+	public function isDebug(){
+		return $this->get('debug', null, false);
+	}
+
+	/**
 	 * Returns the path to the application root
 	 *
 	 * @param string $append	An additonal path fragment to append to the path

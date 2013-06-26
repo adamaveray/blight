@@ -61,3 +61,8 @@ The default author for the blog, for posts without an author manually entered. T
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
 - **feed_format**: The format to build feeds, of either `atom` or `rss`
 - **cache_twig**: Whether to cache compiled Twig tempates
+
+
+## Debug
+
+`true` enables debug settings in the site, including the `dump` function in Twig templates.

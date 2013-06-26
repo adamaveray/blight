@@ -9,6 +9,11 @@ interface Blog {
 	public function __construct($config);
 
 	/**
+	 * @return bool	Whether the site is in debug mode
+	 */
+	public function isDebug();
+
+	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The root path, with the provided string appended
 	 */
