@@ -135,25 +135,25 @@ class Template implements \Blight\Interfaces\Models\Template {
 	protected function getTwigEnvironment($dir){
 		if(!isset(self::$twigEnvironments[$dir])){
 			$loader	= new \Twig_Loader_Filesystem($dir);
-			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader, array(
+			$twig	= new \Twig_Environment($loader, array(
 				'cache' => ($this->blog->get('cache_twig', 'output', false) ? $this->blog->getPathCache('twig/') : null)
 			));
-			self::$twigEnvironments[$dir]->getExtension('core')->setTimezone($this->blog->get('timezone', 'site', 'UTC'));
+			$twig->getExtension('core')->setTimezone($this->blog->get('timezone', 'site', 'UTC'));
 
 			// Add globals
-			self::$twigEnvironments[$dir]->addGlobal('blog', $this->blog);
-			self::$twigEnvironments[$dir]->addGlobal('theme', $this->theme);
+			$twig->addGlobal('blog', $this->blog);
+			$twig->addGlobal('theme', $this->theme);
 
 			// Set up functions
-			self::$twigEnvironments[$dir]->addFunction(new \Twig_SimpleFunction('styles', array($this, 'getStyles'), array('is_safe' => array('html'))));
-			self::$twigEnvironments[$dir]->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'getScripts'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('styles', array($this, 'getStyles'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'getScripts'), array('is_safe' => array('html'))));
 
 			// Set up filters
 			$blog	= $this->blog;
 			$textProcessor	= new \Blight\TextProcessor($this->blog);
 
 			// Markdown filter
-			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){
+			$twig->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){
 				$filters	= array(
 					'markdown'		=> true,
 					'typography'	=> true
@@ -167,15 +167,17 @@ class Template implements \Blight\Interfaces\Models\Template {
 			)));
 
 			// Typography filter
-			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('typo', array($textProcessor, 'processTypography'), array(
+			$twig->addFilter(new \Twig_SimpleFilter('typo', array($textProcessor, 'processTypography'), array(
 				'pre_escape'	=> 'html',
 				'is_safe'		=> array('html')
 			)));
 
 			// Truncate filter
-			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('truncate', array($textProcessor, 'truncateHTML'), array(
+			$twig->addFilter(new \Twig_SimpleFilter('truncate', array($textProcessor, 'truncateHTML'), array(
 				'is_safe'	=> array('html')
 			)));
+
+			self::$twigEnvironments[$dir]	= $twig;
 		}
 
 		return self::$twigEnvironments[$dir];
