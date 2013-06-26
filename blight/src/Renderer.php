@@ -315,14 +315,14 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$noPages	= ceil(count($posts)/$perPage);
 		$pages		= array();
 		for($page = 0; $page < $noPages; $page++){
-			$pages[$page+1]	= $base.$collection->getURL(true).($page == 0 ? '' : '/'.($page+1));
+			$pages[$page+1]	= $collection->getURL().($page == 0 ? '' : '/'.($page+1));
 		}
 
 		// Build each page
 		for($page = 0; $page < $noPages; $page++){
 			$path	= $base.$collection->getURL(true).'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 			$returnPages[$path]	= array(
-				'posts'			=> array_slice($posts, ($page-1)*$perPage, $perPage),
+				'posts'			=> array_slice($posts, $page*$perPage, $perPage-1),
 				'pagination'	=> new \Blight\Pagination($pages, $page+1)
 			);
 		}
