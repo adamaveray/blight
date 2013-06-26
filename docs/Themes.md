@@ -1,7 +1,7 @@
 Themes
 ======
 
-A theme follows the same base package format as a [plugin](PLUGIN.md), with additional files.
+A theme follows the same base package format as a [plugin](PLUGIN.md), with additional files:
 
 	ThemeName/
     	ThemeName.php
@@ -33,9 +33,9 @@ Static resources the theme uses, such as images and stylesheets, should be store
 
 ## Templates
 
-The templates directory contains the templates that will be rendered into static pages.
+The templates directory contains the templates that will be rendered into static pages. All templates must exist in the plugin for the site to generate correctly.
 
-Templates are written using [Twig](http://twig.sensiolabs.org), or alternatively can be written in regular PHP. All templates must exist in the plugin for the site to generate correctly.
+Templates are written using [Twig](http://twig.sensiolabs.org), or alternatively can be written in regular PHP. Twig templates end in `.tpl.html`, and PHP templates have the extension `.php`.
 
 The following variables are available to both PHP and Twig templates:
 
@@ -60,7 +60,7 @@ The following variables are available to list pages:
 
 - **posts**: An array containing posts for the current page
 
-For each of the different listing types, the page's `Collection` object itself will also be provided:
+For each of the different listing types, the page's `Collection` object itself will also be provided under the appropriate name:
 
 - Year archive pages: **year**
 - Tag pages: **tag**
