@@ -51,6 +51,8 @@ Posts saved to the `drafts/` directory will have preview HTML pages generated, b
 
 When drafts are ready to be published, add a line `Publish Now` to the header block, and the post will be moved to the published posts directory and added to the site on next rebuild. Alternatively, move the post to the `_publish/` directory in the drafts directory, and it will be published on rebuild.
 
+To schedule a post for a future date, add a line `Publish At` to the header block, with the date to publish the post after. On the next site rebuild after that time, the post will be published. _If automatic monitoring of the site is not set up (such as with the run script below) the post will not be published until the site is rebuilt manually._
+
 ### Pages
 
 Simple pages in the same format as posts can be saved to the `pages/` directory, and will have a separate page generated in the public site area, but will not be listed along with posts.

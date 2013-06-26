@@ -131,12 +131,26 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected function organisePostFile(\Blight\Interfaces\Models\Post $post, $currentPath){
 		// Check for special headers
 		$hasDate	= $post->hasMeta('date');
-		$hasPublish	= $post->hasMeta('publish-now');
-		if(!$hasDate || $hasPublish){
+		$hasPublish		= $post->hasMeta('publish-now');
+		$willPublish	= $post->getMeta('publish-at');
+		if(isset($willPublish)){
+			try {
+				$willPublish	= new \DateTime($willPublish, $this->blog->getTimezone());
+				if($willPublish > new \DateTime('now', $this->blog->getTimezone())){
+					// Publish date in future - do not publish yet
+					$willPublish	= null;
+				}
+			} catch(\Exception $e){
+				$willPublish	= null;
+			}
+		}
+		if(!$hasDate || $hasPublish || isset($willPublish)){
 			$lines	= explode("\n", $this->blog->getFileSystem()->loadFile($currentPath));
 
-			if($hasPublish){
+			if($hasPublish || isset($willPublish)){
 				// Remove publish header
+				$searchLine	= ($hasPublish ? 'publish[- ]now' : 'publish[- ]at:.*?');
+
 				$count	= count($lines);
 				for($i = 2; $i < $count; $i++){
 					$line	= rtrim($lines[$i]);
@@ -145,7 +159,7 @@ class Manager implements \Blight\Interfaces\Manager {
 						break;
 					}
 
-					if(preg_match('/^publish[- ]now$/i', strtolower($line))){
+					if(preg_match('/^'.$searchLine.'$/i', strtolower($line))){
 						// Found header
 						array_splice($lines, $i, 1);
 						break;
@@ -153,11 +167,11 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 			}
 
-			if(!$hasDate && ($hasPublish || !$post->isDraft())){
+			if(!$hasDate && ($hasPublish || isset($willPublish) || !$post->isDraft())){
 				// Add date header
-				$now	= new \DateTime('now', $this->blog->getTimezone());
-				$post->setDate($now);
-				$dateLine	= 'Date:'."\t".$now->format('Y-m-d H:i:s');
+				$date	= (isset($willPublish) ? $willPublish : new \DateTime('now', $this->blog->getTimezone()));
+				$post->setDate($date);
+				$dateLine	= 'Date:'."\t".$date->format('Y-m-d g:i:sa');
 				array_splice($lines, 2, 0, $dateLine);
 			}
 
@@ -252,7 +266,19 @@ class Manager implements \Blight\Interfaces\Manager {
 					continue;
 				}
 
-				if($post->hasMeta('publish-now')){
+				$willPublish	= $post->hasMeta('publish-now');
+				if(!$willPublish){
+					try {
+						$publishDate	= $post->getMeta('publish-at');
+						if(isset($publishDate)){
+							$publishDate	= new \DateTime($publishDate, $this->blog->getTimezone());
+							$willPublish	= ($publishDate < new \DateTime('now', $this->blog->getTimezone()));
+						}
+					} catch(\Exception $e){
+						$willPublish	= false;
+					}
+				}
+				if($willPublish){
 					// Move to publish directory
 					$this->blog->getFileSystem()->moveFile($file, str_replace($this->blog->getPathDrafts(), $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR), $file));
 					continue;
