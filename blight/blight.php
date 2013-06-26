@@ -1,7 +1,7 @@
 <?php
 /**
  * Blight
- * v0.7
+ * v0.8
  */
 
 define('IS_CLI', (PHP_SAPI === 'cli'));

@@ -1,6 +1,18 @@
 Release Notes
 =============
 
+## 0.8
+
+_25 Jun 2013_
+
+- Scheduled posts
+- Folder watching and command line building
+- Timezone support
+- Logging
+- Hooks in Themes
+- Organised documentation
+
+
 ## 0.7
 
 _31 Mar 2013_
