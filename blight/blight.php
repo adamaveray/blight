@@ -159,11 +159,11 @@ $blog->getLogger()->debug('Renderer initialised');
 	));
 	$blog->getLogger()->debug('Categories rendered');
 
-	// Render home page
-	$renderer->renderHome(array(
-		'limit'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
+	// Render home and sequential list pages
+	$renderer->renderSequential(array(
+		'per_page'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
 	));
-	$blog->getLogger()->debug('Home rendered');
+	$blog->getLogger()->debug('Home and sequential pages rendered');
 
 	// Render feeds
 	$renderer->renderFeeds(array(

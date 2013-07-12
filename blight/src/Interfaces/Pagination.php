@@ -23,6 +23,16 @@ interface Pagination {
 	public function getNext();
 
 	/**
+	 * @return bool	Whether the paginated data has a previous item
+	 */
+	public function hasPrev();
+
+	/**
+	 * @return bool	Whether the paginated data has a next item
+	 */
+	public function hasNext();
+
+	/**
 	 * @return int	The number of items
 	 */
 	public function getCount();
@@ -38,9 +48,10 @@ interface Pagination {
 	public function getPosition();
 
 	/**
-	 * @param int $i	The index of the item to retrieve
+	 * @param int $i	The index of the item to retrieve (1-indexed)
+	 * @param bool $isZeroIndexed	Whether the index requested is 0-indexed or 1-indexed
 	 * @return mixed	The item at the given index
 	 * @throws \OutOfRangeException	No item exists at the given position
 	 */
-	public function getIndex($i);
+	public function getIndex($i, $isZeroIndexed = false);
 };

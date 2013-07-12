@@ -285,6 +285,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 *
 	 * @param Interfaces\Collection $collection
 	 * @param int $perPage	The maximum number of posts to show per page
+	 * @param callable|null	A callback to apply to each paginated item
 	 * @return array	An associative array of pages to be created
 	 *
 	 *		array (
@@ -297,7 +298,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * 			)
 	 *		)
 	 */
-	protected function paginateCollection(\Blight\Interfaces\Models\Collection $collection, $perPage){
+	protected function paginateCollection(\Blight\Interfaces\Models\Collection $collection, $perPage, $callback = null){
 		$returnPages	= array();
 
 		$posts	= $collection->getPosts();
@@ -318,6 +319,13 @@ class Renderer implements \Blight\Interfaces\Renderer {
 			$pages[$page+1]	= $collection->getURL().($page == 0 ? '' : '/'.($page+1));
 		}
 
+		if(isset($callback) && is_callable($callback)){
+			$result	= $callback($pages, $this->blog, $collection);
+			if(isset($result)){
+				$pages	= $result;
+			}
+		}
+
 		// Build each page
 		for($page = 0; $page < $noPages; $page++){
 			$path	= $base.$collection->getURL(true).'/'.($page == 0 ? 'index' : ($page+1)).'.html';
@@ -331,7 +339,52 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	}
 
 	/**
-	 * Generates and saves the static file for the blog home page. Posts are retrieved from the
+	 * Generates and saves the static file for the blog home page and sequential posts. Posts are retrieved from the
+	 * Manager set during class construction.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 20]
+	 */
+	public function renderSequential($options = null){
+		$options	= array_merge(array(
+			'per_page'	=> 20
+		), (array)$options);
+
+		// Prepare posts
+		$posts	= $this->manager->getPosts();
+
+		$collection	= new \Blight\Models\Collections\Sequential($this->blog, 'Page');
+		$collection->setPosts($posts);
+
+		$pages	= $this->paginateCollection($collection, $options['per_page'], function($pages, \Blight\Interfaces\Blog $blog, \Blight\Interfaces\Models\Collection $collection){
+			// Change home page
+			$pages[1]	= $blog->getURL();
+			return $pages;
+		});
+
+		$pageNo	= 0;
+		foreach($pages as $outputFile => $page){
+			if($pageNo == 0){
+				// Home page
+				$template	= 'home';
+				$outputFile	= $this->blog->getPathWWW('index.html');
+			} else {
+				// Subsequent
+				$template	= 'list';
+				$page['page_title']	= 'Page '.($pageNo+1);
+			}
+
+			$this->renderTemplateToFile($template, $outputFile, array_merge(array(
+				'sequential'	=> $collection
+			), $page));
+
+			$pageNo++;
+		}
+	}
+
+	/**
+	 * Generates and saves the static file for blog the home page. Posts are retrieved from the
 	 * Manager set during class construction.
 	 *
 	 * @param array|null $options	An array of options to alter the rendered pages
