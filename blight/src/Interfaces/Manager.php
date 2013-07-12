@@ -72,5 +72,10 @@ interface Manager {
 	 */
 	public function getPostsByCategory();
 
+	/**
+	 * @return array	An array of \Blight\Models\Post objects
+	 */
+	public function getSupplementaryPages();
+
 	public function cleanupDrafts();
 };

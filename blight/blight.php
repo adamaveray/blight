@@ -176,6 +176,12 @@ $blog->getLogger()->debug('Renderer initialised');
 	));
 	$blog->getLogger()->debug('Sitemap rendered');
 
+	// Render additional pages
+	$renderer->renderSupplementaryPages(array(
+		'limit'	=> $blog->get('supplementary', 'limits', $blog->get('page', 'limits', 5))
+	));
+	$blog->getLogger()->debug('Supplementary pages rendered');
+
 	// Rendering completed
 
 // Copy theme assets

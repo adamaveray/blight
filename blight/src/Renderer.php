@@ -518,6 +518,37 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		));
 	}
 
+	/**
+	 * Generates and saves the static files for additional utility pages, such as the 404 page.
+	 */
+	public function renderSupplementaryPages($options = null){
+		$options	= array_merge(array(
+			'limit'	=> 5
+		), (array)$options);
+
+		$pages	= $this->manager->getSupplementaryPages();
+
+		$outputPath	= $this->blog->getPathWWW();
+
+		foreach($pages as $pageID => $page){
+			/** @var \Blight\Interfaces\Models\Page $page */
+			$templates	= array('page');
+			$params		= array();
+			switch($pageID){
+				case '404':
+					array_unshift($templates, '404');
+					$params['recent_posts']	= array_slice($this->manager->getPosts(), 0, $options['limit']);
+					break;
+			}
+
+			$path	= $outputPath.$page->getSlug().'.html';
+			$this->renderTemplateToFile($templates, $path, array_merge($params, array(
+				'page'			=> $page,
+				'page_title'	=> $page->getTitle()
+			)));
+		}
+	}
+
 
 	/**
 	 * Copies all static assets from the theme to the web directory

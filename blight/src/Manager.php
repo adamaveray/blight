@@ -488,6 +488,21 @@ class Manager implements \Blight\Interfaces\Manager {
 	}
 
 	/**
+	 * Retrieves additional utility pages, such as the 404 page.
+	 *
+	 * @return array	An array of \Blight\Models\Post objects
+	 */
+	public function getSupplementaryPages(){
+		$pages	= array();
+
+		// 404 page
+		$path	= $this->blog->getPathApp('src/views/pages/404.md');
+		$pages['404']	= new \Blight\Models\Page($this->blog, $this->blog->getFileSystem()->loadFile($path), '404');
+
+		return $pages;
+	}
+
+	/**
 	 * Deletes any rendered drafts without an associated draft post
 	 */
 	public function cleanupDrafts(){
