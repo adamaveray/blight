@@ -43,29 +43,38 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
-	 * @param string $name			The template to use
+	 * @param string|array $names	The template or templates to use
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
 	 * @return string	The rendered content from the template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	protected function renderTemplate($name, $params = null){
+	protected function renderTemplate($names, $params = null){
 		$params	= array_merge(array(
 			'archives'		=> $this->manager->getPostsByYear(),
 			'categories'	=> $this->manager->getPostsByCategory()
 		), (array)$params);
 
-		$callback	= array($this->theme, 'render_'.$name);
-		if(is_callable($callback)){
-			return call_user_func($callback, $params);
-
-		} elseif(isset($this->inbuiltTemplates[$name])){
-			// Use default template
-			$template	= new \Blight\Models\Template($this->blog, $this->theme, $name, $this->inbuiltTemplates[$name]);
-			return $template->render($params);
-
-		} else {
-			return $this->theme->renderTemplate($name, $params);
+		if(!is_array($names)){
+			$names	= array($names);
 		}
+
+		foreach($names as $name){
+			$callback	= array($this->theme, 'render_'.$name);
+			if(is_callable($callback)){
+				return call_user_func($callback, $params);
+
+			} elseif(isset($this->inbuiltTemplates[$name])){
+				// Use default template
+				$template	= new \Blight\Models\Template($this->blog, $this->theme, $name, $this->inbuiltTemplates[$name]);
+
+				return $template->render($params);
+			}
+
+			// No match - continue
+		}
+
+		// No special cases
+		return $this->theme->renderTemplate($names, $params);
 	}
 
 	/**
@@ -81,15 +90,21 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Builds a template file with the provided parameters, and writes the rendered content to the specified file
 	 *
-	 * @param string $templateName	The template to use
+	 * @param string|array $names	The template or templates to use
 	 * @param string $outputPath	The file to write to
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
+	 *
+	 * @throws \InvalidArgumentException	The output path is not specified
 	 *
 	 * @see renderTemplate
 	 * @see write
 	 */
-	protected function renderTemplateToFile($templateName, $outputPath, $params = null){
-		$this->write($outputPath, $this->renderTemplate($templateName, $params));
+	protected function renderTemplateToFile($names, $outputPath, $params = null){
+		if(!isset($outputPath) || trim($outputPath) == ''){
+			throw new \InvalidArgumentException('No output path provided');
+		}
+
+		$this->write($outputPath, $this->renderTemplate($names, $params));
 	}
 
 	/**
@@ -405,7 +420,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 
 		$path	= $this->blog->getPathWWW('index.html');
 
-		$this->renderTemplateToFile('home', $path, array(
+		$this->renderTemplateToFile(array('home', 'list'), $path, array(
 			'posts'	=> $posts
 		));
 	}
