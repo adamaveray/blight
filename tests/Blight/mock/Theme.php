@@ -17,9 +17,23 @@ class Theme implements \Blight\Interfaces\Models\Packages\Theme {
 	public function setup(){
 	}
 
-	public function renderTemplate($name, $params = null){
-		$template	= new \Blight\Models\Template($this->blog, $this, $name);
-		return $template->render($params);
+	public function renderTemplate($names, $params = null){
+		if(!is_array($names)){
+			$names	= array($names);
+		}
+
+		foreach($names as $templateName){
+			try {
+				$template	= new \Blight\Models\Template($this->blog, $this, $templateName);
+				return $template->render($params);
+			} catch(\Exception $e){
+				// Skip template
+				continue;
+			}
+		}
+
+		// Template not found
+		throw new \RuntimeException('No templates could be found');
 	}
 
 	public function getPathTemplates(){

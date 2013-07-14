@@ -520,6 +520,8 @@ class Renderer implements \Blight\Interfaces\Renderer {
 
 	/**
 	 * Generates and saves the static files for additional utility pages, such as the 404 page.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered documents
 	 */
 	public function renderSupplementaryPages($options = null){
 		$options	= array_merge(array(

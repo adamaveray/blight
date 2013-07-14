@@ -63,5 +63,15 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 		return array($category);
 	}
 
+	public function getSupplementaryPages(){
+		$pages	= array();
+
+		// 404 page
+		$path	= $this->blog->getPathApp('src/views/pages/404.md');
+		$pages['404']	= new \Blight\Models\Page($this->blog, $this->blog->getFileSystem()->loadFile($path), '404');
+
+		return $pages;
+	}
+
 	public function cleanupDrafts(){}
 };
