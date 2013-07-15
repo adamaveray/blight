@@ -19,6 +19,9 @@ class Blog implements \Blight\Interfaces\Blog {
 	/** @var \Psr\Log\LoggerInterface */
 	protected $logger;
 
+	/** @var \Blight\Interfaces\Cache */
+	protected $cache;
+
 	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
 
@@ -328,6 +331,25 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function setLogger(\Psr\Log\LoggerInterface $logger){
 		$this->logger	= $logger;
+	}
+
+	/**
+	 * @return \Blight\Interfaces\Cache
+	 * @throws \RuntimeException
+	 */
+	public function getCache(){
+		if(!isset($this->cache)){
+			throw new \RuntimeException('Cache has not been set');
+		}
+
+		return $this->cache;
+	}
+
+	/**
+	 * @param Interfaces\Cache $cache
+	 */
+	public function setCache(\Blight\Interfaces\Cache $cache){
+		$this->cache	= $cache;
 	}
 
 	/**

@@ -99,6 +99,7 @@ $blog->setPackageManager(new \Blight\PackageManager($blog));
 		$logger->pushHandler(new \Monolog\Handler\StreamHandler($blog->getPathRoot($logPath), \Monolog\Logger::INFO));
 	}
 $blog->setLogger($logger);
+$blog->setCache(new \Blight\Cache($blog));
 
 // Load posts
 $manager	= new \Blight\Manager($blog);

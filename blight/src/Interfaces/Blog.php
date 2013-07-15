@@ -143,6 +143,17 @@ interface Blog {
 	public function setLogger(\Psr\Log\LoggerInterface $logger);
 
 	/**
+	 * @return \Blight\Interfaces\Cache
+	 * @throws \RuntimeException
+	 */
+	public function getCache();
+
+	/**
+	 * @param Interfaces\Cache $cache
+	 */
+	public function setCache(\Blight\Interfaces\Cache $cache);
+
+	/**
 	 * @return \Blight\Interfaces\Models\Packages\Theme
 	 */
 	public function getTheme();
