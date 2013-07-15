@@ -67,4 +67,16 @@ interface FileSystem {
 	 * @throws \RuntimeException	Cannot create target directory
 	 */
 	public function copyDir($sourceDir, $targetDir, $mode = 0755, $recursive = true, $maintainAttributes = true, $checkDifference = false);
+
+	/**
+	 * @param string $directory
+	 * @return array
+	 */
+	public function getDirectoryListing($directory);
+
+	/**
+	 * @param array $files
+	 * @return array
+	 */
+	public function getModifiedTimesForFiles($files);
 };

@@ -31,18 +31,26 @@ class Cache implements \Blight\Interfaces\Cache {
 			$value	= $this->blog->getFileSystem()->loadFile($path);
 			$value	= unserialize($value);
 		} catch(\Exception $e){
-			throw new \RuntimeException('Cannot load cache item');
+			return null;
 		}
 
 		return $value;
 	}
 
 	/**
-	 * @param string $key	The key to cache the value ender
-	 * @param mixed $value	The value to be cached
+	 * @param string|array $key	The key to cache the value ender
+	 * @param mixed|null $value	The value to be cached
 	 * @throws \RuntimeException	The item cannot be cached
 	 */
-	public function set($key, $value){
+	public function set($key, $value = null){
+		if(is_array($key)){
+			foreach($key as $k => $v){
+				$this->set($k, $v);
+			}
+
+			return;
+		}
+
 		$path	= $this->keyToPath($key);
 		$value	= serialize($value);
 
@@ -59,14 +67,6 @@ class Cache implements \Blight\Interfaces\Cache {
 	 * @return string		The path for the key
 	 */
 	protected function keyToPath($key){
-		preg_match('/^(\w*?)\\|\\|(.*?)$/i', $key, $matches);
-
-		$prefix	= '';
-		if(isset($matches[1])){
-			$prefix	= $matches[1].'-';
-			$key	= $matches[2];
-		}
-
 		return $this->dir.$prefix.sha1($key).self::FILE_EXT;
 	}
 };

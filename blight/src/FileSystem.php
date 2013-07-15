@@ -241,4 +241,42 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 			}
 		}
 	}
+
+	/**
+	 * @param string $directory
+	 * @return array
+	 */
+	public function getDirectoryListing($directory, $pattern = null){
+		if(!isset($pattern)){
+			$pattern	= '*';
+		}
+
+		$directory	= rtrim($directory, '/');
+
+		$files	= array();
+
+		$rawFiles	= glob($directory.'/'.$pattern);
+		foreach($rawFiles as $file){
+			if(is_dir($file)){
+				$files	= array_merge($files, $this->getDirectoryListing($file));
+			} else {
+				$files[]	= $file;
+			}
+		}
+
+		return $files;
+	}
+
+	/**
+	 * @param array $files
+	 * @return array
+	 */
+	public function getModifiedTimesForFiles($files){
+		$fileDetails	= array();
+		foreach($files as $file){
+			$fileDetails[$file]	= filemtime($file);
+		}
+
+		return $fileDetails;
+	}
 };

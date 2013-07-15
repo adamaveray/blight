@@ -47,27 +47,10 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	A list of filenames for each page file found
 	 */
-	protected function getRawPages(){
+	public function getRawPages(){
 		$dir	= $this->blog->getPathPages();
 
-		function getSubPages($dir){
-			$dir	= rtrim($dir, '/');
-
-			$files	= array();
-
-			$rawFiles	= glob($dir.'/*');
-			foreach($rawFiles as $file){
-				if(is_dir($file)){
-					$files	= array_merge($files, getSubPages($file));
-				} else {
-					$files[]	= $file;
-				}
-			}
-
-			return $files;
-		};
-
-		$files	= getSubPages($dir);
+		$files	= $this->blog->getFileSystem()->getDirectoryListing($dir);
 
 		return $files;
 	}
@@ -78,17 +61,17 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * @param bool $drafts	Whether to return only drafts or only published posts
 	 * @return array	A list of filenames for each post file found
 	 */
-	protected function getRawPosts($drafts = false){
+	public function getRawPosts($drafts = false){
 		$dir	= ($drafts ? $this->blog->getPathDrafts() : $this->blog->getPathPosts());
-		$files	= glob($dir.'*.*');
+		$files	= $this->blog->getFileSystem()->getDirectoryListing($dir, '*.*');
 
 		if(!$drafts){
 			$draftPublishDir	= $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR);
 
 			$files	= array_merge(
 				$files,		// Unsorted
-				glob($dir.'*/*/*.*'),	// Sorted (YYYY/DD/post.md)
-				glob($draftPublishDir.'*.*')	// Ready-to-publish drafts
+				$this->blog->getFileSystem()->getDirectoryListing($dir, '*/*/*.*'),			// Sorted (YYYY/DD/post.md)
+				$this->blog->getFileSystem()->getDirectoryListing($draftPublishDir, '*.*')	// Ready-to-publish drafts
 			);
 		}
 
