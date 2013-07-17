@@ -253,7 +253,9 @@ class Blog implements \Blight\Interfaces\Blog {
 		return isset($this->config['site']['description']) ? $this->config['site']['description'] : null;
 	}
 
-	/** @return \DateTimezone	The blog publishing timezone */
+	/**
+	 * @return \DateTimezone	The blog publishing timezone
+	 */
 	public function getTimezone(){
 		if(!isset($this->timezone)){
 			$defaultTimezone	= 'UTC';
