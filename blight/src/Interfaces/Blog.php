@@ -172,6 +172,18 @@ interface Blog {
 	public function getAuthor($name = null);
 
 	/**
+	 * @return array	An associative array of all authors defined in the site, with author names as keys
+	 */
+	public function getAuthors();
+
+	/**
+	 * @param array $authors	An array of \Blight\Interfaces\Models\Author instances
+	 * @throws \InvalidArgumentException	An author object does not implement \Blight\Interfaces\Models\Author
+	 */
+	public function setAuthors(array $authors);
+
+
+	/**
 	 * @param string $parameter		The name of the parameter to retrieve
 	 * @param string|null $group	The settings group the parameter exists in
 	 * @param mixed $default		The value to be returned if the requested parameter is not set

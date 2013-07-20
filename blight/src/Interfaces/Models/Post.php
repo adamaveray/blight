@@ -44,6 +44,9 @@ interface Post extends \Blight\Interfaces\Models\Page {
 	 */
 	public function getSummary($length = null, $append = '…');
 
+	/**
+	 * @return \Blight\Interfaces\Models\Author|null	The post's author, or the site's default author if not set, or null if neither are set
+	 */
 	public function getAuthor();
 
 	/**

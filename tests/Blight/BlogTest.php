@@ -200,6 +200,74 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Blog::setAuthors
+	 */
+	public function testSetAuthors(){
+		$authorName	= 'Test Author';
+
+		$alternateConfig	= $this->config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$author	= new \Blight\Models\Author($blog, array(
+			'name'	=> $authorName
+		));
+		$blog->setAuthors(array($author));
+	}
+
+	/**
+	 * @covers \Blight\Blog::setAuthors
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testSetInvalidAuthors(){
+		$blog	= new \Blight\Blog($alternateConfig);
+		$blog->setAuthors(array('not an author'));
+	}
+
+	/**
+	 * @covers \Blight\Blog::getAuthor
+	 * @depends testSetAuthors
+	 */
+	public function testGetAuthor(){
+		$authorName	= 'Test Author';
+
+		$alternateConfig	= $this->config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$author	= new \Blight\Models\Author($blog, array(
+			'name'	=> $authorName
+		));
+		$blog->setAuthors(array($author));
+
+		$this->assertEquals($author, $blog->getAuthor());
+		$this->assertEquals($author, $blog->getAuthor($authorName));
+	}
+
+	/**
+	 * @covers \Blight\Blog::getAuthors
+	 * @depends testSetAuthors
+	 */
+	public function testGetAuthors(){
+		$authorNames	= array('Test Author', 'Test Author 2');
+
+		$alternateConfig	= $this->config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$authors	= array(
+			new \Blight\Models\Author($blog, array(
+				'name'	=> $authorNames[0]
+			)),
+			new \Blight\Models\Author($blog, array(
+				'name'	=> $authorNames[1]
+			))
+		);
+		$blog->setAuthors($authors);
+
+		$resultAuthors	= $blog->getAuthors();
+		$this->assertCount(count($authors), $resultAuthors);
+		$this->assertEquals($author[0], $resultAuthors[0]);
+	}
+
+	/**
 	 * @covers \Blight\Blog::get
 	 */
 	public function testGet(){

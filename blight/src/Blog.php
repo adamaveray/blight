@@ -398,7 +398,10 @@ class Blog implements \Blight\Interfaces\Blog {
 		return $authors[$name];
 	}
 
-	protected function getAuthors(){
+	/**
+	 * @return array	An associative array of all authors defined in the site, with author names as keys
+	 */
+	public function getAuthors(){
 		if(!isset($this->authors)){
 			$rawAuthors	= array();
 
@@ -407,6 +410,11 @@ class Blog implements \Blight\Interfaces\Blog {
 			if(file_exists($file)){
 				$config	= new \Blight\Config();
 				$rawAuthors	= $config->unserialize($this->getFileSystem()->loadFile($file));
+
+				if(is_object($rawAuthors) && isset($rawAuthors->name)){
+					// Single author given
+					$rawAuthors	= array($rawAuthors);
+				}
 			}
 
 			// Load config author
@@ -419,6 +427,24 @@ class Blog implements \Blight\Interfaces\Blog {
 		}
 
 		return $this->authors;
+	}
+
+	/**
+	 * @param array $authors	An array of \Blight\Interfaces\Models\Author instances
+	 * @throws \InvalidArgumentException	An author object does not implement \Blight\Interfaces\Models\Author
+	 */
+	public function setAuthors(array $authors){
+		$processedAuthors	= array();
+
+		foreach($authors as $author){
+			if(!($author instanceof \Blight\Interfaces\Models\Author)){
+				throw new \InvalidArgumentException('Authors must be instances of \Blight\Interfaces\Models\Author');
+			}
+
+			$processedAuthors[\Blight\Utilities::convertNameToSlug($author->getName())]	= $author;
+		}
+
+		$this->authors	= $processedAuthors;
 	}
 
 

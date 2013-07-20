@@ -320,6 +320,33 @@ EOD;
 	}
 
 	/**
+	 * @covers \Blight\Models\Post::getAuthor
+	 */
+	public function testGetAuthor(){
+		global $config;
+
+		// No author
+		$blog	= new \Blight\Blog($config);
+		$blog->setAuthors(array());
+
+		$post	= new \Blight\Models\Post($blog, $this->content, $this->content_slug);
+		$this->assertNull($post->getAuthor());
+
+		// Site author
+		$authorName	= 'Test Author';
+		$alternateConfig	= $config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$author	= new \Blight\Models\Author($blog, array(
+			'name'	=> $authorName
+		));
+		$blog->setAuthors(array($author));
+
+		$post	= new \Blight\Models\Post($blog, $this->content, $this->content_slug);
+		$this->assertEquals($author, $post->getAuthor());
+	}
+
+	/**
 	 * @covers \Blight\Models\Post::getCategories
 	 */
 	public function testNoCategoryGetCategories(){
