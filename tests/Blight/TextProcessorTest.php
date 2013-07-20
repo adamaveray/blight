@@ -82,11 +82,11 @@ EOD;
 	 */
 	public function testTruncateHTML(){
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
-		$truncated	= '<p>Lorem...</p>';
+		$truncated	= '<p>Lorem…</p>';
 		$this->assertEquals($truncated, $this->text_processor->truncateHTML($original, 10));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
-		$truncated	= '<p>Lorem ipsum...</p>';
+		$truncated	= '<p>Lorem ipsum…</p>';
 		$this->assertEquals($truncated, $this->text_processor->truncateHTML($original, 20));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';

@@ -116,7 +116,7 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 *
 	 * @return string	The truncated text
 	 */
-	public function truncateHTML($html, $length = 100, $ending = '...', $splitWords = false, $handleHTML = true){
+	public function truncateHTML($html, $length = 100, $ending = '…', $splitWords = false, $handleHTML = true){
 		if(!$handleHTML){
 			// Ignore HTML tags
 			if(strlen($html) <= $length){
