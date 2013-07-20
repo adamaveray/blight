@@ -12,6 +12,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	protected $link;
 	protected $isBeingPublished;
 	protected $summary;
+	protected $images;
 
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
@@ -274,4 +275,27 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	public function isLinked(){
 		return $this->hasMeta('link');
 	}
-}
+
+	/**
+	 * @return array	An array of \Blight\Interfaces\Models\Image objects
+	 */
+	public function getImages(){
+		if(!isset($this->images)){
+			// Parse images from content
+			preg_match_all('~\!\[(.*?)\]\((.*?)(?: "(.*?)")?\)~', $this->getContent(), $matches, \PREG_SET_ORDER);
+			$images	= array();
+			foreach($matches as $match){
+				$image	= new \Blight\Models\Image($this->blog, $match[2]);
+				$image->setText($match[1]);
+				if(isset($match[3])){
+					$image->setTitle($match[3]);
+				}
+				$images[]	= $image;
+			}
+
+			$this->images	= $images;
+		}
+
+		return $this->images;
+	}
+};

@@ -401,4 +401,42 @@ EOD;
 		$post	= new \Blight\Models\Post($this->blog, $this->linked_content, $this->content_slug);
 		$this->assertTrue($post->isLinked());
 	}
+
+	/**
+	 * @covers \Blight\Models\Post::getImages
+	 */
+	public function testGetImages(){
+		$imageText	= 'Image Text';
+		$imageURL	= '/img/image-url.jpg';
+		$imageTitle	= 'Image Title';
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2013-01-01
+
+Test content
+
+![${imageText}](${imageURL})
+
+![${imageText} 2](${imageURL}-2)
+
+![${imageText} 3](${imageURL}-3 "${imageTitle}")
+EOD;
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$images	= $post->getImages();
+		$this->assertTrue(is_array($images));
+		$this->assertCount(3, $images);
+
+		$this->assertEquals($imageText, $images[0]->getText());
+		$this->assertEquals($imageURL, $images[0]->getURL());
+		$this->assertEquals($this->blog->getURL($images[0]->getURL()), $images[0]->getURL(true));
+
+		// Test additional
+		$this->assertEquals($imageText.' 2', $images[1]->getText());
+
+		// Test titles
+		$this->assertFalse($images[0]->hasTitle());
+		$this->assertTrue($images[2]->hasTitle());
+		$this->assertEquals($imageTitle, $images[2]->getTitle());
+	}
 };
