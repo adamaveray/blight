@@ -66,6 +66,9 @@ if(!file_exists($configFile) || isset($_COOKIE[\Blight\Controllers\Install::COOK
 // Initialise blog
 $parser	= new \Blight\Config();
 $config	= $parser->unserialize(file_get_contents($configFile));
+if(!isset($config)){
+	throw new \Exception('Config invalid');
+}
 $config['root_path']	= $rootPath;
 $blog	= new \Blight\Blog($config);
 
