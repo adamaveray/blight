@@ -11,6 +11,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	protected $isDraft;
 	protected $link;
 	protected $isBeingPublished;
+	protected $summary;
 
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
@@ -186,18 +187,47 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	 * @return bool	Whether the post has a summary or not
 	 */
 	public function hasSummary(){
-		return $this->hasMeta('summary');
+		return ($this->hasMeta('summary') || $this->blog->get('generate_summaries', 'output', true));
 	}
 
 	/**
-	 * @return string	The post's summary
+	 * @param int|null $length	The maximum number of characters to allow in the summary
+	 * @param string $append	A string to append if the summary is truncated
+	 * @return string|null		The post's summary
 	 */
-	public function getSummary(){
+	public function getSummary($length = null, $append = '…'){
 		if(!$this->hasSummary()){
+			// No summary
 			return null;
 		}
 
-		return $this->getMeta('summary');
+		if(!isset($this->summary)){
+			if($this->hasMeta('summary')){
+				$summary	= $this->getMeta('summary');
+
+			} else {
+				// Generate summary
+				$replaces	= array(
+					'~\!\[(.*?)\](\(.*?\)|\[.*?\])~'	=> '',		// Images
+					'~\[(.*?)\](\(.*?\)|\[.*?\])~'		=> '$1',	// Links
+					'~(\*\*?|__?)(.+?)(\*\*?|__|)~'		=> '$1',	// Bold/Emphasis
+					'~\s*[\n\r]+\s*~'					=> ' ',		// Line breaks
+				);
+
+				$summary	= strip_tags(preg_replace(array_keys($replaces), array_values($replaces), $this->getContent()));
+			}
+
+			$this->summary	= $summary;
+		}
+
+		$summary	= $this->summary;
+		if(isset($length)){
+			// Limit
+			$typo		= new \Blight\TextProcessor($this->blog);
+			$summary	= $typo->truncateHTML($summary, $length, $append);
+		}
+
+		return $summary;
 	}
 
 	public function getAuthor(){

@@ -268,28 +268,55 @@ EOD;
 	 * @covers \Blight\Models\Post::hasSummary
 	 */
 	public function testHasSummary(){
-		$this->assertFalse($this->post->hasSummary());
+		$this->assertTrue($this->post->hasSummary());
 
+		// Test with summary header
 		$summary	= 'A test summary';
 		$content	= $this->content;
 		$content	= preg_replace('/(=+)(\n)/', '$1$2Summary: '.$summary.'$2', $content);
 
 		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->assertTrue($post->hasSummary());
+
+		// Test disabling generated summary
+		global $config;
+		$summaryConfig	= $config;
+		$summaryConfig['output']['generate_summaries']	= false;
+		$alternateBlog	= new \Blight\Blog($summaryConfig);
+
+		$content	= $this->content;
+		$post	= new \Blight\Models\Post($alternateBlog, $content, 'test-post');
+		$this->assertFalse($post->hasSummary());
 	}
 
 	/**
 	 * @covers \Blight\Models\Post::getSummary
 	 */
 	public function testGetSummary(){
-		$this->assertNull($this->post->getSummary());
+		$alternateText	= 'Aenean ullamcorper nisi lorem, non egestas metus posuere id. Donec vitae gravida dolor, sit amet lobortis magna. Mauris mi leo, pellentesque sed hendrerit sit amet, mattis id erat. Mauris feugiat ullamcorper risus, eu facilisis enim pharetra at. Maecenas quis faucibus enim, ac pretium sapien. Integer pharetra ante nec lectus posuere tincidunt. Cras lobortis felis at eros blandit, eu viverra justo egestas. Sed eu tellus fringilla, molestie nunc ut, auctor ligula. Fusce enim nisi, volutpat sed neque eget, gravida gravida nulla. Pellentesque mattis mauris eget mi tempor lacinia.';
 
+		$content	= str_replace($this->content_text, $alternateText, $this->content);
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$this->assertEquals($alternateText, $post->getSummary());
+		$this->assertLessThanOrEqual(100, strlen($post->getSummary(100)));
+
+		// Test with summary header
 		$summary	= 'A test summary';
 		$content	= $this->content;
 		$content	= preg_replace('/(=+)(\n)/', '$1$2Summary: '.$summary.'$2', $content);
 
 		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->assertEquals($summary, $post->getSummary());
+
+		// Test with generated summary
+		global $config;
+		$summaryConfig	= $config;
+		$summaryConfig['output']['generate_summaries']	= false;
+		$alternateBlog	= new \Blight\Blog($summaryConfig);
+
+		$content	= $this->content;
+		$post	= new \Blight\Models\Post($alternateBlog, $content, 'test-post');
+		$this->assertNull($post->getSummary());
 	}
 
 	/**
