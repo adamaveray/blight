@@ -166,7 +166,7 @@ class UpdateManager {
 		$files	= array(
 			$this->blog->getPathRoot('config.json'),
 			$this->blog->getPathRoot('authors.json'),
-			$this->blog->getPathThemes($this->blog->get('name', 'theme').'.phar')
+			$this->blog->getPathThemes($this->blog->get('theme.name').'.phar')
 		);
 
 		if($withModification){
