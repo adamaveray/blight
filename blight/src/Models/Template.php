@@ -13,6 +13,8 @@ class Template implements \Blight\Interfaces\Models\Template {
 	protected $blog;
 	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
+	/** @var \Blight\TextProcessor */
+	protected $textProcessor;
 	protected $dir;
 	protected $name;
 	protected $filename;
@@ -91,8 +93,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 		}
 
 		if($this->blog->get('output.minify_html', false)){
-			$textProcessor	= new \Blight\TextProcessor($this->blog);
-			$output	= $textProcessor->minifyHTML($output);
+			$output	= $this->getTextProcessor()->minifyHTML($output);
 		}
 		return $output;
 	}
@@ -151,10 +152,12 @@ class Template implements \Blight\Interfaces\Models\Template {
 			// Set up functions
 			$twig->addFunction(new \Twig_SimpleFunction('styles', array($this, 'getStyles'), array('is_safe' => array('html'))));
 			$twig->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'getScripts'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('postBody', array($this, 'buildPostBody'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('pageBody', array($this, 'buildPageBody'), array('is_safe' => array('html'))));
 
 			// Set up filters
 			$blog	= $this->blog;
-			$textProcessor	= new \Blight\TextProcessor($this->blog);
+			$textProcessor	= $this->getTextProcessor();
 
 			// Markdown filter
 			$twig->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){
@@ -219,6 +222,57 @@ class Template implements \Blight\Interfaces\Models\Template {
 	}
 
 	/**
+	 * @param \Blight\Interfaces\Models\Post $post
+	 * @param bool $isSummary
+	 * @return string
+	 */
+	public function buildPostBody(\Blight\Interfaces\Models\Post $post, $isSummary = false){
+		if($isSummary && $post->hasSummary()){
+			$content	= $post->getSummary();
+		} else {
+			$content	= $post->getContent();
+		}
+
+		$this->blog->doHook('postBodyRaw', array(
+			'post'		=> $post,
+			'isSummary'	=> $isSummary,
+			'content'	=> &$content
+		));
+
+		$body	= $this->getTextProcessor()->process($content);
+
+		$this->blog->doHook('postBodyProcessed', array(
+			'post'		=> $post,
+			'isSummary'	=> $isSummary,
+			'content'	=> &$body
+		));
+
+		return $body;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\Models\Page $page
+	 * @return string
+	 */
+	public function buildPageBody(\Blight\Interfaces\Models\Page $page){
+		$content	= $page->getContent();
+
+		$this->blog->doHook('pageBodyRaw', array(
+			'page'		=> $page,
+			'content'	=> &$body
+		));
+
+		$body	= $this->getTextProcessor()->process($content);
+
+		$this->blog->doHook('pageBodyProcessed', array(
+			'page'		=> $page,
+			'content'	=> &$body
+		));
+
+		return $body;
+	}
+
+	/**
 	 * Builds the HTML tags for the provided scripts or styles
 	 *
 	 * @param array $items	The items to build tags for
@@ -268,5 +322,17 @@ class Template implements \Blight\Interfaces\Models\Template {
 		}
 
 		return implode("\n", $output);
+	}
+
+
+	/**
+	 * @return \Blight\TextProcessor
+	 */
+	protected function getTextProcessor(){
+		if(!$this->textProcessor){
+			$this->textProcessor	= new \Blight\TextProcessor($this->blog);
+		}
+
+		return $this->textProcessor;
 	}
 };

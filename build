@@ -29,7 +29,7 @@ $name	= 'Blight.phar';
 
 
 $pathSource	= __DIR__.'/'.$dir;
-$pathBuild	= end($_SERVER['argv']);
+$pathBuild	= rtrim(end($_SERVER['argv']), '/');
 if(!$pathBuild || ($pathBuild[0] == '-' && strlen($pathBuild) <= 3) || $pathBuild === '--all'){
 	// No path given
 	$pathBuild	= __DIR__;
@@ -37,11 +37,15 @@ if(!$pathBuild || ($pathBuild[0] == '-' && strlen($pathBuild) <= 3) || $pathBuil
 
 function consoleOutput($message, $detailed = true){
 	global $verbose;
-	if($detailed && !$verbose){
+	if($detailed === true && !$verbose){
 		return;
 	}
 
-	echo $message.PHP_EOL;
+	echo $message;
+	if(is_string($detailed) && $verbose){
+		echo ' '.$detailed;
+	}
+	echo PHP_EOL;
 }
 
 function quotedConsoleOutput($message, $detailed = true){
@@ -109,11 +113,48 @@ try {
 	if(hasFlag('p')){
 		consoleOutput('Preparing packages');
 
-		ob_start();
-		require('prepare_packages.php');
-		consoleOutput('Prepared packages', false);
+		function buildPackage($source, $targetDir){
+        	$name	= basename($source).'.phar';
 
-		quotedConsoleOutput(ob_get_clean());
+        	try {
+        		$phar = new Phar($targetDir.'/'.$name, 0, $name);
+        		$phar->buildFromDirectory($source);
+        		$phar->setStub('<?php __HALT_COMPILER();');
+        		unset($phar);
+
+        	} catch(\Exception $e){
+				quotedConsoleOutput('Could not package `'.$name.'`', '(Exception: '.$e->getMessage().' ['.$e->getFile().'#'.$e->getLine().'])');
+        		return;
+        	}
+
+			quotedConsoleOutput('Packaged "'.$name.'"');
+        }
+
+        // Build default theme
+        $defaultTheme	= __DIR__.'/default-theme/Basic/';
+        if(is_dir($defaultTheme)){
+        	buildPackage($defaultTheme, __DIR__.'/blog-data/themes/');
+        }
+
+        // Build additional packages
+        $baseDirs	= array(
+        	__DIR__.'/blog-data/plugins/',
+        	__DIR__.'/blog-data/themes/'
+        );
+
+        foreach($baseDirs as $baseDir){
+        	$dirs	= glob($baseDir.'/*');
+
+        	foreach($dirs as $dir){
+        		if(!is_dir($dir)){
+        			continue;
+        		}
+
+        		buildPackage($dir, $baseDir);
+        	}
+        }
+
+		consoleOutput('Prepared packages', false);
 
 		consoleLinebreak();
 	}
@@ -142,7 +183,10 @@ try {
 
 // Run
 	if(hasFlag('r')){
-		require($pathBuild.'/Blight.phar');
+		$output	= shell_exec('php -f "'.$pathBuild.'/Blight.phar"');
+
+		consoleOutput('Ran blog', false);
+		quotedConsoleOutput($output);
 
 		consoleLinebreak();
 	}

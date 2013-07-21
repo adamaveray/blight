@@ -34,6 +34,48 @@ Publishing
 Output
 ------
 
+- ### postBodyRaw
+
+	Called when building a post's body, before processing Markdown and typography
+
+	#### Params
+
+	- \Blight\Interfaces\Models\Post **post**: The post being rendered
+	- bool **isSummary**: Whether the body content requested is the post's summary
+	- string **content**: _(editable)_ The raw Markdown content of the post
+
+
+- ### postBodyProcessed
+
+	Called when building a post's body, after processing Markdown and typography
+
+	#### Params
+
+	- \Blight\Interfaces\Models\Post **post**: The post being rendered
+	- bool **isSummary**: Whether the body content requested is the post's summary
+	- string **content**: _(editable)_ The processed HTML content of the post
+
+
+- ### pageBodyRaw
+
+	Called when building a page's body, before processing Markdown and typography
+
+	#### Params
+
+	- \Blight\Interfaces\Models\Page **page**: The page being rendered
+	- string **content**: _(editable)_ The raw Markdown content of the page
+
+
+- ### pageBodyProcessed
+
+	Called when building a page's body, after processing Markdown and typography
+
+	#### Params
+
+	- \Blight\Interfaces\Models\Page **page**: The page being rendered
+	- string **content**: _(editable)_ The processed HTML content of the page
+
+
 - ### feed_post
 
 	Called when building a post's content in an RSS feed
