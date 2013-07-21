@@ -67,6 +67,6 @@ class Cache implements \Blight\Interfaces\Cache {
 	 * @return string		The path for the key
 	 */
 	protected function keyToPath($key){
-		return $this->dir.$prefix.sha1($key).self::FILE_EXT;
+		return $this->dir.sha1($key).self::FILE_EXT;
 	}
 };
