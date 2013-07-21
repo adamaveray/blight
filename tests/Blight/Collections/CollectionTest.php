@@ -8,15 +8,15 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 	protected $blog;
 
 	protected $collection;
-	protected $collection_name	= 'Test Name';
-	protected $collection_slug	= 'test-name';
+	protected $collectionName	= 'Test Name';
+	protected $collectionSlug	= 'test-name';
 
 	public function setUp(){
 		global $config;
 
 		$this->blog	= new \Blight\Blog($config);
 
-		$this->collection	= new static::$class($this->blog, $this->collection_name);
+		$this->collection	= new static::$class($this->blog, $this->collectionName);
 	}
 
 	/**
@@ -32,21 +32,21 @@ class CollectionTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\Models\Collections\Collection::getName
 	 */
 	public function testGetName(){
-		$this->assertEquals($this->collection->getName(), $this->collection_name);
+		$this->assertEquals($this->collection->getName(), $this->collectionName);
 	}
 
 	/**
 	 * @covers \Blight\Models\Collections\Collection::getSlug
 	 */
 	public function testGetSlug(){
-		$this->assertEquals($this->collection->getSlug(), $this->collection_slug);
+		$this->assertEquals($this->collection->getSlug(), $this->collectionSlug);
 	}
 
 	/**
 	 * @covers \Blight\Models\Collections\Collection::getURL
 	 */
 	public function testGetURL(){
-		$this->assertEquals($this->collection->getURL(), $this->blog->getURL().$this->collection_slug);
+		$this->assertEquals($this->collection->getURL(), $this->blog->getURL().$this->collectionSlug);
 	}
 
 	/**

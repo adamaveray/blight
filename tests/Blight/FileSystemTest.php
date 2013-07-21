@@ -5,41 +5,41 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
-	protected $file_dir;
-	protected $file_path;
-	protected $file_content;
+	protected $fileDir;
+	protected $filePath;
+	protected $fileContent;
 
 	/** @var \Blight\Interfaces\FileSystem */
-	protected $file_system;
+	protected $fileSystem;
 
 	public function setUp(){
 		global $config;
-		$test_config	= $config;
-		$test_config['paths']['templates']	= __DIR__.'/files/templates/';
-		$this->blog		= new \Blight\Blog($test_config);
+		$testConfig	= $config;
+		$testConfig['paths']['templates']	= __DIR__.'/files/templates/';
+		$this->blog		= new \Blight\Blog($testConfig);
 
-		$this->file_dir		= __DIR__.'/files/';
-		$this->file_path	= $this->file_dir.'test.txt';
-		$this->file_content	= 'Test content';
+		$this->fileDir		= __DIR__.'/files/';
+		$this->filePath		= $this->fileDir.'test.txt';
+		$this->fileContent	= 'Test content';
 
-		$this->file_system	= new \Blight\FileSystem($this->blog);
+		$this->fileSystem	= new \Blight\FileSystem($this->blog);
 	}
 
 	/**
 	 * @covers \Blight\FileSystem::__construct
 	 */
 	public function testConstruct(){
-		$file_system	= new \Blight\FileSystem($this->blog);
-		$this->assertInstanceOf('\Blight\FileSystem', $file_system);
+		$fileSystem	= new \Blight\FileSystem($this->blog);
+		$this->assertInstanceOf('\Blight\FileSystem', $fileSystem);
 	}
 
 	/**
 	 * @covers \Blight\FileSystem::createFile
 	 */
 	public function testCreateFile(){
-		$this->assertFalse(file_exists($this->file_path));
-		$this->file_system->createFile($this->file_path, $this->file_content);
-		$this->assertFileExists($this->file_path);
+		$this->assertFalse(file_exists($this->filePath));
+		$this->fileSystem->createFile($this->filePath, $this->fileContent);
+		$this->assertFileExists($this->filePath);
 	}
 
 	/**
@@ -47,8 +47,8 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @depends testCreateFile
 	 */
 	public function testLoadFile(){
-		$this->assertTrue(file_exists($this->file_path));
-		$this->assertEquals($this->file_content, $this->file_system->loadFile($this->file_path));
+		$this->assertTrue(file_exists($this->filePath));
+		$this->assertEquals($this->fileContent, $this->fileSystem->loadFile($this->filePath));
 	}
 
 	/**
@@ -56,8 +56,8 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \RuntimeException
 	 */
 	public function testInvalidLoadFile(){
-		$path		= $this->file_dir.'nonexistent.txt';
-		$this->file_system->loadFile($path);
+		$path		= $this->fileDir.'nonexistent.txt';
+		$this->fileSystem->loadFile($path);
 	}
 
 	/**
@@ -65,14 +65,14 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @depends testCreateFile
 	 */
 	public function testCopyFile(){
-		$new_path	= $this->file_dir.'copied.txt';
-		$this->file_system->copyFile($this->file_path, $new_path);
+		$newPath	= $this->fileDir.'copied.txt';
+		$this->fileSystem->copyFile($this->filePath, $newPath);
 		// New file exists
-		$this->assertFileExists($new_path);
+		$this->assertFileExists($newPath);
 		// Old file exists
-		$this->assertFileExists($this->file_path);
+		$this->assertFileExists($this->filePath);
 		// New file content matches old
-		$this->assertEquals($this->file_content, file_get_contents($new_path));
+		$this->assertEquals($this->fileContent, file_get_contents($newPath));
 	}
 
 	/**
@@ -80,25 +80,25 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @depends testCreateFile
 	 */
 	public function testMoveFile(){
-		$new_path	= $this->file_dir.'moved.txt';
-		$this->file_system->moveFile($this->file_path, $new_path);
+		$newPath	= $this->fileDir.'moved.txt';
+		$this->fileSystem->moveFile($this->filePath, $newPath);
 		// New file exists
-		$this->assertFileExists($new_path);
+		$this->assertFileExists($newPath);
 		// Old file does not exist
-		$this->assertFalse(file_exists($this->file_path));
+		$this->assertFalse(file_exists($this->filePath));
 		// New file content matches old
-		$this->assertEquals($this->file_content, file_get_contents($new_path));
+		$this->assertEquals($this->fileContent, file_get_contents($newPath));
 	}
 
 	/**
 	 * @covers \Blight\FileSystem::deleteFile
 	 */
 	public function testDeleteFile(){
-		$path	= $this->file_dir.'delete.txt';
+		$path	= $this->fileDir.'delete.txt';
 		// Create file
-		file_put_contents($path, $this->file_content);
+		file_put_contents($path, $this->fileContent);
 
-		$this->file_system->deleteFile($path);
+		$this->fileSystem->deleteFile($path);
 		$this->assertFalse(file_exists($path));
 	}
 
@@ -106,8 +106,8 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\FileSystem::createDir
 	 */
 	public function testCreateDir(){
-		$path	= $this->file_dir.'dir';
-		$this->file_system->createDir($path);
+		$path	= $this->fileDir.'dir';
+		$this->fileSystem->createDir($path);
 		$this->assertTrue(is_dir($path));
 	}
 
@@ -116,10 +116,10 @@ class FileSystemTest extends \PHPUnit_Framework_TestCase {
 	 * @depends testCreateDir
 	 */
 	public function testCopyDir(){
-		$source	= $this->file_dir.'dir';
-		$target	= $this->file_dir.'dir-2';
+		$source	= $this->fileDir.'dir';
+		$target	= $this->fileDir.'dir-2';
 
-		$this->file_system->copyDir($source, $target);
+		$this->fileSystem->copyDir($source, $target);
 		// Old directory exists
 		$this->assertTrue(is_dir($source));
 		// New directory exists

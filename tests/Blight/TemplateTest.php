@@ -9,15 +9,15 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	/** @var \Blight\Tests\Mock\Theme */
 	protected $theme;
 
-	protected $template_php_name;
-	protected $template_twig_name;
-	protected $template_content;
-	protected $template_content_variable;
+	protected $templatePHPName;
+	protected $templateTwigName;
+	protected $templateContent;
+	protected $templateContentVariable;
 
 	/** @var \Blight\Interfaces\Models\Template */
-	protected $template_php;
+	protected $templatePHP;
 	/** @var \Blight\Interfaces\Models\Template */
-	protected $template_twig;
+	protected $templateTwig;
 
 	public function setUp(){
 		global $config;
@@ -27,21 +27,21 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 			'path'	=> __DIR__.'/files/'
 		));
 
-		$this->template_php_name	= 'test_php';
-		$this->template_twig_name	= 'test_twig';
+		$this->templatePHPName	= 'test_php';
+		$this->templateTwigName	= 'test_twig';
 
-		$this->template_content				= 'Template'."\n".'No Variable';
-		$this->template_content_variable	= 'Template'."\n".'Variable: %s';
+		$this->templateContent			= 'Template'."\n".'No Variable';
+		$this->templateContentVariable	= 'Template'."\n".'Variable: %s';
 
-		$this->template_php		= new \Blight\Models\Template($this->blog, $this->theme, $this->template_php_name);
-		$this->template_twig	= new \Blight\Models\Template($this->blog, $this->theme, $this->template_twig_name);
+		$this->templatePHP		= new \Blight\Models\Template($this->blog, $this->theme, $this->templatePHPName);
+		$this->templateTwig	= new \Blight\Models\Template($this->blog, $this->theme, $this->templateTwigName);
 	}
 
 	/**
 	 * @covers \Blight\Models\Template::__construct
 	 */
 	public function testPHPConstruct(){
-		$template	= new \Blight\Models\Template($this->blog, $this->theme, $this->template_php_name);
+		$template	= new \Blight\Models\Template($this->blog, $this->theme, $this->templatePHPName);
 		$this->assertInstanceOf('\Blight\Models\Template', $template);
 	}
 
@@ -49,7 +49,7 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 * @covers \Blight\Models\Template::__construct
 	 */
 	public function testTwigConstruct(){
-		$template	= new \Blight\Models\Template($this->blog, $this->theme, $this->template_twig_name);
+		$template	= new \Blight\Models\Template($this->blog, $this->theme, $this->templateTwigName);
 		$this->assertInstanceOf('\Blight\Models\Template', $template);
 	}
 
@@ -66,10 +66,10 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testPHPRender(){
 		// No params
-		$this->assertEquals($this->template_content, $this->template_php->render());
+		$this->assertEquals($this->templateContent, $this->templatePHP->render());
 
 		// With params
-		$this->assertEquals(sprintf($this->template_content_variable, 'test'), $this->template_php->render(array(
+		$this->assertEquals(sprintf($this->templateContentVariable, 'test'), $this->templatePHP->render(array(
 			'variable'	=> 'test'
 		)));
 	}
@@ -79,10 +79,10 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 */
 	public function testTwigRender(){
 		// No params
-		$this->assertEquals($this->template_content, $this->template_twig->render());
+		$this->assertEquals($this->templateContent, $this->templateTwig->render());
 
 		// With params
-		$this->assertEquals(sprintf($this->template_content_variable, 'test'), $this->template_twig->render(array(
+		$this->assertEquals(sprintf($this->templateContentVariable, 'test'), $this->templateTwig->render(array(
 			'variable'	=> 'test'
 		)));
 	}
@@ -92,6 +92,6 @@ class TemplateTest extends \PHPUnit_Framework_TestCase {
 	 * @expectedException \InvalidArgumentException
 	 */
 	public function testInvalidRender(){
-		$this->template_php->render('Not Array');
+		$this->templatePHP->render('Not Array');
 	}
 };
