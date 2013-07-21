@@ -236,7 +236,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The URL, with the provided string appended
 	 */
 	public function getURL($append = ''){
-		return $this->url.$append;
+		return $this->url.ltrim($append, '/');
 	}
 
 	/**

@@ -151,6 +151,8 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->config['site']['url'], $this->blog->getURL());
 
 		$this->assertEquals($this->config['site']['url'].'test', $this->blog->getURL('test'));
+
+		$this->assertEquals($this->config['site']['url'].'test', $this->blog->getURL('/test'));
 	}
 
 	/**
