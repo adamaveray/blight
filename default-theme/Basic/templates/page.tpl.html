@@ -5,5 +5,5 @@
     <h1>{{ page.title|e|typo }}</h1>
 </header>
 
-{{ page.content|md }}
+{{ pageBody(page) }}
 {% endblock %}

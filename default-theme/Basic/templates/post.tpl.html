@@ -19,7 +19,7 @@
         {% endif %}
 	</header>
 
-    {{ post.content|md }}
+    {{ postBody(post) }}
 
 	<footer>
         {% set tags = post.tags %}
