@@ -183,7 +183,7 @@ try {
 
 // Run
 	if(hasFlag('r')){
-		$output	= shell_exec('php -f "'.$pathBuild.'/Blight.phar"');
+		$output	= shell_exec('php "'.$pathBuild.'/Blight.phar"'.($verbose ? ' -v' : ''));
 
 		consoleOutput('Ran blog', false);
 		quotedConsoleOutput($output);
