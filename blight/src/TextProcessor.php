@@ -93,7 +93,7 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 */
 	public function processTypography($html){
 		$errors	= error_reporting(0);
-		$this->getTypography()->set_hyphenation($this->blog->get('generate_hypenation', 'output', true));
+		$this->getTypography()->set_hyphenation($this->blog->get('output.generate_hypenation', true));
 		$result	= $this->getTypography()->process($html);
 		error_reporting($errors);
 

@@ -59,11 +59,11 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 
 			if($isLinkblog && !$isLinkpost){
 				// Unlinked post - prepend glyph
-				$prepend = $this->blog->get('post_character', 'linkblog', '★') . ' ';
+				$prepend = $this->blog->get('linkblog.post_character', '★') . ' ';
 
 			} elseif(!$isLinkblog && $isLinkpost) {
 				// Linked post - prepend arrow
-				$prepend = $this->blog->get('link_character', 'linkblog', '→') . ' ';
+				$prepend = $this->blog->get('linkblog.link_character', '→') . ' ';
 			}
 		}
 
@@ -111,7 +111,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 		$permalink = $this->getDate()->format('Y/m') . '/' . $this->slug;
 
 		if($this->isLinked()){
-			$prefix = $this->blog->get('link_directory', 'linkblog');
+			$prefix = $this->blog->get('linkblog.link_directory');
 			if(isset($prefix)){
 				$permalink = rtrim($prefix, '/') . '/' . $permalink;
 			}
@@ -188,7 +188,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	 * @return bool	Whether the post has a summary or not
 	 */
 	public function hasSummary(){
-		return ($this->hasMeta('summary') || $this->blog->get('generate_summaries', 'output', true));
+		return ($this->hasMeta('summary') || $this->blog->get('output.generate_summaries', true));
 	}
 
 	/**

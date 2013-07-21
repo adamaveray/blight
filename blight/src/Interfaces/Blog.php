@@ -184,10 +184,9 @@ interface Blog {
 
 
 	/**
-	 * @param string $parameter		The name of the parameter to retrieve
-	 * @param string|null $group	The settings group the parameter exists in
+	 * @param string $parameter		The name of the parameter to retrieve, dot-separated through the hierarchy
 	 * @param mixed $default		The value to be returned if the requested parameter is not set
 	 * @return mixed		The requested parameter's value or $default
 	 */
-	public function get($parameter, $group = null, $default = null);
+	public function get($parameter, $default = null);
 };

@@ -480,7 +480,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$validFormats	= array('atom', 'rss');
 		$defaultFormat	= current($validFormats);
 		if(!isset($options['format']) || !in_array($options['format'], $validFormats)){
-			$options['format']	= $this->blog->get('feed_format', 'output', $defaultFormat);
+			$options['format']	= $this->blog->get('output.feed_format', $defaultFormat);
 			if(!in_array($options['format'], $validFormats)){
 				// Invalid format in config
 				$options['format']	= $defaultFormat;

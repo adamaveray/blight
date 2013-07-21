@@ -260,7 +260,7 @@ class Blog implements \Blight\Interfaces\Blog {
 		if(!isset($this->timezone)){
 			$defaultTimezone	= 'UTC';
 			try {
-				$this->timezone	= new \DateTimezone($this->get('timezone', 'site', $defaultTimezone));
+				$this->timezone	= new \DateTimezone($this->get('site.timezone', $defaultTimezone));
 			} catch(\Exception $e){
 				$this->timezone	= new \DateTimezone($defaultTimezone);
 			}
@@ -337,7 +337,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getTheme(){
 		if(!isset($this->theme)){
-			$this->theme	= $this->getPackageManager()->getTheme($this->get('name', 'theme'));
+			$this->theme	= $this->getPackageManager()->getTheme($this->get('theme.name'));
 		}
 
 		return $this->theme;
@@ -347,7 +347,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return bool	Whether the blog is a linkblog
 	 */
 	public function isLinkblog(){
-		return (bool)$this->get('linkblog', 'linkblog', false);
+		return (bool)$this->get('linkblog.linkblog', false);
 	}
 
 	/**
@@ -384,7 +384,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getAuthor($name = null){
 		$authors	= $this->getAuthors();
-		$name		= (isset($name) ? $name : $this->get('name', 'author', $this->get('author')));
+		$name		= (isset($name) ? $name : $this->get('author.name', $this->get('author')));
 		if(!isset($name)){
 			throw new \RuntimeException('No author set for site');
 		}
@@ -451,24 +451,21 @@ class Blog implements \Blight\Interfaces\Blog {
 	/**
 	 * Retrieves settings from the blog configation
 	 *
-	 * @param string $parameter		The name of the parameter to retrieve
-	 * @param string|null $group	The settings group the parameter exists in
+	 * @param string $parameter		The name of the parameter to retrieve, dot-separated through the hierarchy
 	 * @param mixed $default		The value to be returned if the requested parameter is not set
 	 * @return mixed		The requested parameter's value or $default
 	 */
-	public function get($parameter, $group = null, $default = null){
-		$config	= $this->config;
-		if(isset($group)){
-			if(!isset($config[$group])){
+	public function get($parameter, $default = null){
+		$path	= explode('.', $parameter);
+		$value	= $this->config;
+		foreach($path as $level){
+			if(!isset($value[$level])){
 				return $default;
 			}
-			$config	= $config[$group];
+
+			$value	= $value[$level];
 		}
 
-		if(!isset($config[$parameter])){
-			return $default;
-		}
-
-		return $config[$parameter];
+		return $value;
 	}
 };

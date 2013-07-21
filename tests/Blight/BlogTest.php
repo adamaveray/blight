@@ -275,25 +275,23 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	public function testGet(){
 		// Test existing, non-grouped
 		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path'));
-		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', null));
-		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', null, '(notfound)'));
+		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', '(notfound)'));
 
 		// Test non-existing, non-grouped
 		$this->assertNull($this->blog->get('nonexistent'));
-		$this->assertNull($this->blog->get('nonexistent', null));
-		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', null, '(notfound)'));
+		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', '(notfound)'));
 
 		// Test existing, grouped
 		$this->assertNull($this->blog->get('web'));
-		$this->assertEquals($this->config['paths']['web'], $this->blog->get('web', 'paths'));
-		$this->assertEquals($this->config['paths']['web'], $this->blog->get('web', 'paths', '(notfound)'));
+		$this->assertEquals($this->config['paths']['web'], $this->blog->get('paths.web'));
+		$this->assertEquals($this->config['paths']['web'], $this->blog->get('paths.web', '(notfound)'));
 
-		// Test non-existing, grouped, group existing
-		$this->assertNull($this->blog->get('nonexistent', 'paths'));
-		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', 'paths', '(notfound)'));
+		// Test non-existing, grouped, with existing group
+		$this->assertNull($this->blog->get('paths.nonexistent'));
+		$this->assertEquals('(notfound)', $this->blog->get('paths.nonexistent', '(notfound)'));
 
 		// Test non-existing, grouped, group non-existing
-		$this->assertNull($this->blog->get('nonexistent', 'nogroup'));
-		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', 'nogroup', '(notfound)'));
+		$this->assertNull($this->blog->get('nogroup.nonexistent'));
+		$this->assertEquals('(notfound)', $this->blog->get('nogroup.nonexistent', '(notfound)'));
 	}
 };

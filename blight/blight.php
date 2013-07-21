@@ -97,7 +97,7 @@ $blog->setPackageManager(new \Blight\PackageManager($blog));
 	$logger	= new \Monolog\Logger('Blight');
 	$logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
 
-	$logPath	= $blog->get('log', 'paths');
+	$logPath	= $blog->get('paths.log');
 	if(isset($logPath)){
 		$logger->pushHandler(new \Monolog\Handler\StreamHandler($blog->getPathRoot($logPath), \Monolog\Logger::INFO));
 	}
@@ -136,7 +136,7 @@ $blog->getLogger()->debug('Renderer initialised');
 
 		// Render archive
 		$renderer->renderYear($year, array(
-			'per_page'	=> $blog->get('page', 'limits', 0)
+			'per_page'	=> $blog->get('limits.page', 0)
 		));
 		$blog->getLogger()->debug(sprintf('Year "%s" archive rendered', $year->getName()));
 	}
@@ -152,25 +152,25 @@ $blog->getLogger()->debug('Renderer initialised');
 
 	// Render tag pages
 	$renderer->renderTags(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('limits.page', 0)
 	));
 	$blog->getLogger()->debug('Tags rendered');
 
 	// Render category pages
 	$renderer->renderCategories(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('limits.page', 0)
 	));
 	$blog->getLogger()->debug('Categories rendered');
 
 	// Render home and sequential list pages
 	$renderer->renderSequential(array(
-		'per_page'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
+		'per_page'	=> $blog->get('limits.home', $blog->get('limits.page', 10))
 	));
 	$blog->getLogger()->debug('Home and sequential pages rendered');
 
 	// Render feeds
 	$renderer->renderFeeds(array(
-		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
+		'limit'	=> $blog->get('limits.feed', $blog->get('limits.page', 15))
 	));
 	$blog->getLogger()->debug('Feeds rendered');
 
@@ -181,7 +181,7 @@ $blog->getLogger()->debug('Renderer initialised');
 
 	// Render additional pages
 	$renderer->renderSupplementaryPages(array(
-		'limit'	=> $blog->get('supplementary', 'limits', $blog->get('page', 'limits', 5))
+		'limit'	=> $blog->get('limits.supplementary', $blog->get('limits.page', 5))
 	));
 	$blog->getLogger()->debug('Supplementary pages rendered');
 
