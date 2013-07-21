@@ -31,6 +31,6 @@ foreach($files as $file => $name){
 }
 ?>
 
-<a class="continue retry" href="<?php echo $target_url;?>">Retry</a>
+<a class="continue retry" href="<?php echo $targetURL;?>">Retry</a>
 
 <?php include('inc/footer.php');?>

@@ -1,8 +1,8 @@
 <?php
-$page_id	= 'site_settings';
+$pageID	= 'site_settings';
 include('inc/header.php');?>
 
-<form method="post" action="<?php echo $target_url;?>">
+<form method="post" action="<?php echo $targetURL;?>">
 	<fieldset>
 		<ul>
 			<li>
