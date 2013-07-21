@@ -69,7 +69,7 @@ $root->setAttribute('xml:lang', 'en-US');
 				$append	= "\n\n".'[∞ Permalink]('.$post->getPermalink().')';
 			}
 
-			$blog->doHook('feed_post', array(
+			$blog->doHook('feedPost', array(
 				'feed_type'	=> 'atom',
 				'post'		=> $post,
 				'title'		=> &$title,

@@ -9,7 +9,7 @@ _Parameters marked as 'editable' can be modified within the callback to change t
 Publishing
 ----------
 
-- ### will_publish_post
+- ### willPublishPost
 
 	Called before publishing a new post
 
@@ -18,7 +18,7 @@ Publishing
 	- \Blight\Interfaces\Models\Post **post**: The post being published
 
 
-- ### did_publish_post
+- ### didPublishPost
 
 	Called after publishing a new post
 
@@ -76,7 +76,7 @@ Output
 	- string **content**: _(editable)_ The processed HTML content of the page
 
 
-- ### feed_post
+- ### feedPost
 
 	Called when building a post's content in an RSS feed
 
@@ -97,7 +97,7 @@ Output
 	- bool **process_content**: _(editable)_ Whether to process the content as Markdown
 
 
-- ### render_styles
+- ### renderStyles
 
 	Allows adding styles to rendered pages
 
@@ -118,7 +118,7 @@ Output
 			$styles[]	= 'body { background: #fff; }';
 
 
-- ### render_scripts
+- ### renderScripts
 
 	Allows adding scripts to rendered pages
 
@@ -139,7 +139,7 @@ Output
 			$styles[]	= 'alert("Scripts");';
 
 
-- ### process_typography
+- ### processTypography
 
 	Called when applying typographical fixes and helper classes to a block of HTML
 

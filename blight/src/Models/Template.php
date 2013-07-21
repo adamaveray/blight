@@ -196,7 +196,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 	 */
 	public function getStyles(){
 		$styles	= array();
-		$this->blog->doHook('render_styles', array(
+		$this->blog->doHook('renderStyles', array(
 			'theme'		=> $this->theme,
 			'template'	=> $this,
 			'name'		=> $this->name,
@@ -211,7 +211,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 	 */
 	public function getScripts(){
 		$scripts	= array();
-		$this->blog->doHook('render_scripts', array(
+		$this->blog->doHook('renderScripts', array(
 			'theme'		=> $this->theme,
 			'template'	=> $this,
 			'name'		=> $this->name,

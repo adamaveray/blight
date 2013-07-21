@@ -59,7 +59,7 @@ $channel	= $dom->createElement('channel');
 				$append	= "\n\n".'[∞ Permalink]('.$post->getPermalink().')';
 			}
 
-			$blog->doHook('feed_post', array(
+			$blog->doHook('feedPost', array(
 				'feed_type'	=> 'rss',
 				'post'		=> $post,
 				'title'		=> &$title,
