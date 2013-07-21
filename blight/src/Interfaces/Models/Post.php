@@ -38,10 +38,15 @@ interface Post extends \Blight\Interfaces\Models\Page {
 	public function hasSummary();
 
 	/**
-	 * @return string	The post's summary
+	 * @param int|null $length	The maximum number of characters to allow in the summary
+	 * @param string $append	A string to append if the summary is truncated
+	 * @return string|null		The post's summary
 	 */
-	public function getSummary();
+	public function getSummary($length = null, $append = '…');
 
+	/**
+	 * @return \Blight\Interfaces\Models\Author|null	The post's author, or the site's default author if not set, or null if neither are set
+	 */
 	public function getAuthor();
 
 	/**

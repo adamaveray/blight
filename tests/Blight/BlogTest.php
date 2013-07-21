@@ -151,6 +151,8 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 		$this->assertEquals($this->config['site']['url'], $this->blog->getURL());
 
 		$this->assertEquals($this->config['site']['url'].'test', $this->blog->getURL('test'));
+
+		$this->assertEquals($this->config['site']['url'].'test', $this->blog->getURL('/test'));
 	}
 
 	/**
@@ -200,30 +202,96 @@ class BlogTest extends \PHPUnit_Framework_TestCase {
 	}
 
 	/**
+	 * @covers \Blight\Blog::setAuthors
+	 */
+	public function testSetAuthors(){
+		$authorName	= 'Test Author';
+
+		$alternateConfig	= $this->config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$author	= new \Blight\Models\Author($blog, array(
+			'name'	=> $authorName
+		));
+		$blog->setAuthors(array($author));
+	}
+
+	/**
+	 * @covers \Blight\Blog::setAuthors
+	 * @expectedException \InvalidArgumentException
+	 */
+	public function testSetInvalidAuthors(){
+		$blog	= new \Blight\Blog($alternateConfig);
+		$blog->setAuthors(array('not an author'));
+	}
+
+	/**
+	 * @covers \Blight\Blog::getAuthor
+	 * @depends testSetAuthors
+	 */
+	public function testGetAuthor(){
+		$authorName	= 'Test Author';
+
+		$alternateConfig	= $this->config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$author	= new \Blight\Models\Author($blog, array(
+			'name'	=> $authorName
+		));
+		$blog->setAuthors(array($author));
+
+		$this->assertEquals($author, $blog->getAuthor());
+		$this->assertEquals($author, $blog->getAuthor($authorName));
+	}
+
+	/**
+	 * @covers \Blight\Blog::getAuthors
+	 * @depends testSetAuthors
+	 */
+	public function testGetAuthors(){
+		$authorNames	= array('Test Author', 'Test Author 2');
+
+		$alternateConfig	= $this->config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$authors	= array(
+			new \Blight\Models\Author($blog, array(
+				'name'	=> $authorNames[0]
+			)),
+			new \Blight\Models\Author($blog, array(
+				'name'	=> $authorNames[1]
+			))
+		);
+		$blog->setAuthors($authors);
+
+		$resultAuthors	= $blog->getAuthors();
+		$this->assertCount(count($authors), $resultAuthors);
+		$this->assertEquals($author[0], $resultAuthors[0]);
+	}
+
+	/**
 	 * @covers \Blight\Blog::get
 	 */
 	public function testGet(){
 		// Test existing, non-grouped
 		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path'));
-		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', null));
-		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', null, '(notfound)'));
+		$this->assertEquals($this->config['root_path'], $this->blog->get('root_path', '(notfound)'));
 
 		// Test non-existing, non-grouped
 		$this->assertNull($this->blog->get('nonexistent'));
-		$this->assertNull($this->blog->get('nonexistent', null));
-		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', null, '(notfound)'));
+		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', '(notfound)'));
 
 		// Test existing, grouped
 		$this->assertNull($this->blog->get('web'));
-		$this->assertEquals($this->config['paths']['web'], $this->blog->get('web', 'paths'));
-		$this->assertEquals($this->config['paths']['web'], $this->blog->get('web', 'paths', '(notfound)'));
+		$this->assertEquals($this->config['paths']['web'], $this->blog->get('paths.web'));
+		$this->assertEquals($this->config['paths']['web'], $this->blog->get('paths.web', '(notfound)'));
 
-		// Test non-existing, grouped, group existing
-		$this->assertNull($this->blog->get('nonexistent', 'paths'));
-		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', 'paths', '(notfound)'));
+		// Test non-existing, grouped, with existing group
+		$this->assertNull($this->blog->get('paths.nonexistent'));
+		$this->assertEquals('(notfound)', $this->blog->get('paths.nonexistent', '(notfound)'));
 
 		// Test non-existing, grouped, group non-existing
-		$this->assertNull($this->blog->get('nonexistent', 'nogroup'));
-		$this->assertEquals('(notfound)', $this->blog->get('nonexistent', 'nogroup', '(notfound)'));
+		$this->assertNull($this->blog->get('nogroup.nonexistent'));
+		$this->assertEquals('(notfound)', $this->blog->get('nogroup.nonexistent', '(notfound)'));
 	}
 };

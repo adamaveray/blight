@@ -90,7 +90,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 				break;
 		}
 
-		if($this->blog->get('minify_html', 'output', false)){
+		if($this->blog->get('output.minify_html', false)){
 			$textProcessor	= new \Blight\TextProcessor($this->blog);
 			$output	= $textProcessor->minifyHTML($output);
 		}
@@ -137,12 +137,12 @@ class Template implements \Blight\Interfaces\Models\Template {
 			$loader	= new \Twig_Loader_Filesystem($dir);
 			$twig	= new \Twig_Environment($loader, array(
 				'debug'	=> $this->blog->isDebug(),
-				'cache' => ($this->blog->get('cache_twig', 'output', false) ? $this->blog->getPathCache('twig/') : null)
+				'cache' => ($this->blog->get('output.cache_twig', false) ? $this->blog->getPathCache('twig/') : null)
 			));
 			if($this->blog->isDebug()){
 				$twig->addExtension(new \Twig_Extension_Debug());
 			}
-			$twig->getExtension('core')->setTimezone($this->blog->get('timezone', 'site', 'UTC'));
+			$twig->getExtension('core')->setTimezone($this->blog->get('site.timezone', 'UTC'));
 
 			// Add globals
 			$twig->addGlobal('blog', $this->blog);

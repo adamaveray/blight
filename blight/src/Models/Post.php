@@ -11,6 +11,8 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	protected $isDraft;
 	protected $link;
 	protected $isBeingPublished;
+	protected $summary;
+	protected $images;
 
 	/**
 	 * Initialises a post and processes the metadata contained in the header block
@@ -57,11 +59,11 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 
 			if($isLinkblog && !$isLinkpost){
 				// Unlinked post - prepend glyph
-				$prepend = $this->blog->get('post_character', 'linkblog', '★') . ' ';
+				$prepend = $this->blog->get('linkblog.post_character', '★') . ' ';
 
 			} elseif(!$isLinkblog && $isLinkpost) {
 				// Linked post - prepend arrow
-				$prepend = $this->blog->get('link_character', 'linkblog', '→') . ' ';
+				$prepend = $this->blog->get('linkblog.link_character', '→') . ' ';
 			}
 		}
 
@@ -109,7 +111,7 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 		$permalink = $this->getDate()->format('Y/m') . '/' . $this->slug;
 
 		if($this->isLinked()){
-			$prefix = $this->blog->get('link_directory', 'linkblog');
+			$prefix = $this->blog->get('linkblog.link_directory');
 			if(isset($prefix)){
 				$permalink = rtrim($prefix, '/') . '/' . $permalink;
 			}
@@ -186,20 +188,52 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	 * @return bool	Whether the post has a summary or not
 	 */
 	public function hasSummary(){
-		return $this->hasMeta('summary');
+		return ($this->hasMeta('summary') || $this->blog->get('output.generate_summaries', true));
 	}
 
 	/**
-	 * @return string	The post's summary
+	 * @param int|null $length	The maximum number of characters to allow in the summary
+	 * @param string $append	A string to append if the summary is truncated
+	 * @return string|null		The post's summary
 	 */
-	public function getSummary(){
+	public function getSummary($length = null, $append = '…'){
 		if(!$this->hasSummary()){
+			// No summary
 			return null;
 		}
 
-		return $this->getMeta('summary');
+		if(!isset($this->summary)){
+			if($this->hasMeta('summary')){
+				$summary	= $this->getMeta('summary');
+
+			} else {
+				// Generate summary
+				$replaces	= array(
+					'~\!\[(.*?)\](\(.*?\)|\[.*?\])~'	=> '',		// Images
+					'~\[(.*?)\](\(.*?\)|\[.*?\])~'		=> '$1',	// Links
+					'~(\*\*?|__?)(.+?)(\*\*?|__|)~'		=> '$1',	// Bold/Emphasis
+					'~\s*[\n\r]+\s*~'					=> ' ',		// Line breaks
+				);
+
+				$summary	= strip_tags(preg_replace(array_keys($replaces), array_values($replaces), $this->getContent()));
+			}
+
+			$this->summary	= $summary;
+		}
+
+		$summary	= $this->summary;
+		if(isset($length)){
+			// Limit
+			$typo		= new \Blight\TextProcessor($this->blog);
+			$summary	= $typo->truncateHTML($summary, $length, $append);
+		}
+
+		return $summary;
 	}
 
+	/**
+	 * @return \Blight\Interfaces\Models\Author|null	The post's author, or the site's default author if not set, or null if neither are set
+	 */
 	public function getAuthor(){
 		if(!isset($this->author)){
 			$name	= null;
@@ -241,4 +275,27 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 	public function isLinked(){
 		return $this->hasMeta('link');
 	}
-}
+
+	/**
+	 * @return array	An array of \Blight\Interfaces\Models\Image objects
+	 */
+	public function getImages(){
+		if(!isset($this->images)){
+			// Parse images from content
+			preg_match_all('~\!\[(.*?)\]\((.*?)(?: "(.*?)")?\)~', $this->getContent(), $matches, \PREG_SET_ORDER);
+			$images	= array();
+			foreach($matches as $match){
+				$image	= new \Blight\Models\Image($this->blog, $match[2]);
+				$image->setText($match[1]);
+				if(isset($match[3])){
+					$image->setTitle($match[3]);
+				}
+				$images[]	= $image;
+			}
+
+			$this->images	= $images;
+		}
+
+		return $this->images;
+	}
+};

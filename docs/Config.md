@@ -58,6 +58,7 @@ The default author for the blog, for posts without an author manually entered. T
 ## Output
 
 - **generate_hypenation**: Whether to insert soft hyphens into page content during the typography filtering
+- **generate_summaries**: Whether to generate post summaries if not manually defined in post headers
 - **minify_html**: Whether to minify rendered HTML files, by removing whitespace, etc, reducing file size
 - **feed_format**: The format to build feeds, of either `atom` or `rss`
 - **cache_twig**: Whether to cache compiled Twig tempates

@@ -268,28 +268,82 @@ EOD;
 	 * @covers \Blight\Models\Post::hasSummary
 	 */
 	public function testHasSummary(){
-		$this->assertFalse($this->post->hasSummary());
+		$this->assertTrue($this->post->hasSummary());
 
+		// Test with summary header
 		$summary	= 'A test summary';
 		$content	= $this->content;
 		$content	= preg_replace('/(=+)(\n)/', '$1$2Summary: '.$summary.'$2', $content);
 
 		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->assertTrue($post->hasSummary());
+
+		// Test disabling generated summary
+		global $config;
+		$summaryConfig	= $config;
+		$summaryConfig['output']['generate_summaries']	= false;
+		$alternateBlog	= new \Blight\Blog($summaryConfig);
+
+		$content	= $this->content;
+		$post	= new \Blight\Models\Post($alternateBlog, $content, 'test-post');
+		$this->assertFalse($post->hasSummary());
 	}
 
 	/**
 	 * @covers \Blight\Models\Post::getSummary
 	 */
 	public function testGetSummary(){
-		$this->assertNull($this->post->getSummary());
+		$alternateText	= 'Aenean ullamcorper nisi lorem, non egestas metus posuere id. Donec vitae gravida dolor, sit amet lobortis magna. Mauris mi leo, pellentesque sed hendrerit sit amet, mattis id erat. Mauris feugiat ullamcorper risus, eu facilisis enim pharetra at. Maecenas quis faucibus enim, ac pretium sapien. Integer pharetra ante nec lectus posuere tincidunt. Cras lobortis felis at eros blandit, eu viverra justo egestas. Sed eu tellus fringilla, molestie nunc ut, auctor ligula. Fusce enim nisi, volutpat sed neque eget, gravida gravida nulla. Pellentesque mattis mauris eget mi tempor lacinia.';
 
+		$content	= str_replace($this->content_text, $alternateText, $this->content);
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$this->assertEquals($alternateText, $post->getSummary());
+		$this->assertLessThanOrEqual(100, strlen($post->getSummary(100)));
+
+		// Test with summary header
 		$summary	= 'A test summary';
 		$content	= $this->content;
 		$content	= preg_replace('/(=+)(\n)/', '$1$2Summary: '.$summary.'$2', $content);
 
 		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->assertEquals($summary, $post->getSummary());
+
+		// Test with generated summary
+		global $config;
+		$summaryConfig	= $config;
+		$summaryConfig['output']['generate_summaries']	= false;
+		$alternateBlog	= new \Blight\Blog($summaryConfig);
+
+		$content	= $this->content;
+		$post	= new \Blight\Models\Post($alternateBlog, $content, 'test-post');
+		$this->assertNull($post->getSummary());
+	}
+
+	/**
+	 * @covers \Blight\Models\Post::getAuthor
+	 */
+	public function testGetAuthor(){
+		global $config;
+
+		// No author
+		$blog	= new \Blight\Blog($config);
+		$blog->setAuthors(array());
+
+		$post	= new \Blight\Models\Post($blog, $this->content, $this->content_slug);
+		$this->assertNull($post->getAuthor());
+
+		// Site author
+		$authorName	= 'Test Author';
+		$alternateConfig	= $config;
+		$alternateConfig['author']	= $authorName;
+		$blog	= new \Blight\Blog($alternateConfig);
+		$author	= new \Blight\Models\Author($blog, array(
+			'name'	=> $authorName
+		));
+		$blog->setAuthors(array($author));
+
+		$post	= new \Blight\Models\Post($blog, $this->content, $this->content_slug);
+		$this->assertEquals($author, $post->getAuthor());
 	}
 
 	/**
@@ -346,5 +400,43 @@ EOD;
 
 		$post	= new \Blight\Models\Post($this->blog, $this->linked_content, $this->content_slug);
 		$this->assertTrue($post->isLinked());
+	}
+
+	/**
+	 * @covers \Blight\Models\Post::getImages
+	 */
+	public function testGetImages(){
+		$imageText	= 'Image Text';
+		$imageURL	= '/img/image-url.jpg';
+		$imageTitle	= 'Image Title';
+		$content	= <<<EOD
+Test Post
+=========
+Date: 2013-01-01
+
+Test content
+
+![${imageText}](${imageURL})
+
+![${imageText} 2](${imageURL}-2)
+
+![${imageText} 3](${imageURL}-3 "${imageTitle}")
+EOD;
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$images	= $post->getImages();
+		$this->assertTrue(is_array($images));
+		$this->assertCount(3, $images);
+
+		$this->assertEquals($imageText, $images[0]->getText());
+		$this->assertEquals($imageURL, $images[0]->getURL());
+		$this->assertEquals($this->blog->getURL($images[0]->getURL()), $images[0]->getURL(true));
+
+		// Test additional
+		$this->assertEquals($imageText.' 2', $images[1]->getText());
+
+		// Test titles
+		$this->assertFalse($images[0]->hasTitle());
+		$this->assertTrue($images[2]->hasTitle());
+		$this->assertEquals($imageTitle, $images[2]->getTitle());
 	}
 };

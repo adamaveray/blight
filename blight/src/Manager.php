@@ -36,10 +36,10 @@ class Manager implements \Blight\Interfaces\Manager {
 			throw new \RuntimeException('Posts directory not found');
 		}
 
-		if($blog->get('allow_txt', 'posts', false)){
+		if($blog->get('posts.allow_txt', false)){
 			$this->allowedExtensions[]	= 'txt';
 		}
-		$this->postExtension	= ltrim($blog->get('default_extension', 'posts', current($this->allowedExtensions)), '.');
+		$this->postExtension	= ltrim($blog->get('posts.default_extension', current($this->allowedExtensions)), '.');
 	}
 
 	/**

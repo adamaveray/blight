@@ -93,7 +93,7 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 */
 	public function processTypography($html){
 		$errors	= error_reporting(0);
-		$this->getTypography()->set_hyphenation($this->blog->get('generate_hypenation', 'output', true));
+		$this->getTypography()->set_hyphenation($this->blog->get('output.generate_hypenation', true));
 		$result	= $this->getTypography()->process($html);
 		error_reporting($errors);
 
@@ -116,7 +116,7 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	 *
 	 * @return string	The truncated text
 	 */
-	public function truncateHTML($html, $length = 100, $ending = '...', $splitWords = false, $handleHTML = true){
+	public function truncateHTML($html, $length = 100, $ending = '…', $splitWords = false, $handleHTML = true){
 		if(!$handleHTML){
 			// Ignore HTML tags
 			if(strlen($html) <= $length){

@@ -45,7 +45,7 @@ interface TextProcessor {
 	 *
 	 * @return string	The truncated text
 	 */
-	public function truncateHTML($html, $length = 100, $ending = '...', $splitWords = false, $handleHTML = true);
+	public function truncateHTML($html, $length = 100, $ending = '…', $splitWords = false, $handleHTML = true);
 
 	/**
 	 * Minifies the provided HTML by removing whitespace, etc

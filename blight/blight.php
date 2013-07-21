@@ -66,6 +66,9 @@ if(!file_exists($configFile) || isset($_COOKIE[\Blight\Controllers\Install::COOK
 // Initialise blog
 $parser	= new \Blight\Config();
 $config	= $parser->unserialize(file_get_contents($configFile));
+if(!isset($config)){
+	throw new \Exception('Config invalid');
+}
 $config['root_path']	= $rootPath;
 $blog	= new \Blight\Blog($config);
 
@@ -94,7 +97,7 @@ $blog->setPackageManager(new \Blight\PackageManager($blog));
 	$logger	= new \Monolog\Logger('Blight');
 	$logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
 
-	$logPath	= $blog->get('log', 'paths');
+	$logPath	= $blog->get('paths.log');
 	if(isset($logPath)){
 		$logger->pushHandler(new \Monolog\Handler\StreamHandler($blog->getPathRoot($logPath), \Monolog\Logger::INFO));
 	}
@@ -151,7 +154,7 @@ if($updateManager->needsUpdate('posts')){
 
 		// Render archive
 		$renderer->renderYear($year, array(
-			'per_page'	=> $blog->get('page', 'limits', 0)
+			'per_page'	=> $blog->get('limits.page', 0)
 		));
 		$blog->getLogger()->debug(sprintf('Year "%s" archive rendered', $year->getName()));
 	}
@@ -167,25 +170,25 @@ if($updateManager->needsUpdate('posts')){
 
 	// Render tag pages
 	$renderer->renderTags(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('limits.page', 0)
 	));
 	$blog->getLogger()->debug('Tags rendered');
 
 	// Render category pages
 	$renderer->renderCategories(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('limits.page', 0)
 	));
 	$blog->getLogger()->debug('Categories rendered');
 
 	// Render home and sequential list pages
 	$renderer->renderSequential(array(
-		'per_page'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
+		'per_page'	=> $blog->get('limits.home', $blog->get('limits.page', 10))
 	));
 	$blog->getLogger()->debug('Home and sequential pages rendered');
 
 	// Render feeds
 	$renderer->renderFeeds(array(
-		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
+		'limit'	=> $blog->get('limits.feed', $blog->get('limits.page', 15))
 	));
 	$blog->getLogger()->debug('Feeds rendered');
 }
@@ -206,7 +209,7 @@ if($updateManager->needsUpdate('pages')){
 if($updateManager->needsUpdate('supplementary')){
 	// Render additional pages
 	$renderer->renderSupplementaryPages(array(
-		'limit'	=> $blog->get('supplementary', 'limits', $blog->get('page', 'limits', 5))
+		'limit'	=> $blog->get('limits.supplementary', $blog->get('limits.page', 5))
 	));
 	$blog->getLogger()->debug('Supplementary pages rendered');
 }

@@ -239,7 +239,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return string			The URL, with the provided string appended
 	 */
 	public function getURL($append = ''){
-		return $this->url.$append;
+		return $this->url.ltrim($append, '/');
 	}
 
 	/**
@@ -256,12 +256,14 @@ class Blog implements \Blight\Interfaces\Blog {
 		return isset($this->config['site']['description']) ? $this->config['site']['description'] : null;
 	}
 
-	/** @return \DateTimezone	The blog publishing timezone */
+	/**
+	 * @return \DateTimezone	The blog publishing timezone
+	 */
 	public function getTimezone(){
 		if(!isset($this->timezone)){
 			$defaultTimezone	= 'UTC';
 			try {
-				$this->timezone	= new \DateTimezone($this->get('timezone', 'site', $defaultTimezone));
+				$this->timezone	= new \DateTimezone($this->get('site.timezone', $defaultTimezone));
 			} catch(\Exception $e){
 				$this->timezone	= new \DateTimezone($defaultTimezone);
 			}
@@ -357,7 +359,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getTheme(){
 		if(!isset($this->theme)){
-			$this->theme	= $this->getPackageManager()->getTheme($this->get('name', 'theme'));
+			$this->theme	= $this->getPackageManager()->getTheme($this->get('theme.name'));
 		}
 
 		return $this->theme;
@@ -367,7 +369,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 * @return bool	Whether the blog is a linkblog
 	 */
 	public function isLinkblog(){
-		return (bool)$this->get('linkblog', 'linkblog', false);
+		return (bool)$this->get('linkblog.linkblog', false);
 	}
 
 	/**
@@ -404,7 +406,7 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getAuthor($name = null){
 		$authors	= $this->getAuthors();
-		$name		= (isset($name) ? $name : $this->get('name', 'author', $this->get('author')));
+		$name		= (isset($name) ? $name : $this->get('author.name', $this->get('author')));
 		if(!isset($name)){
 			throw new \RuntimeException('No author set for site');
 		}
@@ -418,7 +420,10 @@ class Blog implements \Blight\Interfaces\Blog {
 		return $authors[$name];
 	}
 
-	protected function getAuthors(){
+	/**
+	 * @return array	An associative array of all authors defined in the site, with author names as keys
+	 */
+	public function getAuthors(){
 		if(!isset($this->authors)){
 			$rawAuthors	= array();
 
@@ -427,6 +432,11 @@ class Blog implements \Blight\Interfaces\Blog {
 			if(file_exists($file)){
 				$config	= new \Blight\Config();
 				$rawAuthors	= $config->unserialize($this->getFileSystem()->loadFile($file));
+
+				if(is_object($rawAuthors) && isset($rawAuthors->name)){
+					// Single author given
+					$rawAuthors	= array($rawAuthors);
+				}
 			}
 
 			// Load config author
@@ -441,28 +451,43 @@ class Blog implements \Blight\Interfaces\Blog {
 		return $this->authors;
 	}
 
+	/**
+	 * @param array $authors	An array of \Blight\Interfaces\Models\Author instances
+	 * @throws \InvalidArgumentException	An author object does not implement \Blight\Interfaces\Models\Author
+	 */
+	public function setAuthors(array $authors){
+		$processedAuthors	= array();
+
+		foreach($authors as $author){
+			if(!($author instanceof \Blight\Interfaces\Models\Author)){
+				throw new \InvalidArgumentException('Authors must be instances of \Blight\Interfaces\Models\Author');
+			}
+
+			$processedAuthors[\Blight\Utilities::convertNameToSlug($author->getName())]	= $author;
+		}
+
+		$this->authors	= $processedAuthors;
+	}
+
 
 	/**
 	 * Retrieves settings from the blog configation
 	 *
-	 * @param string $parameter		The name of the parameter to retrieve
-	 * @param string|null $group	The settings group the parameter exists in
+	 * @param string $parameter		The name of the parameter to retrieve, dot-separated through the hierarchy
 	 * @param mixed $default		The value to be returned if the requested parameter is not set
 	 * @return mixed		The requested parameter's value or $default
 	 */
-	public function get($parameter, $group = null, $default = null){
-		$config	= $this->config;
-		if(isset($group)){
-			if(!isset($config[$group])){
+	public function get($parameter, $default = null){
+		$path	= explode('.', $parameter);
+		$value	= $this->config;
+		foreach($path as $level){
+			if(!isset($value[$level])){
 				return $default;
 			}
-			$config	= $config[$group];
+
+			$value	= $value[$level];
 		}
 
-		if(!isset($config[$parameter])){
-			return $default;
-		}
-
-		return $config[$parameter];
+		return $value;
 	}
 };
