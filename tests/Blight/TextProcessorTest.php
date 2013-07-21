@@ -6,13 +6,13 @@ class TextProcessorTest extends \PHPUnit_Framework_TestCase {
 	protected $blog;
 
 	/** @var \Blight\Interfaces\TextProcessor */
-	protected $text_processor;
+	protected $textProcessor;
 
 	public function setUp(){
 		global $config;
 		$this->blog		= new \Blight\Blog($config);
 
-		$this->text_processor	= new \Blight\TextProcessor($this->blog);
+		$this->textProcessor	= new \Blight\TextProcessor($this->blog);
 	}
 
 	/**
@@ -37,7 +37,7 @@ EOD;
 </ul>
 
 EOD;
-		$this->assertEquals($processed, $this->text_processor->process($raw));
+		$this->assertEquals($processed, $this->textProcessor->process($raw));
 	}
 
 	/**
@@ -63,7 +63,7 @@ EOD;
 </ul>
 
 EOD;
-		$this->assertEquals($processed, $this->text_processor->processMarkdown($raw));
+		$this->assertEquals($processed, $this->textProcessor->processMarkdown($raw));
 	}
 
 	/**
@@ -74,7 +74,7 @@ EOD;
 		$raw		= '<p>Test 123</p>';
 		$processed	= '<p>Test <span class="numbers">123</span></p>';
 
-		$this->assertEquals($processed, $this->text_processor->processTypography($raw));
+		$this->assertEquals($processed, $this->textProcessor->processTypography($raw));
 	}
 
 	/**
@@ -83,20 +83,20 @@ EOD;
 	public function testTruncateHTML(){
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
 		$truncated	= '<p>Lorem…</p>';
-		$this->assertEquals($truncated, $this->text_processor->truncateHTML($original, 10));
+		$this->assertEquals($truncated, $this->textProcessor->truncateHTML($original, 10));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
 		$truncated	= '<p>Lorem ipsum…</p>';
-		$this->assertEquals($truncated, $this->text_processor->truncateHTML($original, 20));
+		$this->assertEquals($truncated, $this->textProcessor->truncateHTML($original, 20));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
 		$truncated	= '<p>Lorem ipsum dolor!</p>';
-		$this->assertEquals($truncated, $this->text_processor->truncateHTML($original, 20, '!'));
+		$this->assertEquals($truncated, $this->textProcessor->truncateHTML($original, 20, '!'));
 
 		$original	= '<p>Lorem ipsum dolor sit amet</p>';
-		$this->assertEquals($original, $this->text_processor->truncateHTML($original, 100));
+		$this->assertEquals($original, $this->textProcessor->truncateHTML($original, 100));
 
 		$original	= '';
-		$this->assertEquals($original, $this->text_processor->truncateHTML($original, 100));
+		$this->assertEquals($original, $this->textProcessor->truncateHTML($original, 100));
 	}
 };

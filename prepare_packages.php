@@ -1,9 +1,9 @@
 <?php
-function buildPackage($source, $target_dir){
+function buildPackage($source, $targetDir){
 	$name	= basename($source).'.phar';
 
 	try {
-		$phar = new Phar($target_dir.'/'.$name, 0, $name);
+		$phar = new Phar($targetDir.'/'.$name, 0, $name);
 		$phar->buildFromDirectory($source);
 		$phar->setStub('<?php __HALT_COMPILER();');
 		unset($phar);

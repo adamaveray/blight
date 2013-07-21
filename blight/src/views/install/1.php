@@ -1,8 +1,8 @@
 <?php
-$page_id	= 'user_settings';
+$pageID	= 'user_settings';
 include('inc/header.php');?>
 
-<form method="post" action="<?php echo $target_url;?>">
+<form method="post" action="<?php echo $targetURL;?>">
 	<ul>
 		<li>
 			<label for="input_author_name">Your Name</label>

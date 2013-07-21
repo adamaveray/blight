@@ -2,26 +2,26 @@
 namespace Blight\Tests;
 
 class ManagerTest extends \PHPUnit_Framework_TestCase {
-	protected static $pages_count		= 2;
-	protected static $posts_count		= 5;
-	protected static $drafts_count		= 3;
-	protected static $collection_count_year		= 2;
-	protected static $collection_count_tag		= 1;
-	protected static $collection_count_category	= 1;
+	protected static $pagesCount		= 2;
+	protected static $postsCount		= 5;
+	protected static $draftsCount		= 3;
+	protected static $collectionCountYear		= 2;
+	protected static $collectionCountTag		= 1;
+	protected static $collectionCountCategory	= 1;
 
 	static public function setUpBeforeClass(){
 		$dir	= __DIR__.'/files/posts/';
 
 		$now	= new \DateTime();
 		$date	= $now->format('Y-m-d H:i:s');
-		$page_content	= <<<EOD
+		$pageContent	= <<<EOD
 Test Page
 =========
 Date: {DATE} 12:00:00
 
 Test content.
 EOD;
-		$post_content	= <<<EOD
+		$postContent	= <<<EOD
 Test Post
 =========
 Date: {DATE} 12:00:00
@@ -41,27 +41,27 @@ EOD;
 			'drafts'		=> 'drafts/',
 			'drafts_web'	=> 'drafts_web/'
 		);
-		foreach($dirs as $child_dir){
-			$child_dir	= $dir.$child_dir;
-			if(!is_dir($child_dir)){
-				mkdir($child_dir);
+		foreach($dirs as $childDir){
+			$childDir	= $dir.$childDir;
+			if(!is_dir($childDir)){
+				mkdir($childDir);
 			}
 		}
 
-		for($i = 0; $i < self::$pages_count; $i++){
-			file_put_contents($dir.$dirs['pages'].'test-page-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $page_content));
+		for($i = 0; $i < self::$pagesCount; $i++){
+			file_put_contents($dir.$dirs['pages'].'test-page-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $pageContent));
 		}
 
-		for($i = 0; $i < self::$posts_count; $i++){
-			file_put_contents($dir.$dirs['posts'].'test-post-2013-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $post_content));
+		for($i = 0; $i < self::$postsCount; $i++){
+			file_put_contents($dir.$dirs['posts'].'test-post-2013-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $postContent));
 		}
-		for($i = 0; $i < self::$posts_count; $i++){
-			file_put_contents($dir.$dirs['posts'].'test-post-2012-'.$i.'.md', str_replace('{DATE}', '2012-02-0'.$i, $post_content));
+		for($i = 0; $i < self::$postsCount; $i++){
+			file_put_contents($dir.$dirs['posts'].'test-post-2012-'.$i.'.md', str_replace('{DATE}', '2012-02-0'.$i, $postContent));
 		}
-		self::$posts_count	*= 2;
+		self::$postsCount	*= 2;
 
-		for($i = 0; $i < self::$drafts_count; $i++){
-			file_put_contents($dir.$dirs['drafts'].'test-post-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $post_content));
+		for($i = 0; $i < self::$draftsCount; $i++){
+			file_put_contents($dir.$dirs['drafts'].'test-post-'.$i.'.md', str_replace('{DATE}', '2013-02-0'.$i, $postContent));
 		}
 	}
 
@@ -96,12 +96,12 @@ EOD;
 
 		$this->dir	= __DIR__.'/files/posts/';
 
-		$test_config	= $config;
-		$test_config['paths']['pages']		= $this->dir.'pages/';
-		$test_config['paths']['posts']		= $this->dir.'posts/';
-		$test_config['paths']['drafts']		= $this->dir.'drafts/';
-		$test_config['paths']['drafts_web']	= $this->dir.'drafts_web/';
-		$this->blog	= new \Blight\Blog($test_config);
+		$testConfig	= $config;
+		$testConfig['paths']['pages']		= $this->dir.'pages/';
+		$testConfig['paths']['posts']		= $this->dir.'posts/';
+		$testConfig['paths']['drafts']		= $this->dir.'drafts/';
+		$testConfig['paths']['drafts_web']	= $this->dir.'drafts_web/';
+		$this->blog	= new \Blight\Blog($testConfig);
 
 		$this->blog->setFileSystem(new \Blight\FileSystem($this->blog));
 
@@ -122,9 +122,9 @@ EOD;
 	 */
 	public function testInvalidConstruct(){
 		global $config;
-		$test_config	= $config;
-		$test_config['paths']['posts']	= 'nonexistent';
-		$blog	= new \Blight\Blog($test_config);
+		$testConfig	= $config;
+		$testConfig['paths']['posts']	= 'nonexistent';
+		$blog	= new \Blight\Blog($testConfig);
 
 		new \Blight\Manager($blog);
 	}
@@ -135,7 +135,7 @@ EOD;
 	public function testGetPages(){
 		$pages	= $this->manager->getPages();
 		$this->assertTrue(is_array($pages));
-		$this->assertEquals(count($pages), self::$pages_count);
+		$this->assertEquals(count($pages), self::$pagesCount);
 		foreach($pages as $page){
 			$this->assertInstanceOf('\Blight\Interfaces\Models\Page', $page);
 		}
@@ -147,7 +147,7 @@ EOD;
 	public function testGetDraftPosts(){
 		$posts	= $this->manager->getDraftPosts();
 		$this->assertTrue(is_array($posts));
-		$this->assertEquals(count($posts), self::$drafts_count);
+		$this->assertEquals(count($posts), self::$draftsCount);
 		foreach($posts as $post){
 			$this->assertInstanceOf('\Blight\Interfaces\Models\Post', $post);
 			$this->assertTrue($post->isDraft());
@@ -160,7 +160,7 @@ EOD;
 	public function testGetPosts(){
 		$posts	= $this->manager->getPosts();
 		$this->assertTrue(is_array($posts));
-		$this->assertEquals(count($posts), self::$posts_count);
+		$this->assertEquals(count($posts), self::$postsCount);
 		foreach($posts as $post){
 			$this->assertInstanceOf('\Blight\Interfaces\Models\Post', $post);
 			$this->assertFalse($post->isDraft());
@@ -173,7 +173,7 @@ EOD;
 	public function testGetPostsByYear(){
 		$archive	= $this->manager->getPostsByYear();
 		$this->assertTrue(is_array($archive));
-		$this->assertEquals(self::$collection_count_year, count($archive));
+		$this->assertEquals(self::$collectionCountYear, count($archive));
 		foreach($archive as $year){
 			$this->assertInstanceOf('\Blight\Models\Collections\Year', $year);
 		}
@@ -185,7 +185,7 @@ EOD;
 	public function testGetPostsByTag(){
 		$tags	= $this->manager->getPostsByTag();
 		$this->assertTrue(is_array($tags));
-		$this->assertEquals(self::$collection_count_tag, count($tags));
+		$this->assertEquals(self::$collectionCountTag, count($tags));
 		foreach($tags as $tag){
 			$this->assertInstanceOf('\Blight\Models\Collections\Tag', $tag);
 		}
@@ -197,7 +197,7 @@ EOD;
 	public function testGetPostsByCategory(){
 		$categories	= $this->manager->getPostsByCategory();
 		$this->assertTrue(is_array($categories));
-		$this->assertEquals(self::$collection_count_category, count($categories));
+		$this->assertEquals(self::$collectionCountCategory, count($categories));
 		foreach($categories as $category){
 			$this->assertInstanceOf('\Blight\Models\Collections\Category', $category);
 		}
