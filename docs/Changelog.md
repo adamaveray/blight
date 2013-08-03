@@ -1,6 +1,20 @@
 Release Notes
 =============
 
+## 0.9
+
+_3 Aug 2013_
+
+- [Caching](Performance.md)
+- Sequential, year-ignorant pagination
+- 404 page generation
+- Template fallbacks/hierarchies
+- Post summary generation
+- Post image retrieval
+- Debug mode
+- Unified build script
+
+
 ## 0.8
 
 _25 Jun 2013_
