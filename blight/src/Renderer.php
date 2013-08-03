@@ -144,7 +144,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 */
 	public function renderPost(\Blight\Interfaces\Models\Post $post, $prev = null, $next = null){
 		if($post->isBeingPublished()){
-			$this->blog->doHook('will_publish_post', array(
+			$this->blog->doHook('willPublishPost', array(
 				'post'	=> $post
 			));
 		}
@@ -171,7 +171,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$this->renderTemplateToFile('post', $path, $params);
 
 		if($post->isBeingPublished()){
-			$this->blog->doHook('did_publish_post', array(
+			$this->blog->doHook('didPublishPost', array(
 				'post'	=> $post
 			));
 		}

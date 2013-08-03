@@ -25,7 +25,7 @@ class Image implements \Blight\Interfaces\Models\Image {
 	 */
 	public function getURL($absolute = false){
 		$url	= $this->url;
-		if($absolute){
+		if($absolute && !preg_match('~^(https?:)?\/\/~i', $url)){
 			$url	= $this->blog->getURL(ltrim($url, '/'));
 		}
 

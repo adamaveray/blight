@@ -308,7 +308,7 @@ EOD;
 		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
 		$this->assertEquals($summary, $post->getSummary());
 
-		// Test with generated summary
+		// Test without generated summary
 		global $config;
 		$summaryConfig	= $config;
 		$summaryConfig['output']['generate_summaries']	= false;
@@ -317,6 +317,14 @@ EOD;
 		$content	= $this->content;
 		$post	= new \Blight\Models\Post($alternateBlog, $content, 'test-post');
 		$this->assertNull($post->getSummary());
+
+		// Test with complex content
+		$complexText	= 'Aenean ullamcorper _nisi lorem_, non egestas **metus posuere id**. Donec ![vitae gravida](http://www.example.com) dolor, sit [amet lobortis](http://www.example.com) magna.';
+		$complexSummary	= 'Aenean ullamcorper nisi lorem, non egestas metus posuere id. Donec dolor, sit amet lobortis magna.';
+
+		$content	= str_replace($this->contentText, $complexText, $this->content);
+		$post	= new \Blight\Models\Post($this->blog, $content, 'test-post');
+		$this->assertEquals($complexSummary, $post->getSummary());
 	}
 
 	/**

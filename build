@@ -50,7 +50,7 @@ function consoleOutput($message, $detailed = true){
 
 function quotedConsoleOutput($message, $detailed = true){
 	$message	= trim($message);
-	if(!$message){
+	if($message === ''){
 		return;
 	}
 
@@ -174,7 +174,14 @@ try {
 			$output	= preg_replace($find, $replace, $output);
 		}
 
-		consoleOutput('Ran tests', false);
+		if(strstr($output, PHP_EOL.'FAILURES!'.PHP_EOL) === false){
+			// Passed
+			consoleOutput('Passed tests', false);
+		} else {
+			// Failed
+			consoleOutput('Failed tests', false);
+		}
+
 		quotedConsoleOutput($output);
 
 		consoleLinebreak();
@@ -183,7 +190,7 @@ try {
 
 // Run
 	if(hasFlag('r')){
-		$output	= shell_exec('php -f "'.$pathBuild.'/Blight.phar"');
+		$output	= shell_exec('php "'.$pathBuild.'/Blight.phar"'.($verbose ? ' -v' : ''));
 
 		consoleOutput('Ran blog', false);
 		quotedConsoleOutput($output);

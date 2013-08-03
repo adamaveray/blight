@@ -26,7 +26,7 @@ This file must contain a class of the same name, extending `\Blight\Models\Packa
 
 See the [Hooks](HOOKS.md) file for the list of available hooks.
 
-Implementing callback functions for the hooks available requires creating an instance method on your main class named `hook_{HOOKNAME}` (for example `public function hook_render_styles($params){ ... }` for the hook `render_styles`)
+Implementing callback functions for the hooks available requires creating an instance method on your main class named `hook{HOOKNAME}` (for example `public function hookRenderStyles($params){ ... }` for the hook `renderStyles`)
 
 Some hooks will provide parameters to the callbacks, which will be passed as an associative array to the callback. Hooks that allow the callbacks to modify some of the parameters will pass those parameters by reference in the array, meaning any changes to the variable will change the original value. To make changes to the parameter locally without modifying the final value, simply assign the parameter from the array to a variable.
 
