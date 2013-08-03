@@ -5,6 +5,7 @@ class Page implements \Blight\Interfaces\Models\Page {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
 
+	protected $file;
 	protected $title;
 	protected $slug;
 	protected $date;
@@ -156,6 +157,20 @@ class Page implements \Blight\Interfaces\Models\Page {
 	 */
 	public function setDateUpdated(\DateTime $date){
 		$this->dateUpdated	= $date;
+	}
+
+	/**
+	 * @return string|null	The path for the page's source file
+	 */
+	public function getFile(){
+		return $this->file;
+	}
+
+	/**
+	 * @param string $file	The path for the page's source file
+	 */
+	public function setFile($file){
+		$this->file	= $file;
 	}
 
 	/**

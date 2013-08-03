@@ -130,7 +130,7 @@ $blog->getLogger()->debug('Archive built');
 
 if($updateManager->needsUpdate('drafts')){
 	// Render draft posts
-	$renderer->renderDrafts();
+	$renderer->renderDrafts($updateManager->getChangedDraftPosts());
 	$blog->getLogger()->debug('Drafts rendered');
 
 	// Remove old draft files

@@ -98,6 +98,11 @@ class UpdateManager {
 	}
 
 
+	public function getChangedDraftPosts(){
+		return $this->manager->getDraftPosts($this->getChangedDraftFiles());
+	}
+
+
 	public function getChangedDraftFiles(){
 		if(!isset($this->changedDraftsFiles)){
 			$this->changedDraftsFiles	= $this->getChangedFiles($this->getDraftFiles(), self::CACHE_KEY_DRAFTS);

@@ -93,6 +93,7 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		$post	= new \Blight\Models\Post($this->blog, $content, $filename);
+		$post->setFile($rawPost);
 
 		// Modified time
 		try {
@@ -206,6 +207,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				// Create page object
 				try {
 					$page	= new \Blight\Models\Page($this->blog, $content, preg_replace('/^(.*?)\.\w+?$/', '$1', str_replace($dir, '', $file)));
+					$page->setFile($file);
 				} catch(\Exception $e){
 					continue;
 				}
@@ -228,9 +230,9 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	An array of \Blight\Models\Page objects
 	 */
-	public function getDraftPosts(){
+	public function getDraftPosts(array $files = null){
 		if(!isset($this->draftPosts)){
-			$files	= $this->getRawPosts(true);
+			$files	= (isset($files) ? $files : $this->getRawPosts(true));
 			$posts	= array();
 
 			foreach($files as $file){
@@ -245,6 +247,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				// Create post object
 				try {
 					$post	= new \Blight\Models\Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
+					$post->setFile($file);
 				} catch(\Exception $e){
 					continue;
 				}
@@ -277,7 +280,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			$this->draftPosts	= $posts;
 		}
 
-		return $this->draftPosts;
+		return $this->filterItemsByFiles($this->draftPosts, $files);
 	}
 
 	/**
@@ -512,5 +515,27 @@ class Manager implements \Blight\Interfaces\Manager {
 			// Post not found - remove
 			$this->blog->getFileSystem()->deleteFile($file);
 		}
+	}
+
+
+	protected function filterItemsByFiles(array $items, $files){
+		if(!isset($files)){
+			// No filtering
+			return $items;
+		}
+
+		$filteredItems	= array();
+
+		foreach($items as $item){
+			if(!in_array($item->getFile(), $files)){
+				// Unknown - skip
+				continue;
+			}
+
+			// Valid
+			$filteredItems[]	= $item;
+		}
+
+		return $filteredItems;
 	}
 };
