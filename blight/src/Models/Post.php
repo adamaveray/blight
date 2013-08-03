@@ -208,14 +208,9 @@ class Post extends \Blight\Models\Page implements \Blight\Interfaces\Models\Post
 
 			} else {
 				// Generate summary
-				$replaces	= array(
-					'~\!\[(.*?)\](\(.*?\)|\[.*?\])~'	=> '',		// Images
-					'~\[(.*?)\](\(.*?\)|\[.*?\])~'		=> '$1',	// Links
-					'~(\*\*?|__?)(.+?)(\*\*?|__|)~'		=> '$1',	// Bold/Emphasis
-					'~\s*[\n\r]+\s*~'					=> ' ',		// Line breaks
-				);
-
-				$summary	= strip_tags(preg_replace(array_keys($replaces), array_values($replaces), $this->getContent()));
+				$processor	= new \Blight\TextProcessor($this->blog);
+				$summary	= trim(strip_tags($processor->processMarkdown($this->getContent())));
+				$summary	= preg_replace(array('~\s*[\n\r]+\s*~', '~\s\s+~'), ' ', $summary);	// Remove line breaks and double spaces
 			}
 
 			$this->summary	= $summary;
