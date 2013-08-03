@@ -180,8 +180,8 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static files for all draft posts.
 	 */
-	public function renderDrafts(){
-		$drafts	= $this->manager->getDraftPosts();
+	public function renderDrafts(array $drafts = null){
+		$drafts	= (isset($drafts) ? $drafts : $this->manager->getDraftPosts());
 
 		$outputPath	= $this->blog->getPathDraftsWeb();
 

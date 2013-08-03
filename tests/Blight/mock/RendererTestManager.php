@@ -17,6 +17,14 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 		$this->mockPages	= $pages;
 	}
 
+	public function getRawPages(){
+		return array();
+	}
+
+	public function getRawPosts($drafts = false){
+		return array();
+	}
+
 	public function getPages(){
 		return $this->mockPages;
 	}

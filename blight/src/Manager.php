@@ -47,27 +47,10 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	A list of filenames for each page file found
 	 */
-	protected function getRawPages(){
+	public function getRawPages(){
 		$dir	= $this->blog->getPathPages();
 
-		function getSubPages($dir){
-			$dir	= rtrim($dir, '/');
-
-			$files	= array();
-
-			$rawFiles	= glob($dir.'/*');
-			foreach($rawFiles as $file){
-				if(is_dir($file)){
-					$files	= array_merge($files, getSubPages($file));
-				} else {
-					$files[]	= $file;
-				}
-			}
-
-			return $files;
-		};
-
-		$files	= getSubPages($dir);
+		$files	= $this->blog->getFileSystem()->getDirectoryListing($dir);
 
 		return $files;
 	}
@@ -78,17 +61,17 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * @param bool $drafts	Whether to return only drafts or only published posts
 	 * @return array	A list of filenames for each post file found
 	 */
-	protected function getRawPosts($drafts = false){
+	public function getRawPosts($drafts = false){
 		$dir	= ($drafts ? $this->blog->getPathDrafts() : $this->blog->getPathPosts());
-		$files	= glob($dir.'*.*');
+		$files	= $this->blog->getFileSystem()->getDirectoryListing($dir, '*.*');
 
 		if(!$drafts){
 			$draftPublishDir	= $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR);
 
 			$files	= array_merge(
 				$files,		// Unsorted
-				glob($dir.'*/*/*.*'),	// Sorted (YYYY/DD/post.md)
-				glob($draftPublishDir.'*.*')	// Ready-to-publish drafts
+				$this->blog->getFileSystem()->getDirectoryListing($dir, '*/*/*.*'),			// Sorted (YYYY/DD/post.md)
+				$this->blog->getFileSystem()->getDirectoryListing($draftPublishDir, '*.*')	// Ready-to-publish drafts
 			);
 		}
 
@@ -110,6 +93,7 @@ class Manager implements \Blight\Interfaces\Manager {
 		}
 
 		$post	= new \Blight\Models\Post($this->blog, $content, $filename);
+		$post->setFile($rawPost);
 
 		// Modified time
 		try {
@@ -223,6 +207,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				// Create page object
 				try {
 					$page	= new \Blight\Models\Page($this->blog, $content, preg_replace('/^(.*?)\.\w+?$/', '$1', str_replace($dir, '', $file)));
+					$page->setFile($file);
 				} catch(\Exception $e){
 					continue;
 				}
@@ -245,9 +230,9 @@ class Manager implements \Blight\Interfaces\Manager {
 	 *
 	 * @return array	An array of \Blight\Models\Page objects
 	 */
-	public function getDraftPosts(){
+	public function getDraftPosts(array $files = null){
 		if(!isset($this->draftPosts)){
-			$files	= $this->getRawPosts(true);
+			$files	= (isset($files) ? $files : $this->getRawPosts(true));
 			$posts	= array();
 
 			foreach($files as $file){
@@ -262,6 +247,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				// Create post object
 				try {
 					$post	= new \Blight\Models\Post($this->blog, $content, pathinfo($file, \PATHINFO_FILENAME), true);
+					$post->setFile($file);
 				} catch(\Exception $e){
 					continue;
 				}
@@ -294,7 +280,7 @@ class Manager implements \Blight\Interfaces\Manager {
 			$this->draftPosts	= $posts;
 		}
 
-		return $this->draftPosts;
+		return $this->filterItemsByFiles($this->draftPosts, $files);
 	}
 
 	/**
@@ -529,5 +515,27 @@ class Manager implements \Blight\Interfaces\Manager {
 			// Post not found - remove
 			$this->blog->getFileSystem()->deleteFile($file);
 		}
+	}
+
+
+	protected function filterItemsByFiles(array $items, $files){
+		if(!isset($files)){
+			// No filtering
+			return $items;
+		}
+
+		$filteredItems	= array();
+
+		foreach($items as $item){
+			if(!in_array($item->getFile(), $files)){
+				// Unknown - skip
+				continue;
+			}
+
+			// Valid
+			$filteredItems[]	= $item;
+		}
+
+		return $filteredItems;
 	}
 };

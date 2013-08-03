@@ -9,6 +9,17 @@ interface Manager {
 	public function __construct(\Blight\Interfaces\Blog $blog);
 
 	/**
+	 * @return array	A list of filenames for each page file found
+	 */
+	public function getRawPages();
+
+	/**
+	 * @param bool $drafts	Whether to return only drafts or only published posts
+	 * @return array	A list of filenames for each post file found
+	 */
+	public function getRawPosts($drafts = false);
+
+	/**
 	 * @return array	An array of \Blight\Models\Page objects
 	 */
 	public function getPages();
