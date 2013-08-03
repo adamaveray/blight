@@ -23,4 +23,6 @@ After installation, your directory structure should look like the following:
 		.htaccess
 		index.php
 
+	cache/
+
 The paths to these directories are stored in the `config.json` file, so to change the directory structure, simply update this file.

@@ -4,11 +4,11 @@ namespace Blight\Tests;
 class PageTest extends \PHPUnit_Framework_TestCase {
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;
-	protected $content_title;
-	protected $content_date;
-	protected $content_slug;
-	protected $content_text;
-	protected $content_metadata;
+	protected $contentTitle;
+	protected $contentDate;
+	protected $contentSlug;
+	protected $contentText;
+	protected $contentMetadata;
 	protected $content;
 
 	protected $timezone;
@@ -22,38 +22,38 @@ class PageTest extends \PHPUnit_Framework_TestCase {
 
 		$this->blog	= new \Blight\Blog($config);
 
-		$this->content_title	= 'Test Page';
-		$this->content_slug		= 'test-page';
-		$this->content_date		= new \DateTime('now', $this->timezone);
-		$this->content_metadata	= array(
-			'Date'		=> $this->content_date->format('Y-m-d H:i:s'),
+		$this->contentTitle	= 'Test Page';
+		$this->contentSlug		= 'test-page';
+		$this->contentDate		= new \DateTime('now', $this->timezone);
+		$this->contentMetadata	= array(
+			'Date'		=> $this->contentDate->format('Y-m-d H:i:s'),
 			'Test Meta'	=> 'Test Value'
 		);
 
 		$meta	= array();
-		foreach($this->content_metadata as $key => $value){
+		foreach($this->contentMetadata as $key => $value){
 			$meta[]	= $key.': '.$value;
 		}
 		$meta	= implode("\n", $meta);
 
-		$this->content_text		= 'Test content.';
+		$this->contentText		= 'Test content.';
 
 		$this->content	= <<<EOD
-$this->content_title
+$this->contentTitle
 =========
 $meta
 
-$this->content_text
+$this->contentText
 EOD;
 
-		$this->page	= new \Blight\Models\Page($this->blog, $this->content, $this->content_slug);
+		$this->page	= new \Blight\Models\Page($this->blog, $this->content, $this->contentSlug);
 	}
 
 	/**
 	 * @covers \Blight\Models\Page::__construct
 	 */
 	public function testConstruct(){
-		$post	= new \Blight\Models\Page($this->blog, $this->content, $this->content_slug);
+		$post	= new \Blight\Models\Page($this->blog, $this->content, $this->contentSlug);
 		$this->assertInstanceOf('\Blight\Models\Page', $post);
 	}
 
@@ -72,21 +72,21 @@ EOD;
 	 * @covers \Blight\Models\Page::getTitle
 	 */
 	public function testGetTitle(){
-		$this->assertEquals($this->content_title, $this->page->getTitle(true));
+		$this->assertEquals($this->contentTitle, $this->page->getTitle(true));
 	}
 
 	/**
 	 * @covers \Blight\Models\Page::getSlug
 	 */
 	public function testGetSlug(){
-		$this->assertEquals($this->content_slug, $this->page->getSlug());
+		$this->assertEquals($this->contentSlug, $this->page->getSlug());
 	}
 
 	/**
 	 * @covers \Blight\Models\Page::getDate
 	 */
 	public function testGetDate(){
-		$this->assertEquals($this->content_date, $this->page->getDate());
+		$this->assertEquals($this->contentDate, $this->page->getDate());
 	}
 
 	/**
@@ -103,7 +103,7 @@ EOD;
 	 */
 	public function testGetDateUpdated(){
 		// Should default to date created
-		$this->assertEquals($this->content_date, $this->page->getDateUpdated());
+		$this->assertEquals($this->contentDate, $this->page->getDateUpdated());
 	}
 
 	/**
@@ -119,7 +119,7 @@ EOD;
 	 * @covers \Blight\Models\Page::getContent
 	 */
 	public function testGetContent(){
-		$this->assertEquals($this->content_text, $this->page->getContent());
+		$this->assertEquals($this->contentText, $this->page->getContent());
 	}
 
 	/**
@@ -127,8 +127,8 @@ EOD;
 	 */
 	public function testGetMetadata(){
 		$meta	= array(
-			'date'		=> $this->content_metadata['Date'],
-			'test-meta'	=> $this->content_metadata['Test Meta']
+			'date'		=> $this->contentMetadata['Date'],
+			'test-meta'	=> $this->contentMetadata['Test Meta']
 		);
 
 		$this->assertEquals($meta, $this->page->getMetadata());
@@ -138,8 +138,8 @@ EOD;
 	 * @covers \Blight\Models\Page::getMeta
 	 */
 	public function testGetMeta(){
-		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->getMeta('Test Meta'));
-		$this->assertEquals($this->content_metadata['Test Meta'], $this->page->getMeta('test-meta'));
+		$this->assertEquals($this->contentMetadata['Test Meta'], $this->page->getMeta('Test Meta'));
+		$this->assertEquals($this->contentMetadata['Test Meta'], $this->page->getMeta('test-meta'));
 
 		// Non-existent
 		$this->assertNull($this->page->getMeta('nonexistent'));
@@ -158,7 +158,7 @@ EOD;
 	 * @covers \Blight\Models\Page::getLink
 	 */
 	public function testGetLink(){
-		$url	= $this->blog->getURL($this->content_slug);
+		$url	= $this->blog->getURL($this->contentSlug);
 		$this->assertEquals($url, $this->page->getLink());
 	}
 
@@ -166,7 +166,7 @@ EOD;
 	 * @covers \Blight\Models\Page::getPermalink
 	 */
 	public function testGetPermalink(){
-		$url	= $this->blog->getURL($this->content_slug);
+		$url	= $this->blog->getURL($this->contentSlug);
 		$this->assertEquals($url, $this->page->getPermalink());
 	}
 
@@ -174,7 +174,7 @@ EOD;
 	 * @covers \Blight\Models\Page::getRelativePermalink
 	 */
 	public function testGetRelativePermalink(){
-		$url	= $this->content_slug;
+		$url	= $this->contentSlug;
 		$this->assertEquals($url, $this->page->getRelativePermalink());
 	}
 };

@@ -1,0 +1,203 @@
+#!/usr/bin/env php
+<?php
+if(in_array('--help', $_SERVER['argv'])){
+	// Show help
+	echo <<<EOD
+Usage: ./build [OPTIONS] [OUTPUT_DIRECTORY]
+
+Builds the system into a Phar
+
+  -c- Skip Composer installation
+  -c+ Update Composer packages
+  -p  Prepare packages
+  -t  Run tests
+  -r  Run the blog
+  -v  Output detailed information
+  --all  Build system, prepare packages, run tests and run blog
+EOD;
+	echo PHP_EOL;
+
+	return;
+}
+
+ini_set('memory_limit','16M');
+
+$scriptPath	= array_shift($_SERVER['argv']);
+
+$dir	= 'blight';
+$name	= 'Blight.phar';
+
+
+$pathSource	= __DIR__.'/'.$dir;
+$pathBuild	= rtrim(end($_SERVER['argv']), '/');
+if(!$pathBuild || ($pathBuild[0] == '-' && strlen($pathBuild) <= 3) || $pathBuild === '--all'){
+	// No path given
+	$pathBuild	= __DIR__;
+}
+
+function consoleOutput($message, $detailed = true){
+	global $verbose;
+	if($detailed === true && !$verbose){
+		return;
+	}
+
+	echo $message;
+	if(is_string($detailed) && $verbose){
+		echo ' '.$detailed;
+	}
+	echo PHP_EOL;
+}
+
+function quotedConsoleOutput($message, $detailed = true){
+	$message	= trim($message);
+	if($message === ''){
+		return;
+	}
+
+	return consoleOutput('> '.str_replace(PHP_EOL, PHP_EOL.'> ', $message), $detailed);
+}
+
+function consoleLinebreak($detailed = true){
+	return consoleOutput('', $detailed);
+}
+
+
+function hasFlag($flag, $allowAll = true){
+	$result	= in_array('-'.$flag, $_SERVER['argv']);
+	if(!$result && $allowAll){
+		$result	= hasFlag('-all', false);
+	}
+
+	return $result;
+}
+
+$verbose	= hasFlag('v', false);
+
+try {
+// Compose
+	if(!hasFlag('c-', false)){
+		consoleOutput('Updating Composer');
+
+		$output	= shell_exec('composer '.(hasFlag('c+', false) ? 'update' : 'install'));
+
+		consoleOutput('Updated Composer', false);
+		quotedConsoleOutput($output);
+	}
+
+// Build
+	consoleOutput('Building system');
+
+	if(!is_dir($pathBuild)){
+		mkdir($pathBuild);
+	}
+
+	$phar = new Phar($pathBuild.'/'.$name, 0, $name);
+	$phar->buildFromDirectory($pathSource);
+
+	// Update Composer to use Phar
+	$path	= 'vendor/composer/autoload_classmap.php';
+	if(file_exists(__DIR__.'/'.$dir.'/'.$path)){
+		$content	= file_get_contents(__DIR__.'/'.$dir.'/'.$path);
+		$content	= str_replace('/'.$dir.'/', '/'.$name.'/', $content);
+		$phar->addFromString($path, $content);
+	}
+
+	$phar->setStub(file_get_contents($pathSource.'/phar-stub.php'));
+	unset($phar);
+	consoleOutput('Built system', false);
+
+	consoleLinebreak();
+
+
+// Package packages
+	if(hasFlag('p')){
+		consoleOutput('Preparing packages');
+
+		function buildPackage($source, $targetDir){
+        	$name	= basename($source).'.phar';
+
+        	try {
+        		$phar = new Phar($targetDir.'/'.$name, 0, $name);
+        		$phar->buildFromDirectory($source);
+        		$phar->setStub('<?php __HALT_COMPILER();');
+        		unset($phar);
+
+        	} catch(\Exception $e){
+				quotedConsoleOutput('Could not package `'.$name.'`', '(Exception: '.$e->getMessage().' ['.$e->getFile().'#'.$e->getLine().'])');
+        		return;
+        	}
+
+			quotedConsoleOutput('Packaged "'.$name.'"');
+        }
+
+        // Build default theme
+        $defaultTheme	= __DIR__.'/default-theme/Basic/';
+        if(is_dir($defaultTheme)){
+        	buildPackage($defaultTheme, __DIR__.'/blog-data/themes/');
+        }
+
+        // Build additional packages
+        $baseDirs	= array(
+        	__DIR__.'/blog-data/plugins/',
+        	__DIR__.'/blog-data/themes/'
+        );
+
+        foreach($baseDirs as $baseDir){
+        	$dirs	= glob($baseDir.'/*');
+
+        	foreach($dirs as $dir){
+        		if(!is_dir($dir)){
+        			continue;
+        		}
+
+        		buildPackage($dir, $baseDir);
+        	}
+        }
+
+		consoleOutput('Prepared packages', false);
+
+		consoleLinebreak();
+	}
+
+
+// Run tests
+	if(hasFlag('t')){
+		consoleOutput('Running tests');
+
+		$output	= shell_exec('phpunit -c tests/Blight/config.xml -v').PHP_EOL;
+		$replaces	= array(
+			'/PHPUnit .*? by Sebastian Bergmann.(?:\n)?/i'	=> '',
+			'#Configuration read from (?:'.preg_quote(__DIR__, '#').'/)?(.*?\.xml)#i'	=> 'Config: $1',
+			'/\R+/'	=> "\n"
+		);
+		foreach($replaces as $find => $replace){
+			$output	= preg_replace($find, $replace, $output);
+		}
+
+		if(strstr($output, PHP_EOL.'FAILURES!'.PHP_EOL) === false){
+			// Passed
+			consoleOutput('Passed tests', false);
+		} else {
+			// Failed
+			consoleOutput('Failed tests', false);
+		}
+
+		quotedConsoleOutput($output);
+
+		consoleLinebreak();
+	}
+
+
+// Run
+	if(hasFlag('r')){
+		$output	= shell_exec('php "'.$pathBuild.'/Blight.phar"'.($verbose ? ' -v' : ''));
+
+		consoleOutput('Ran blog', false);
+		quotedConsoleOutput($output);
+
+		consoleLinebreak();
+	}
+
+} catch(\Exception $e){
+	exit('Exception: '.$e->getMessage().' ('.$e->getFile().'#'.$e->getLine().')');
+}

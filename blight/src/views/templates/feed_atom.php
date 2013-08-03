@@ -69,7 +69,7 @@ $root->setAttribute('xml:lang', 'en-US');
 				$append	= "\n\n".'[∞ Permalink]('.$post->getPermalink().')';
 			}
 
-			$blog->doHook('feed_post', array(
+			$blog->doHook('feedPost', array(
 				'feed_type'	=> 'atom',
 				'post'		=> $post,
 				'title'		=> &$title,
@@ -112,11 +112,11 @@ $root->setAttribute('xml:lang', 'en-US');
 				));
 			}
 
-			$base_url	= $post->getPermalink();
+			$baseURL	= $post->getPermalink();
 
 			$node	= $dom->createElement('content');
 				$node->setAttribute('type', 'html');
-				$node->setAttribute('xml:base', $base_url);
+				$node->setAttribute('xml:base', $baseURL);
 				$node->setAttribute('xml:lang', 'en-US');
 
 				$node->appendChild($dom->createCDATASection(($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append));

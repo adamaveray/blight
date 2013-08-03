@@ -1,6 +1,8 @@
 Options All -Indexes
 AddDefaultCharset UTF-8
 
+ErrorDocument 404 /{%WEB_PATH%}/404.html
+
 <IfModule mod_rewrite.c>
 	RewriteEngine on
 

@@ -1,7 +1,7 @@
 <?php
 /**
  * Blight
- * v0.8
+ * v0.9
  */
 
 define('IS_CLI', (PHP_SAPI === 'cli'));
@@ -66,6 +66,9 @@ if(!file_exists($configFile) || isset($_COOKIE[\Blight\Controllers\Install::COOK
 // Initialise blog
 $parser	= new \Blight\Config();
 $config	= $parser->unserialize(file_get_contents($configFile));
+if(!isset($config)){
+	throw new \Exception('Config invalid');
+}
 $config['root_path']	= $rootPath;
 $blog	= new \Blight\Blog($config);
 
@@ -82,9 +85,9 @@ if(IS_CLI){
 			$value	= $blog->get($config[1], $config[0]);
 
 			echo $value;
-		}
 
-		exit;
+			exit;
+		}
 	}
 }
 
@@ -94,29 +97,47 @@ $blog->setPackageManager(new \Blight\PackageManager($blog));
 	$logger	= new \Monolog\Logger('Blight');
 	$logger->pushHandler(new \Blight\EchoHandler(), \Monolog\Logger::DEBUG);
 
-	$logPath	= $blog->get('log', 'paths');
+	$logPath	= $blog->get('paths.log');
 	if(isset($logPath)){
 		$logger->pushHandler(new \Monolog\Handler\StreamHandler($blog->getPathRoot($logPath), \Monolog\Logger::INFO));
 	}
 $blog->setLogger($logger);
+$blog->setCache(new \Blight\Cache($blog));
+
 
 // Load posts
 $manager	= new \Blight\Manager($blog);
 $blog->getLogger()->debug('Manager initialised');
-$archive	= $manager->getPostsByYear();
-$blog->getLogger()->debug('Archive built');
 
-// Begin rendering
+$updateManager	= new \Blight\UpdateManager($blog);
+$updateManager->setManager($manager);
+
+if(!$updateManager->needsUpdate()){
+	// No changes
+	$blog->getLogger()->debug('Blog current');
+	if(IS_CLI) echo 'Blog current'.PHP_EOL;
+	exit;
+}
+
+
+// Prepare for rendering
 $renderer	= new \Blight\Renderer($blog, $manager, $blog->getTheme());
 $blog->getLogger()->debug('Renderer initialised');
 
-	// Render pages
-	$renderer->renderPages();
-	$blog->getLogger()->debug('Pages rendered');
 
+if($updateManager->needsUpdate('drafts')){
 	// Render draft posts
-	$renderer->renderDrafts();
+	$renderer->renderDrafts($updateManager->getChangedDraftPosts());
 	$blog->getLogger()->debug('Drafts rendered');
+
+	// Remove old draft files
+	$manager->cleanupDrafts();
+}
+
+
+if($updateManager->needsUpdate('posts')){
+	$archive	= $manager->getPostsByYear();
+	$blog->getLogger()->debug('Archive built');
 
 	// Render posts and archives
 	foreach($archive as $year){
@@ -133,7 +154,7 @@ $blog->getLogger()->debug('Renderer initialised');
 
 		// Render archive
 		$renderer->renderYear($year, array(
-			'per_page'	=> $blog->get('page', 'limits', 0)
+			'per_page'	=> $blog->get('limits.page', 0)
 		));
 		$blog->getLogger()->debug(sprintf('Year "%s" archive rendered', $year->getName()));
 	}
@@ -149,49 +170,72 @@ $blog->getLogger()->debug('Renderer initialised');
 
 	// Render tag pages
 	$renderer->renderTags(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('limits.page', 0)
 	));
 	$blog->getLogger()->debug('Tags rendered');
 
 	// Render category pages
 	$renderer->renderCategories(array(
-		'per_page'	=> $blog->get('page', 'limits', 0)
+		'per_page'	=> $blog->get('limits.page', 0)
 	));
 	$blog->getLogger()->debug('Categories rendered');
 
-	// Render home page
-	$renderer->renderHome(array(
-		'limit'	=> $blog->get('home', 'limits', $blog->get('page', 'limits', 10))
+	// Render home and sequential list pages
+	$renderer->renderSequential(array(
+		'per_page'	=> $blog->get('limits.home', $blog->get('limits.page', 10))
 	));
-	$blog->getLogger()->debug('Home rendered');
+	$blog->getLogger()->debug('Home and sequential pages rendered');
 
 	// Render feeds
 	$renderer->renderFeeds(array(
-		'limit'	=> $blog->get('feed', 'limits', $blog->get('page', 'limits', 15))
+		'limit'	=> $blog->get('limits.feed', $blog->get('limits.page', 15))
 	));
 	$blog->getLogger()->debug('Feeds rendered');
+}
+
+
+if($updateManager->needsUpdate('pages')){
+	// Render pages
+	$renderer->renderPages();
+	$blog->getLogger()->debug('Pages rendered');
 
 	// Render sitemap
 	$renderer->renderSitemap(array(
 	));
 	$blog->getLogger()->debug('Sitemap rendered');
+}
 
-	// Rendering completed
 
-// Copy theme assets
-$renderer->updateThemeAssets();
-$blog->getLogger()->debug('Theme assets updated');
+if($updateManager->needsUpdate('supplementary')){
+	// Render additional pages
+	$renderer->renderSupplementaryPages(array(
+		'limit'	=> $blog->get('limits.supplementary', $blog->get('limits.page', 5))
+	));
+	$blog->getLogger()->debug('Supplementary pages rendered');
+}
 
-// Copy user assets
-$renderer->updateUserAssets();
-$blog->getLogger()->debug('User assets updated');
+// Rendering completed
 
-// Remove old draft files
-$manager->cleanupDrafts();
+if($updateManager->needsUpdate('theme')){
+	// Copy theme assets
+	$renderer->updateThemeAssets();
+	$blog->getLogger()->debug('Theme assets updated');
+}
+
+
+if($updateManager->needsUpdate('assets')){
+	// Copy user assets
+	$renderer->updateUserAssets();
+	$blog->getLogger()->debug('User assets updated');
+}
 
 $blog->getLogger()->info('Blog built', array(
 	'Build Time'	=> (microtime(true) - $_SERVER['REQUEST_TIME_FLOAT']).'s',
 	'Peak Memory'	=> floor(memory_get_peak_usage()/1024).'KB'
 ));
+
+
+// Cache
+$updateManager->saveState();
 
 if(IS_CLI) echo 'Blog built'.PHP_EOL;

@@ -43,29 +43,38 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
-	 * @param string $name			The template to use
+	 * @param string|array $names	The template or templates to use
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
 	 * @return string	The rendered content from the template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	protected function renderTemplate($name, $params = null){
+	protected function renderTemplate($names, $params = null){
 		$params	= array_merge(array(
 			'archives'		=> $this->manager->getPostsByYear(),
 			'categories'	=> $this->manager->getPostsByCategory()
 		), (array)$params);
 
-		$callback	= array($this->theme, 'render_'.$name);
-		if(is_callable($callback)){
-			return call_user_func($callback, $params);
-
-		} elseif(isset($this->inbuiltTemplates[$name])){
-			// Use default template
-			$template	= new \Blight\Models\Template($this->blog, $this->theme, $name, $this->inbuiltTemplates[$name]);
-			return $template->render($params);
-
-		} else {
-			return $this->theme->renderTemplate($name, $params);
+		if(!is_array($names)){
+			$names	= array($names);
 		}
+
+		foreach($names as $name){
+			$callback	= array($this->theme, 'render_'.$name);
+			if(is_callable($callback)){
+				return call_user_func($callback, $params);
+
+			} elseif(isset($this->inbuiltTemplates[$name])){
+				// Use default template
+				$template	= new \Blight\Models\Template($this->blog, $this->theme, $name, $this->inbuiltTemplates[$name]);
+
+				return $template->render($params);
+			}
+
+			// No match - continue
+		}
+
+		// No special cases
+		return $this->theme->renderTemplate($names, $params);
 	}
 
 	/**
@@ -81,15 +90,21 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Builds a template file with the provided parameters, and writes the rendered content to the specified file
 	 *
-	 * @param string $templateName	The template to use
+	 * @param string|array $names	The template or templates to use
 	 * @param string $outputPath	The file to write to
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
+	 *
+	 * @throws \InvalidArgumentException	The output path is not specified
 	 *
 	 * @see renderTemplate
 	 * @see write
 	 */
-	protected function renderTemplateToFile($templateName, $outputPath, $params = null){
-		$this->write($outputPath, $this->renderTemplate($templateName, $params));
+	protected function renderTemplateToFile($names, $outputPath, $params = null){
+		if(!isset($outputPath) || trim($outputPath) == ''){
+			throw new \InvalidArgumentException('No output path provided');
+		}
+
+		$this->write($outputPath, $this->renderTemplate($names, $params));
 	}
 
 	/**
@@ -129,7 +144,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 */
 	public function renderPost(\Blight\Interfaces\Models\Post $post, $prev = null, $next = null){
 		if($post->isBeingPublished()){
-			$this->blog->doHook('will_publish_post', array(
+			$this->blog->doHook('willPublishPost', array(
 				'post'	=> $post
 			));
 		}
@@ -156,7 +171,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$this->renderTemplateToFile('post', $path, $params);
 
 		if($post->isBeingPublished()){
-			$this->blog->doHook('did_publish_post', array(
+			$this->blog->doHook('didPublishPost', array(
 				'post'	=> $post
 			));
 		}
@@ -165,8 +180,8 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Generates and saves the static files for all draft posts.
 	 */
-	public function renderDrafts(){
-		$drafts	= $this->manager->getDraftPosts();
+	public function renderDrafts(array $drafts = null){
+		$drafts	= (isset($drafts) ? $drafts : $this->manager->getDraftPosts());
 
 		$outputPath	= $this->blog->getPathDraftsWeb();
 
@@ -285,6 +300,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 *
 	 * @param Interfaces\Collection $collection
 	 * @param int $perPage	The maximum number of posts to show per page
+	 * @param callable|null	A callback to apply to each paginated item
 	 * @return array	An associative array of pages to be created
 	 *
 	 *		array (
@@ -297,7 +313,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * 			)
 	 *		)
 	 */
-	protected function paginateCollection(\Blight\Interfaces\Models\Collection $collection, $perPage){
+	protected function paginateCollection(\Blight\Interfaces\Models\Collection $collection, $perPage, $callback = null){
 		$returnPages	= array();
 
 		$posts	= $collection->getPosts();
@@ -315,14 +331,21 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$noPages	= ceil(count($posts)/$perPage);
 		$pages		= array();
 		for($page = 0; $page < $noPages; $page++){
-			$pages[$page+1]	= $base.$collection->getURL(true).($page == 0 ? '' : '/'.($page+1));
+			$pages[$page+1]	= $collection->getURL().($page == 0 ? '' : '/'.($page+1));
+		}
+
+		if(isset($callback) && is_callable($callback)){
+			$result	= $callback($pages, $this->blog, $collection);
+			if(isset($result)){
+				$pages	= $result;
+			}
 		}
 
 		// Build each page
 		for($page = 0; $page < $noPages; $page++){
 			$path	= $base.$collection->getURL(true).'/'.($page == 0 ? 'index' : ($page+1)).'.html';
 			$returnPages[$path]	= array(
-				'posts'			=> array_slice($posts, ($page-1)*$perPage, $perPage),
+				'posts'			=> array_slice($posts, $page*$perPage, $perPage-1),
 				'pagination'	=> new \Blight\Pagination($pages, $page+1)
 			);
 		}
@@ -331,7 +354,52 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	}
 
 	/**
-	 * Generates and saves the static file for the blog home page. Posts are retrieved from the
+	 * Generates and saves the static file for the blog home page and sequential posts. Posts are retrieved from the
+	 * Manager set during class construction.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered pages
+	 *
+	 * 		'per_page':	An int specifying the number of posts to include per page. [Default: 20]
+	 */
+	public function renderSequential($options = null){
+		$options	= array_merge(array(
+			'per_page'	=> 20
+		), (array)$options);
+
+		// Prepare posts
+		$posts	= $this->manager->getPosts();
+
+		$collection	= new \Blight\Models\Collections\Sequential($this->blog, 'Page');
+		$collection->setPosts($posts);
+
+		$pages	= $this->paginateCollection($collection, $options['per_page'], function($pages, \Blight\Interfaces\Blog $blog, \Blight\Interfaces\Models\Collection $collection){
+			// Change home page
+			$pages[1]	= $blog->getURL();
+			return $pages;
+		});
+
+		$pageNo	= 0;
+		foreach($pages as $outputFile => $page){
+			if($pageNo == 0){
+				// Home page
+				$template	= 'home';
+				$outputFile	= $this->blog->getPathWWW('index.html');
+			} else {
+				// Subsequent
+				$template	= 'list';
+				$page['page_title']	= 'Page '.($pageNo+1);
+			}
+
+			$this->renderTemplateToFile($template, $outputFile, array_merge(array(
+				'sequential'	=> $collection
+			), $page));
+
+			$pageNo++;
+		}
+	}
+
+	/**
+	 * Generates and saves the static file for blog the home page. Posts are retrieved from the
 	 * Manager set during class construction.
 	 *
 	 * @param array|null $options	An array of options to alter the rendered pages
@@ -352,7 +420,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 
 		$path	= $this->blog->getPathWWW('index.html');
 
-		$this->renderTemplateToFile('home', $path, array(
+		$this->renderTemplateToFile(array('home', 'list'), $path, array(
 			'posts'	=> $posts
 		));
 	}
@@ -412,7 +480,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$validFormats	= array('atom', 'rss');
 		$defaultFormat	= current($validFormats);
 		if(!isset($options['format']) || !in_array($options['format'], $validFormats)){
-			$options['format']	= $this->blog->get('feed_format', 'output', $defaultFormat);
+			$options['format']	= $this->blog->get('output.feed_format', $defaultFormat);
 			if(!in_array($options['format'], $validFormats)){
 				// Invalid format in config
 				$options['format']	= $defaultFormat;
@@ -448,6 +516,39 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		$this->renderTemplateToFile('sitemap', $path, array(
 			'pages'	=> $pages
 		));
+	}
+
+	/**
+	 * Generates and saves the static files for additional utility pages, such as the 404 page.
+	 *
+	 * @param array|null $options	An array of options to alter the rendered documents
+	 */
+	public function renderSupplementaryPages($options = null){
+		$options	= array_merge(array(
+			'limit'	=> 5
+		), (array)$options);
+
+		$pages	= $this->manager->getSupplementaryPages();
+
+		$outputPath	= $this->blog->getPathWWW();
+
+		foreach($pages as $pageID => $page){
+			/** @var \Blight\Interfaces\Models\Page $page */
+			$templates	= array('page');
+			$params		= array();
+			switch($pageID){
+				case '404':
+					array_unshift($templates, '404');
+					$params['recent_posts']	= array_slice($this->manager->getPosts(), 0, $options['limit']);
+					break;
+			}
+
+			$path	= $outputPath.$page->getSlug().'.html';
+			$this->renderTemplateToFile($templates, $path, array_merge($params, array(
+				'page'			=> $page,
+				'page_title'	=> $page->getTitle()
+			)));
+		}
 	}
 
 

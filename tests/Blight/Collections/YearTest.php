@@ -4,8 +4,8 @@ namespace Blight\Models\Collections;
 require_once(__DIR__.'/CollectionTest.php');
 
 class YearTest extends CollectionTest {
-	protected $collection_name	= 2013;
-	protected $collection_slug	= 2013;
+	protected $collectionName	= 2013;
+	protected $collectionSlug	= 2013;
 
 	static public function setUpBeforeClass(){
 		static::$class	= '\Blight\Models\Collections\Year';

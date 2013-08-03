@@ -9,6 +9,11 @@ interface Blog {
 	public function __construct($config);
 
 	/**
+	 * @return bool	Whether the site is in debug mode
+	 */
+	public function isDebug();
+
+	/**
 	 * @param string $append	An additonal path fragment to append to the path
 	 * @return string			The root path, with the provided string appended
 	 */
@@ -138,6 +143,17 @@ interface Blog {
 	public function setLogger(\Psr\Log\LoggerInterface $logger);
 
 	/**
+	 * @return \Blight\Interfaces\Cache
+	 * @throws \RuntimeException
+	 */
+	public function getCache();
+
+	/**
+	 * @param Interfaces\Cache $cache
+	 */
+	public function setCache(\Blight\Interfaces\Cache $cache);
+
+	/**
 	 * @return \Blight\Interfaces\Models\Packages\Theme
 	 */
 	public function getTheme();
@@ -167,10 +183,21 @@ interface Blog {
 	public function getAuthor($name = null);
 
 	/**
-	 * @param string $parameter		The name of the parameter to retrieve
-	 * @param string|null $group	The settings group the parameter exists in
+	 * @return array	An associative array of all authors defined in the site, with author names as keys
+	 */
+	public function getAuthors();
+
+	/**
+	 * @param array $authors	An array of \Blight\Interfaces\Models\Author instances
+	 * @throws \InvalidArgumentException	An author object does not implement \Blight\Interfaces\Models\Author
+	 */
+	public function setAuthors(array $authors);
+
+
+	/**
+	 * @param string $parameter		The name of the parameter to retrieve, dot-separated through the hierarchy
 	 * @param mixed $default		The value to be returned if the requested parameter is not set
 	 * @return mixed		The requested parameter's value or $default
 	 */
-	public function get($parameter, $group = null, $default = null);
+	public function get($parameter, $default = null);
 };

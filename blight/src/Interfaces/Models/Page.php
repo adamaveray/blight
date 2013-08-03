@@ -31,6 +31,16 @@ interface Page {
 	public function setDate(\DateTime $date);
 
 	/**
+	 * @return string|null	The path for the page's source file
+	 */
+	public function getFile();
+
+	/**
+	 * @param string $file	The path for the page's source file
+	 */
+	public function setFile($file);
+
+	/**
 	 * @return \DateTime	The page modified date
 	 */
 	public function getDateUpdated();

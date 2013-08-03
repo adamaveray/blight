@@ -9,7 +9,7 @@ PATH_PAGES="${DIR}/$( php -f ${APP_PATH} config:paths.pages )"
 PATH_DRAFTS="${DIR}/$( php -f ${APP_PATH} config:paths.drafts )"
 PATH_ASSETS="${DIR}/$( php -f ${APP_PATH} config:paths.assets )"
 
-CHECK_SECONDS=30
+CHECK_SECONDS=60
 UPDATE_LOG="${DIR}/$( php -f ${APP_PATH} config:paths.log )"
 
 SCRIPT_LOCK_FILE="${DIR}/blight-updater.pid"

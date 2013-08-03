@@ -14,7 +14,7 @@ function input_error($inputName, $errors){
 	<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1" />
 	<link rel="stylesheet" href="css/install.css" />
 </head>
-<body<?php if(isset($page_id)){ echo ' id="page_'.$page_id.'"'; }?>>
+<body<?php if(isset($pageID)){ echo ' id="page_'.$pageID.'"'; }?>>
 <div id="main" role="main">
 	<header>
 		<h1>Blight</h1>

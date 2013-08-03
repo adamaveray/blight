@@ -18,7 +18,7 @@ abstract class Package implements \Blight\Interfaces\Models\Packages\Package {
 	final public function __construct(\Blight\Interfaces\Blog $blog, $config = null){
 		$this->blog	= $blog;
 
-		$this->config	= $this->load_config($config);
+		$this->config	= $this->loadConfig($config);
 
 		if(isset($this->config['path'])){
 			$this->path	= $this->config['path'];
@@ -33,7 +33,7 @@ abstract class Package implements \Blight\Interfaces\Models\Packages\Package {
 	 * @param array|null $config	The configuration data for the package
 	 * @return array				The processed configuration data
 	 */
-	final protected function load_config($config){
+	final protected function loadConfig($config){
 		$config	= (array)$config;
 
 		// Parse authors

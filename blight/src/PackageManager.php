@@ -3,7 +3,7 @@ namespace Blight;
 
 class PackageManager implements \Blight\Interfaces\PackageManager {
 	const MANIFEST_FILE	= 'package.json';
-	const HOOK_FUNCTION_PREFIX	= 'hook_';
+	const HOOK_FUNCTION_PREFIX	= 'hook';
 
 	/** @var \Blight\Interfaces\Blog */
 	protected $blog;

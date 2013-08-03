@@ -57,6 +57,24 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	}
 
 	/**
+	 * Checks whether the paginated data has a previous item
+	 *
+	 * @return bool	Whether the paginated data has a previous item
+	 */
+	public function hasPrev(){
+		return ($this->getPosition() > 1);
+	}
+
+	/**
+	 * Checks whether the paginated data has a next item
+	 *
+	 * @return bool	Whether the paginated data has a next item
+	 */
+	public function hasNext(){
+		return ($this->getPosition() < $this->getCount());
+	}
+
+	/**
 	 * Returns the number of items provided during construction
 	 *
 	 * @return int	The number of items
@@ -86,13 +104,18 @@ class Pagination implements \Blight\Interfaces\Pagination, \Iterator, \Countable
 	/**
 	 * Retrieves the item at the provided index
 	 *
-	 * @param int $i	The index of the item to retrieve
+	 * @param int $i	The index of the item to retrieve (1-indexed)
+	 * @param bool $isZeroIndexed	Whether the index requested is 0-indexed or 1-indexed
 	 * @return mixed	The item at the given index
 	 * @throws \OutOfRangeException	No item exists at the given position
 	 */
-	public function getIndex($i){
+	public function getIndex($i, $isZeroIndexed = false){
+		if($isZeroIndexed){
+			$i++;
+		}
+
 		if($i < 1 || $i > $this->getCount()){
-			throw new \OutOfRangeException('Invalid position requested');
+			throw new \OutOfRangeException('Invalid position '.$i.' requested');
 		}
 
 		return $this->items[$i];

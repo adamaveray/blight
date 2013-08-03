@@ -6,6 +6,7 @@ Documentation
 - [Setup](Setup.md)
 - [Configuration](Config.md)
 - [Authoring](Authoring.md)
+- [Performance](Performance.md)
 
 
 ## Extending Blight

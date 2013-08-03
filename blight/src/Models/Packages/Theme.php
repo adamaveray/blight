@@ -7,19 +7,35 @@ abstract class Theme extends Package implements \Blight\Interfaces\Models\Packag
 	/**
 	 * Builds a template file with the provided variables, and returns the generated HTML
 	 *
-	 * @param string $name			The template to use
+	 * @param string|array $names	The template or templates to use
 	 * @param array|null $params	An array of variables to be assigned to the local scope of the template
 	 * @return string	The rendered content from the template
 	 * @throws \RuntimeException	Template cannot be found
 	 */
-	public function renderTemplate($name, $params = null){
+	public function renderTemplate($names, $params = null){
 		// Check if template cached
-		if(!isset($this->templates[$name])){
-			// Create template
-			$this->templates[$name]	= new \Blight\Models\Template($this->blog, $this, $name);
+		if(!is_array($names)){
+			$names	= array($names);
 		}
 
-		return $this->templates[$name]->render($params);
+		foreach($names as $templateName){
+			if(!isset($this->templates[$templateName])){
+				// Create template
+				try {
+					$template	= new \Blight\Models\Template($this->blog, $this, $templateName);
+				} catch(\Exception $e){
+					// Skip template
+					continue;
+				}
+
+				$this->templates[$templateName]	= $template;
+			}
+
+			return $this->templates[$templateName]->render($params);
+		}
+
+		// Template not found
+		throw new \RuntimeException('No templates could be found');
 	}
 
 	/**

@@ -350,10 +350,10 @@ class Install {
 		return $parser->serialize($config);
 	}
 
-	protected function copyDefaultTheme($source, $target_dir){
+	protected function copyDefaultTheme($source, $targetDir){
 		$name	= basename($source).'.phar';
 		try {
-			$phar = new \Phar(rtrim($target_dir, '/').'/'.$name, 0, $name);
+			$phar = new \Phar(rtrim($targetDir, '/').'/'.$name, 0, $name);
 			$phar->buildFromDirectory($source);
 			$phar->setStub('<?php __HALT_COMPILER();');
 			unset($phar);

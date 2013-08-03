@@ -13,6 +13,8 @@ class Template implements \Blight\Interfaces\Models\Template {
 	protected $blog;
 	/** @var \Blight\Interfaces\Models\Packages\Theme */
 	protected $theme;
+	/** @var \Blight\TextProcessor */
+	protected $textProcessor;
 	protected $dir;
 	protected $name;
 	protected $filename;
@@ -90,9 +92,8 @@ class Template implements \Blight\Interfaces\Models\Template {
 				break;
 		}
 
-		if($this->blog->get('minify_html', 'output', false)){
-			$textProcessor	= new \Blight\TextProcessor($this->blog);
-			$output	= $textProcessor->minifyHTML($output);
+		if($this->blog->get('output.minify_html', false)){
+			$output	= $this->getTextProcessor()->minifyHTML($output);
 		}
 		return $output;
 	}
@@ -135,25 +136,31 @@ class Template implements \Blight\Interfaces\Models\Template {
 	protected function getTwigEnvironment($dir){
 		if(!isset(self::$twigEnvironments[$dir])){
 			$loader	= new \Twig_Loader_Filesystem($dir);
-			self::$twigEnvironments[$dir]	= new \Twig_Environment($loader, array(
-				'cache' => ($this->blog->get('cache_twig', 'output', false) ? $this->blog->getPathCache('twig/') : null)
+			$twig	= new \Twig_Environment($loader, array(
+				'debug'	=> $this->blog->isDebug(),
+				'cache' => ($this->blog->get('output.cache_twig', false) ? $this->blog->getPathCache('twig/') : null)
 			));
-			self::$twigEnvironments[$dir]->getExtension('core')->setTimezone($this->blog->get('timezone', 'site', 'UTC'));
+			if($this->blog->isDebug()){
+				$twig->addExtension(new \Twig_Extension_Debug());
+			}
+			$twig->getExtension('core')->setTimezone($this->blog->get('site.timezone', 'UTC'));
 
 			// Add globals
-			self::$twigEnvironments[$dir]->addGlobal('blog', $this->blog);
-			self::$twigEnvironments[$dir]->addGlobal('theme', $this->theme);
+			$twig->addGlobal('blog', $this->blog);
+			$twig->addGlobal('theme', $this->theme);
 
 			// Set up functions
-			self::$twigEnvironments[$dir]->addFunction(new \Twig_SimpleFunction('styles', array($this, 'getStyles'), array('is_safe' => array('html'))));
-			self::$twigEnvironments[$dir]->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'getScripts'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('styles', array($this, 'getStyles'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('scripts', array($this, 'getScripts'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('postBody', array($this, 'buildPostBody'), array('is_safe' => array('html'))));
+			$twig->addFunction(new \Twig_SimpleFunction('pageBody', array($this, 'buildPageBody'), array('is_safe' => array('html'))));
 
 			// Set up filters
 			$blog	= $this->blog;
-			$textProcessor	= new \Blight\TextProcessor($this->blog);
+			$textProcessor	= $this->getTextProcessor();
 
 			// Markdown filter
-			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){
+			$twig->addFilter(new \Twig_SimpleFilter('md', function($string, $filterTypography = true) use($blog, $textProcessor){
 				$filters	= array(
 					'markdown'		=> true,
 					'typography'	=> true
@@ -167,15 +174,17 @@ class Template implements \Blight\Interfaces\Models\Template {
 			)));
 
 			// Typography filter
-			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('typo', array($textProcessor, 'processTypography'), array(
+			$twig->addFilter(new \Twig_SimpleFilter('typo', array($textProcessor, 'processTypography'), array(
 				'pre_escape'	=> 'html',
 				'is_safe'		=> array('html')
 			)));
 
 			// Truncate filter
-			self::$twigEnvironments[$dir]->addFilter(new \Twig_SimpleFilter('truncate', array($textProcessor, 'truncateHTML'), array(
+			$twig->addFilter(new \Twig_SimpleFilter('truncate', array($textProcessor, 'truncateHTML'), array(
 				'is_safe'	=> array('html')
 			)));
+
+			self::$twigEnvironments[$dir]	= $twig;
 		}
 
 		return self::$twigEnvironments[$dir];
@@ -187,7 +196,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 	 */
 	public function getStyles(){
 		$styles	= array();
-		$this->blog->doHook('render_styles', array(
+		$this->blog->doHook('renderStyles', array(
 			'theme'		=> $this->theme,
 			'template'	=> $this,
 			'name'		=> $this->name,
@@ -202,7 +211,7 @@ class Template implements \Blight\Interfaces\Models\Template {
 	 */
 	public function getScripts(){
 		$scripts	= array();
-		$this->blog->doHook('render_scripts', array(
+		$this->blog->doHook('renderScripts', array(
 			'theme'		=> $this->theme,
 			'template'	=> $this,
 			'name'		=> $this->name,
@@ -210,6 +219,57 @@ class Template implements \Blight\Interfaces\Models\Template {
 		));
 
 		return $this->buildStylesScripts($scripts, 'script', 'src', false);
+	}
+
+	/**
+	 * @param \Blight\Interfaces\Models\Post $post
+	 * @param bool $isSummary
+	 * @return string
+	 */
+	public function buildPostBody(\Blight\Interfaces\Models\Post $post, $isSummary = false){
+		if($isSummary && $post->hasSummary()){
+			$content	= $post->getSummary();
+		} else {
+			$content	= $post->getContent();
+		}
+
+		$this->blog->doHook('postBodyRaw', array(
+			'post'		=> $post,
+			'isSummary'	=> $isSummary,
+			'content'	=> &$content
+		));
+
+		$body	= $this->getTextProcessor()->process($content);
+
+		$this->blog->doHook('postBodyProcessed', array(
+			'post'		=> $post,
+			'isSummary'	=> $isSummary,
+			'content'	=> &$body
+		));
+
+		return $body;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\Models\Page $page
+	 * @return string
+	 */
+	public function buildPageBody(\Blight\Interfaces\Models\Page $page){
+		$content	= $page->getContent();
+
+		$this->blog->doHook('pageBodyRaw', array(
+			'page'		=> $page,
+			'content'	=> &$body
+		));
+
+		$body	= $this->getTextProcessor()->process($content);
+
+		$this->blog->doHook('pageBodyProcessed', array(
+			'page'		=> $page,
+			'content'	=> &$body
+		));
+
+		return $body;
 	}
 
 	/**
@@ -262,5 +322,17 @@ class Template implements \Blight\Interfaces\Models\Template {
 		}
 
 		return implode("\n", $output);
+	}
+
+
+	/**
+	 * @return \Blight\TextProcessor
+	 */
+	protected function getTextProcessor(){
+		if(!$this->textProcessor){
+			$this->textProcessor	= new \Blight\TextProcessor($this->blog);
+		}
+
+		return $this->textProcessor;
 	}
 };
