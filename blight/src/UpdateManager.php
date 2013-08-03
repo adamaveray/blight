@@ -6,6 +6,7 @@ class UpdateManager {
 	const CACHE_KEY_DRAFTS	= 'drafts';
 	const CACHE_KEY_POSTS	= 'posts';
 	const CACHE_KEY_PAGES	= 'pages';
+	const CACHE_KEY_ASSETS	= 'assets';
 	const CACHE_KEY_SYSTEM	= 'system';
 
 	/** @var \Blight\Interfaces\Blog */
@@ -17,6 +18,8 @@ class UpdateManager {
 	protected $changedDraftsFiles;
 	protected $changedPostsFiles;
 	protected $changedPagesFiles;
+
+	protected $changedAssetFiles;
 
 	protected $changedSystemFiles;
 
@@ -63,6 +66,8 @@ class UpdateManager {
 			'drafts'	=> (bool)count($this->getChangedDraftFiles()),
 			'posts'		=> (bool)count($this->getChangedPostFiles()),
 			'pages'		=> (bool)count($this->getChangedPageFiles()),
+			'assets'	=> (bool)count($this->getChangedAssetFiles()),
+			'theme'		=> $fullSiteUpdate,
 			'supplementary'	=> $fullSiteUpdate
 		);
 
@@ -85,6 +90,7 @@ class UpdateManager {
 			self::CACHE_KEY_PREFIX.self::CACHE_KEY_DRAFTS	=> $this->getDraftFiles(true),
 			self::CACHE_KEY_PREFIX.self::CACHE_KEY_POSTS	=> $this->getPostFiles(true),
 			self::CACHE_KEY_PREFIX.self::CACHE_KEY_PAGES	=> $this->getPageFiles(true),
+			self::CACHE_KEY_PREFIX.self::CACHE_KEY_ASSETS	=> $this->getAssetFiles(true),
 			self::CACHE_KEY_PREFIX.self::CACHE_KEY_SYSTEM	=> $this->getMonitoredSystemFiles(true)
 		));
 	}
@@ -127,6 +133,14 @@ class UpdateManager {
 		return $this->changedPagesFiles;
 	}
 
+	public function getChangedAssetFiles(){
+		if(!isset($this->changedAssetFiles)){
+			$this->changedAssetFiles	= $this->getChangedFiles($this->getAssetFiles(), self::CACHE_KEY_ASSETS);
+		}
+
+		return $this->changedAssetFiles;
+	}
+
 
 	protected function getDraftFiles($withModification = false){
 		$files	= $this->getManager()->getRawPosts(true);
@@ -150,6 +164,16 @@ class UpdateManager {
 
 	protected function getPageFiles($withModification = false){
 		$files	= $this->getManager()->getRawPages();
+
+		if($withModification){
+			$files	= $this->blog->getFileSystem()->getModifiedTimesForFiles($files);
+		}
+
+		return $files;
+	}
+
+	protected function getAssetFiles($withModification = false){
+		$files	= $this->blog->getFileSystem()->getDirectoryListing($this->blog->getPathAssets());
 
 		if($withModification){
 			$files	= $this->blog->getFileSystem()->getModifiedTimesForFiles($files);

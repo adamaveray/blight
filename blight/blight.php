@@ -216,11 +216,14 @@ if($updateManager->needsUpdate('supplementary')){
 
 // Rendering completed
 
-if($updateManager->needsUpdate('assets')){
+if($updateManager->needsUpdate('theme')){
 	// Copy theme assets
 	$renderer->updateThemeAssets();
 	$blog->getLogger()->debug('Theme assets updated');
+}
 
+
+if($updateManager->needsUpdate('assets')){
 	// Copy user assets
 	$renderer->updateUserAssets();
 	$blog->getLogger()->debug('User assets updated');
