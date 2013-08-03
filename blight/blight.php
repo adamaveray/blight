@@ -124,9 +124,6 @@ if(!$updateManager->needsUpdate()){
 $renderer	= new \Blight\Renderer($blog, $manager, $blog->getTheme());
 $blog->getLogger()->debug('Renderer initialised');
 
-$archive	= $manager->getPostsByYear();
-$blog->getLogger()->debug('Archive built');
-
 
 if($updateManager->needsUpdate('drafts')){
 	// Render draft posts
@@ -139,6 +136,9 @@ if($updateManager->needsUpdate('drafts')){
 
 
 if($updateManager->needsUpdate('posts')){
+	$archive	= $manager->getPostsByYear();
+	$blog->getLogger()->debug('Archive built');
+
 	// Render posts and archives
 	foreach($archive as $year){
 		/** @var \Blight\Models\Collections\Year $year */
