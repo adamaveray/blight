@@ -18,6 +18,8 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected $draftPosts;
 	protected $postExtension;
 
+	protected $draftsToPublish	= array();
+
 	/**
 	 * @var array The extensions of files to consider posts
 	 */
@@ -65,17 +67,35 @@ class Manager implements \Blight\Interfaces\Manager {
 		$dir	= ($drafts ? $this->blog->getPathDrafts() : $this->blog->getPathPosts());
 		$files	= $this->blog->getFileSystem()->getDirectoryListing($dir, '*.*');
 
-		if(!$drafts){
+		if($drafts){
 			$draftPublishDir	= $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR);
+			$files	= array_merge(
+				$files,
+				$this->blog->getFileSystem()->getDirectoryListing($draftPublishDir, '*.*')	// Ready-to-publish drafts
+			);
 
+		} else {
 			$files	= array_merge(
 				$files,		// Unsorted
-				$this->blog->getFileSystem()->getDirectoryListing($dir, '*/*/*.*'),			// Sorted (YYYY/DD/post.md)
-				$this->blog->getFileSystem()->getDirectoryListing($draftPublishDir, '*.*')	// Ready-to-publish drafts
+				$this->blog->getFileSystem()->getDirectoryListing($dir, '*/*/*.*')	// Sorted (YYYY/DD/post.md)
 			);
 		}
 
 		return $files;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\Models\Post $post
+	 */
+	public function addDraftToPublish(\Blight\Interfaces\Models\Post $post){
+		$this->draftsToPublish[]	= $post;
+	}
+
+	/**
+	 * @return \Blight\Interfaces\Models\Post[]
+	 */
+	public function getDraftsToPublish(){
+		return $this->draftsToPublish;
 	}
 
 	/**
@@ -112,29 +132,14 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * @param string $currentPath	The current path to the post's file
 	 * @return bool	Whether the post file was moved to be published
 	 */
-	protected function organisePostFile(\Blight\Interfaces\Models\Post $post, $currentPath){
+	protected function organisePostFile(\Blight\Interfaces\Models\Post $post, $currentPath, $isDraft = false){
 		// Check for special headers
 		$hasDate	= $post->hasMeta('date');
-		$hasPublish		= $post->hasMeta('publish-now');
-		$willPublish	= $post->getMeta('publish-at');
-		if(isset($willPublish)){
-			try {
-				$willPublish	= new \DateTime($willPublish, $this->blog->getTimezone());
-				if($willPublish > new \DateTime('now', $this->blog->getTimezone())){
-					// Publish date in future - do not publish yet
-					$willPublish	= null;
-				}
-			} catch(\Exception $e){
-				$willPublish	= null;
-			}
-		}
-		if(!$hasDate || $hasPublish || isset($willPublish)){
+		if(!$hasDate || $isDraft){
 			$lines	= explode("\n", $this->blog->getFileSystem()->loadFile($currentPath));
 
-			if($hasPublish || isset($willPublish)){
-				// Remove publish header
-				$searchLine	= ($hasPublish ? 'publish[- ]now' : 'publish[- ]at:.*?');
-
+			if($isDraft){
+				// Remove publish headers
 				$count	= count($lines);
 				for($i = 2; $i < $count; $i++){
 					$line	= rtrim($lines[$i]);
@@ -143,7 +148,7 @@ class Manager implements \Blight\Interfaces\Manager {
 						break;
 					}
 
-					if(preg_match('/^'.$searchLine.'$/i', strtolower($line))){
+					if(preg_match('/^publish[- ](now|at:.*?)$/i', strtolower($line))){
 						// Found header
 						array_splice($lines, $i, 1);
 						break;
@@ -151,7 +156,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				}
 			}
 
-			if(!$hasDate && ($hasPublish || isset($willPublish) || !$post->isDraft())){
+			if(!$hasDate){
 				// Add date header
 				$date	= (isset($willPublish) ? $willPublish : new \DateTime('now', $this->blog->getTimezone()));
 				$post->setDate($date);
@@ -235,6 +240,8 @@ class Manager implements \Blight\Interfaces\Manager {
 			$files	= (isset($files) ? $files : $this->getRawPosts(true));
 			$posts	= array();
 
+			$publishDir	= $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR);
+
 			foreach($files as $file){
 				$extension	= pathinfo($file, \PATHINFO_EXTENSION);
 				if(!in_array($extension, $this->allowedExtensions)){
@@ -254,19 +261,26 @@ class Manager implements \Blight\Interfaces\Manager {
 
 				$willPublish	= $post->hasMeta('publish-now');
 				if(!$willPublish){
-					try {
-						$publishDate	= $post->getMeta('publish-at');
-						if(isset($publishDate)){
-							$publishDate	= new \DateTime($publishDate, $this->blog->getTimezone());
-							$willPublish	= ($publishDate < new \DateTime('now', $this->blog->getTimezone()));
+					if(strpos($file, $publishDir) === 0){
+						// In publish directory
+						$willPublish	= true;
+
+					} else {
+						// Check if scheduled
+						try {
+							$publishDate	= $post->getMeta('publish-at');
+							if(isset($publishDate)){
+								$publishDate	= new \DateTime($publishDate, $this->blog->getTimezone());
+								$willPublish	= ($publishDate < new \DateTime('now', $this->blog->getTimezone()));
+							}
+						} catch(\Exception $e){
+							$willPublish	= false;
 						}
-					} catch(\Exception $e){
-						$willPublish	= false;
 					}
 				}
 				if($willPublish){
-					// Move to publish directory
-					$this->blog->getFileSystem()->moveFile($file, str_replace($this->blog->getPathDrafts(), $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR), $file));
+					// Prepare to publish
+					$this->addDraftToPublish($post);
 					continue;
 				}
 
@@ -486,6 +500,22 @@ class Manager implements \Blight\Interfaces\Manager {
 		$pages['404']	= new \Blight\Models\Page($this->blog, $this->blog->getFileSystem()->loadFile($path), '404');
 
 		return $pages;
+	}
+
+	/**
+	 * @param \Blight\Interfaces\Models\Post[] $posts
+	 * @return mixed
+	 */
+	public function publishDrafts(array $posts){
+		foreach($posts as $post){
+			$path	= $post->getFile();
+			if(!isset($path)){
+				// Cannot publish - no file path
+				continue;
+			}
+
+			$this->organisePostFile($post, $path, true);
+		}
 	}
 
 	/**

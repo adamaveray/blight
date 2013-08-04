@@ -20,6 +20,16 @@ interface Manager {
 	public function getRawPosts($drafts = false);
 
 	/**
+	 * @param \Blight\Interfaces\Models\Post $post
+	 */
+	public function addDraftToPublish(\Blight\Interfaces\Models\Post $post);
+
+	/**
+	 * @return \Blight\Interfaces\Models\Post[]
+	 */
+	public function getDraftsToPublish();
+
+	/**
 	 * @return array	An array of \Blight\Models\Page objects
 	 */
 	public function getPages();
@@ -87,6 +97,12 @@ interface Manager {
 	 * @return array	An array of \Blight\Models\Post objects
 	 */
 	public function getSupplementaryPages();
+
+	/**
+	 * @param \Blight\Interfaces\Models\Post[] $posts
+	 * @return mixed
+	 */
+	public function publishDrafts(array $posts);
 
 	public function cleanupDrafts();
 };

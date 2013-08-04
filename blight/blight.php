@@ -136,6 +136,12 @@ if($updateManager->needsUpdate('drafts')){
 
 
 if($updateManager->needsUpdate('posts')){
+	// Publish drafts
+	$drafts	= $manager->getDraftsToPublish();
+	if($drafts){
+		$manager->publishDrafts($drafts);
+	}
+
 	$archive	= $manager->getPostsByYear();
 	$blog->getLogger()->debug('Archive built');
 

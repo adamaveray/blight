@@ -5,6 +5,7 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 	protected $blog;
 	protected $mockPosts	= array();
 	protected $mockPages	= array();
+	protected $draftsToPublish	= array();
 
 	public function __construct(\Blight\Interfaces\Blog $blog){
 		$this->blog	= $blog;
@@ -23,6 +24,20 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 
 	public function getRawPosts($drafts = false){
 		return array();
+	}
+
+	/**
+	 * @param \Blight\Interfaces\Models\Post $post
+	 */
+	public function addDraftToPublish(\Blight\Interfaces\Models\Post $post){
+		$this->draftsToPublish[]	= $post;
+	}
+
+	/**
+	 * @return array
+	 */
+	public function getDraftsToPublish(){
+		return $this->draftsToPublish;
 	}
 
 	public function getPages(){
@@ -79,6 +94,23 @@ class RendererTestManager implements \Blight\Interfaces\Manager {
 		$pages['404']	= new \Blight\Models\Page($this->blog, $this->blog->getFileSystem()->loadFile($path), '404');
 
 		return $pages;
+	}
+
+
+	/**
+	 * @param \Blight\Interfaces\Models\Post[] $posts
+	 * @return mixed
+	 */
+	public function publishDrafts(array $posts){
+		foreach($posts as $post){
+			$path	= $post->getFile();
+			if(!isset($path)){
+				// Cannot publish - no file path
+				continue;
+			}
+
+			$this->organisePostFile($post, $path, true);
+		}
 	}
 
 	public function cleanupDrafts(){}

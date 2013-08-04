@@ -64,7 +64,7 @@ class UpdateManager {
 
 		$changedTypes	= array(
 			'drafts'	=> (bool)count($this->getChangedDraftFiles()),
-			'posts'		=> (bool)count($this->getChangedPostFiles()),
+			'posts'		=> (bool)(count($this->getChangedPostFiles()) + count($this->getManager()->getDraftsToPublish())),
 			'pages'		=> (bool)count($this->getChangedPageFiles()),
 			'assets'	=> (bool)count($this->getChangedAssetFiles()),
 			'theme'		=> $fullSiteUpdate,
