@@ -190,10 +190,10 @@ try {
 
 // Run
 	if(hasFlag('r')){
+		consoleOutput('Running blog', false);
 		$output	= shell_exec('php "'.$pathBuild.'/Blight.phar"'.($verbose ? ' -v' : ''));
 
-		consoleOutput('Ran blog', false);
-		quotedConsoleOutput($output);
+		quotedConsoleOutput($output, false);
 
 		consoleLinebreak();
 	}
