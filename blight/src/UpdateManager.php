@@ -18,8 +18,11 @@ class UpdateManager {
 	protected $changedDraftsFiles;
 	protected $changedPostsFiles;
 	protected $changedPagesFiles;
-
 	protected $changedAssetFiles;
+	protected $deletedDraftsFiles;
+	protected $deletedPostsFiles;
+	protected $deletedPagesFiles;
+	protected $deletedAssetFiles;
 
 	protected $changedSystemFiles;
 
@@ -63,10 +66,10 @@ class UpdateManager {
 		}
 
 		$changedTypes	= array(
-			'drafts'	=> (bool)count($this->getChangedDraftFiles()),
-			'posts'		=> (bool)(count($this->getChangedPostFiles()) + count($this->getManager()->getDraftsToPublish())),
-			'pages'		=> (bool)count($this->getChangedPageFiles()),
-			'assets'	=> (bool)count($this->getChangedAssetFiles()),
+			'drafts'	=> (bool)(count($this->getChangedDraftFiles($deletedFiles)) + count($deletedFiles)),
+			'posts'		=> (bool)(count($this->getChangedPostFiles($deletedFiles)) + count($deletedFiles) + count($this->getManager()->getDraftsToPublish())),
+			'pages'		=> (bool)(count($this->getChangedPageFiles($deletedFiles)) + count($deletedFiles)),
+			'assets'	=> (bool)(count($this->getChangedAssetFiles($deletedFiles)) + count($deletedFiles)),
 			'theme'		=> $fullSiteUpdate,
 			'supplementary'	=> $fullSiteUpdate
 		);
@@ -109,35 +112,43 @@ class UpdateManager {
 	}
 
 
-	public function getChangedDraftFiles(){
+	public function getChangedDraftFiles(&$deletedFiles = null){
 		if(!isset($this->changedDraftsFiles)){
-			$this->changedDraftsFiles	= $this->getChangedFiles($this->getDraftFiles(), self::CACHE_KEY_DRAFTS);
+			$this->changedDraftsFiles	= $this->getChangedFiles($this->getDraftFiles(), self::CACHE_KEY_DRAFTS, $deletedFiles);
+			$this->deletedDraftsFiles	= $deletedFiles;
 		}
 
+		$deletedFiles	= $this->deletedDraftsFiles;
 		return $this->changedDraftsFiles;
 	}
 
-	public function getChangedPostFiles(){
+	public function getChangedPostFiles(&$deletedFiles = null){
 		if(!isset($this->changedPostsFiles)){
-			$this->changedPostsFiles	= $this->getChangedFiles($this->getPostFiles(), self::CACHE_KEY_POSTS);
+			$this->changedPostsFiles	= $this->getChangedFiles($this->getPostFiles(), self::CACHE_KEY_POSTS, $deletedFiles);
+			$this->deletedPostsFiles	= $deletedFiles;
 		}
 
+		$deletedFiles	= $this->deletedPostsFiles;
 		return $this->changedPostsFiles;
 	}
 
-	public function getChangedPageFiles(){
+	public function getChangedPageFiles(&$deletedFiles = null){
 		if(!isset($this->changedPagesFiles)){
-			$this->changedPagesFiles	= $this->getChangedFiles($this->getPageFiles(), self::CACHE_KEY_PAGES);
+			$this->changedPagesFiles	= $this->getChangedFiles($this->getPageFiles(), self::CACHE_KEY_PAGES, $deletedFiles);
+			$this->deletedPagesFiles	= $deletedFiles;
 		}
 
+		$deletedFiles	= $this->deletedPagesFiles;
 		return $this->changedPagesFiles;
 	}
 
-	public function getChangedAssetFiles(){
+	public function getChangedAssetFiles(&$deletedFiles = null){
 		if(!isset($this->changedAssetFiles)){
-			$this->changedAssetFiles	= $this->getChangedFiles($this->getAssetFiles(), self::CACHE_KEY_ASSETS);
+			$this->changedAssetFiles	= $this->getChangedFiles($this->getAssetFiles(), self::CACHE_KEY_ASSETS, $deletedFiles);
+			$this->deletedAssetFiles	= $deletedFiles;
 		}
 
+		$deletedFiles	= $this->deletedAssetFiles;
 		return $this->changedAssetFiles;
 	}
 
@@ -213,19 +224,26 @@ class UpdateManager {
 	/**
 	 * @param array $newFilesListing	An array of filepaths
 	 * @param string $cacheKey			The cache key for the directory listing
+	 * @param array|null &$deletedFiles	Any files that were deleted (by reference)
 	 * @return array
 	 */
-	protected function getChangedFiles($newFilesListing, $cacheKey){
+	protected function getChangedFiles($newFilesListing, $cacheKey, &$deletedFiles = null){
 		$files			= $this->blog->getFileSystem()->getModifiedTimesForFiles($newFilesListing);
 		$cachedFiles	= $this->blog->getCache()->get(self::CACHE_KEY_PREFIX.$cacheKey);
 
 		$changedFiles	= array();
+		$remainingFiles	= $cachedFiles;
 
 		foreach($files as $file => $mtime){
+			unset($remainingFiles[$file]);
 			if(!isset($cachedFiles[$file]) || $cachedFiles[$file] < $mtime){
 				// Changed
 				$changedFiles[]	= $file;
 			}
+		}
+
+		if(count($remainingFiles) > 0){
+			$deletedFiles	= array_keys($remainingFiles);
 		}
 
 		return $changedFiles;
