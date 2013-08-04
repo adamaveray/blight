@@ -198,6 +198,10 @@ class UpdateManager {
 			$this->blog->getPathThemes($this->blog->get('theme.name').'.phar')
 		);
 
+		if(substr($this->blog->getPathApp(), 0, 7) === 'phar://'){
+			$files[]	= rtrim(substr($this->blog->getPathApp(), 7), '/');
+		}
+
 		if($withModification){
 			$files	= $this->blog->getFileSystem()->getModifiedTimesForFiles($files);
 		}
