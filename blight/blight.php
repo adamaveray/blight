@@ -231,7 +231,8 @@ if($updateManager->needsUpdate('theme')){
 
 if($updateManager->needsUpdate('assets')){
 	// Copy user assets
-	$renderer->updateUserAssets();
+	$updateManager->getChangedAssetFiles($deletedFiles);
+	$renderer->updateUserAssets($deletedFiles);
 	$blog->getLogger()->debug('User assets updated');
 }
 

@@ -562,8 +562,8 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	/**
 	 * Copies all static assets from the user assets directory to the web directory
 	 */
-	public function updateUserAssets(){
-		$this->updateAssets($this->blog->getPathAssets());
+	public function updateUserAssets($toDelete = null){
+		$this->updateAssets($this->blog->getPathAssets(), $toDelete);
 	}
 
 	/**
@@ -572,7 +572,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 *
 	 * @param string $sourceDir	The directory to copy assets from
 	 */
-	protected function updateAssets($sourceDir){
+	protected function updateAssets($sourceDir, $toDelete = null){
 		$targetDir	= $this->blog->getPathWWW().'assets/';
 
 		if(!is_dir($sourceDir)){
@@ -581,5 +581,10 @@ class Renderer implements \Blight\Interfaces\Renderer {
 		}
 
 		$this->blog->getFileSystem()->copyDir($sourceDir, $targetDir, 0755, true, true, true);
+
+		// Delete old assets
+		foreach((array)$toDelete as $file){
+			$this->blog->getFileSystem()->deleteFile(str_replace($sourceDir, $targetDir, $file), true);
+		}
 	}
 };
