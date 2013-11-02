@@ -1,21 +1,9 @@
 <?php
+require(__DIR__.'/common/feed.php');
+
 /** @var \Blight\Interfaces\Blog $blog */
 /** @var \Blight\TextProcessor $text */
-$createNode	= function(\DOMDocument $document, \DOMElement $parent, $nodeName, $content, $attributes = null, $callback = null){
-	$node	= $document->createElement($nodeName);
-	if(is_array($attributes)){
-		foreach($attributes as $key => $value){
-			$node->setAttribute($key, $value);
-		}
-	}
-	if(is_callable($callback)){
-		$callback($node);
-	}
-	if(isset($content)){
-		$node->appendChild($document->createTextNode($content));
-	}
-	$parent->appendChild($node);
-};
+
 
 $now	= new \DateTime();
 
@@ -74,13 +62,15 @@ $channel	= $dom->createElement('channel');
 				'append'	=> &$append
 			));
 
+			$content	= ($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append;
+
 			$createNode($dom, $item, 'title', $title);
 			$createNode($dom, $item, 'link', $link);
 			$createNode($dom, $item, 'guid', $guid, array(
 				'isPermaLink'	=> ($guidIsPermalink ? 'true' : 'false')
 			));
 			$createNode($dom, $item, 'pubDate', $date->format('r'));
-			$createNode($dom, $item, 'description', ($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append));
+			$createNode($dom, $item, 'description', $filterHTML($content));
 			if(isset($author) && $author->hasEmail()){
 				$createNode($dom, $item, 'author', $author->getEmail().' ('.$author->getName().')');
 			}

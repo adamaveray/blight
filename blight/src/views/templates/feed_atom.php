@@ -1,21 +1,9 @@
 <?php
+require(__DIR__.'/common/feed.php');
+
 /** @var \Blight\Interfaces\Blog $blog */
 /** @var \Blight\TextProcessor $text */
-$createNode	= function(\DOMDocument $document, \DOMElement $parent, $nodeName, $content, $attributes = null, $callback = null){
-	$node	= $document->createElement($nodeName);
-	if(is_array($attributes)){
-		foreach($attributes as $key => $value){
-			$node->setAttribute($key, $value);
-		}
-	}
-	if(is_callable($callback)){
-		$callback($node, $document);
-	}
-	if(isset($content)){
-		$node->appendChild($document->createTextNode($content));
-	}
-	$parent->appendChild($node);
-};
+
 
 $now	= new \DateTime();
 $blogAuthor	= $blog->getAuthor();
@@ -85,6 +73,8 @@ $root->setAttribute('xml:lang', 'en-US');
 				'summary'	=> &$summary
 			));
 
+			$content	= ($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append;
+
 			$createNode($dom, $entry, 'title', $post->getTitle());
 			$createNode($dom, $entry, 'link', null, array(
 				'rel'	=> 'alternate',
@@ -119,7 +109,7 @@ $root->setAttribute('xml:lang', 'en-US');
 				$node->setAttribute('xml:base', $baseURL);
 				$node->setAttribute('xml:lang', 'en-US');
 
-				$node->appendChild($dom->createCDATASection(($processContent ? $text->minifyHTML($text->processMarkdown($content)) : $content).$append));
+				$node->appendChild($dom->createCDATASection($filterHTML($content)));
 			$entry->appendChild($node);
 
 		$root->appendChild($entry);
