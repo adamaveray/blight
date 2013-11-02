@@ -207,7 +207,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @see renderCollections
 	 */
 	public function renderArchives($options = null){
-		$this->renderCollections($this->manager->getPostsByYear(), 'year', 'Archive %s', $options);
+		$this->renderCollections($this->manager->getPostsByYear(), 'year', 'Archive for %s', $options);
 	}
 
 	/**
@@ -222,7 +222,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @see renderCollection
 	 */
 	public function renderYear(\Blight\Interfaces\Models\Collection $year, $options = null){
-		$this->renderCollection($year, 'year', 'Archive '.$year->getName(), $options);
+		$this->renderCollection($year, 'year', 'Archive for '.$year->getName(), $options);
 	}
 
 	/**
@@ -236,7 +236,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @see renderCollections
 	 */
 	public function renderTags($options = null){
-		$this->renderCollections($this->manager->getPostsByTag(), 'tag', 'Tag %s', $options);
+		$this->renderCollections($this->manager->getPostsByTag(), 'tag', 'Posts Tagged %s', $options);
 	}
 
 	/**
@@ -250,7 +250,7 @@ class Renderer implements \Blight\Interfaces\Renderer {
 	 * @see renderCollections
 	 */
 	public function renderCategories($options = null){
-		$this->renderCollections($this->manager->getPostsByCategory(), 'category', 'Category %s', $options);
+		$this->renderCollections($this->manager->getPostsByCategory(), 'category', '%s', $options);
 	}
 
 	/**
