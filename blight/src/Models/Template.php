@@ -188,6 +188,12 @@ class Template implements \Blight\Interfaces\Models\Template {
 			$twig->addFilter(new \Twig_SimpleFilter('slugify', array($textProcessor, 'convertStringToSlug')));
 
 
+			// Allow extra filters
+			$this->blog->doHook('prepareTwig', array(
+				'environment'	=> &$twig
+			));
+
+
 			self::$twigEnvironments[$dir]	= $twig;
 		}
 

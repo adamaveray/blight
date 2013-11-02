@@ -34,6 +34,15 @@ Publishing
 Output
 ------
 
+- ### prepareTwig
+
+	Called when preparing a Twig environment for rendering templates. _(Note this is called once per template directory, so may be called multiple times)_
+
+	#### Params
+
+	- \Twig_Environment **environment**: _(editable)_ The Twig environment
+
+
 - ### postBodyRaw
 
 	Called when building a post's body, before processing Markdown and typography
