@@ -184,6 +184,10 @@ class Template implements \Blight\Interfaces\Models\Template {
 				'is_safe'	=> array('html')
 			)));
 
+			// Slugify filter
+			$twig->addFilter(new \Twig_SimpleFilter('slugify', array($textProcessor, 'convertStringToSlug')));
+
+
 			self::$twigEnvironments[$dir]	= $twig;
 		}
 

@@ -265,4 +265,15 @@ class TextProcessor implements \Blight\Interfaces\TextProcessor {
 	protected function setCachedOutput($key, $value){
 		$this->cache[md5(print_r($key, true))]	= $value;
 	}
+
+
+	/**
+	 * @param string $slug	The string to convert
+	 * @return string		The converted string
+	 *
+	 * @see \Blight\Interfaces\Utilities::convertStringToSlug
+	 */
+	public function convertStringToSlug($string){
+		return \Blight\Utilities::convertStringToSlug($string);
+	}
 };

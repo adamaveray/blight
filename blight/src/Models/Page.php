@@ -221,7 +221,7 @@ class Page implements \Blight\Interfaces\Models\Page {
 	 * @return string		The converted name
 	 */
 	protected function normaliseMetaName($name){
-		return \Blight\Utilities::convertNameToSlug($name);
+		return \Blight\Utilities::convertStringToSlug($name);
 	}
 
 	/**

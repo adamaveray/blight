@@ -411,7 +411,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			throw new \RuntimeException('No author set for site');
 		}
 
-		$name	= \Blight\Utilities::convertNameToSlug($name);
+		$name	= \Blight\Utilities::convertStringToSlug($name);
 		if(!isset($authors[$name])){
 			// Author not found
 			return null;
@@ -463,7 +463,7 @@ class Blog implements \Blight\Interfaces\Blog {
 				throw new \InvalidArgumentException('Authors must be instances of \Blight\Interfaces\Models\Author');
 			}
 
-			$processedAuthors[\Blight\Utilities::convertNameToSlug($author->getName())]	= $author;
+			$processedAuthors[\Blight\Utilities::convertStringToSlug($author->getName())]	= $author;
 		}
 
 		$this->authors	= $processedAuthors;

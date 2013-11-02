@@ -47,7 +47,7 @@ class Author implements \Blight\Interfaces\Models\Author {
 
 		$this->attributes	= array();
 		foreach($data as $key => $value){
-			$this->attributes[\Blight\Utilities::convertNameToSlug($key)]	= $value;
+			$this->attributes[\Blight\Utilities::convertStringToSlug($key)]	= $value;
 		}
 	}
 
@@ -92,7 +92,7 @@ class Author implements \Blight\Interfaces\Models\Author {
 			throw new \RuntimeException('Author does not have attribute `'.$name.'`');
 		}
 
-		$name	= \Blight\Utilities::convertNameToSlug($name);
+		$name	= \Blight\Utilities::convertStringToSlug($name);
 		return $this->attributes[$name];
 	}
 
@@ -115,7 +115,7 @@ class Author implements \Blight\Interfaces\Models\Author {
 	 * @return bool	Whether the attribute exists
 	 */
 	public function hasAttribute($name){
-		$name	= \Blight\Utilities::convertNameToSlug($name);
+		$name	= \Blight\Utilities::convertStringToSlug($name);
 		return isset($this->attributes[$name]);
 	}
 
@@ -135,7 +135,7 @@ class Author implements \Blight\Interfaces\Models\Author {
 				continue;
 			}
 
-			$authors[\Blight\Utilities::convertNameToSlug($author->getName())]	= $author;
+			$authors[\Blight\Utilities::convertStringToSlug($author->getName())]	= $author;
 		}
 
 		return $authors;

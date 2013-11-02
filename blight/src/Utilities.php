@@ -46,7 +46,7 @@ abstract class Utilities implements \Blight\Interfaces\Utilities {
 	 * @param string $name	The name to convert
 	 * @return string		The converted slug
 	 */
-	public static function convertNameToSlug($name){
+	public static function convertStringToSlug($name){
 		$slug	= preg_replace('%[^-/+|\w ]%', '', $name);
 		$slug	= strtolower(trim($slug, '-'));
 		$slug	= preg_replace('/[\/_|+ -]+/', '-', $slug);

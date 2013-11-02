@@ -54,4 +54,12 @@ interface TextProcessor {
 	 * @return string		The minified HTML
 	 */
 	public function minifyHTML($html);
+
+	/**
+	 * @param string $slug	The string to convert
+	 * @return string		The converted string
+	 *
+	 * @see \Blight\Interfaces\Utilities::convertStringToSlug
+	 */
+	public function convertStringToSlug($string);
 };
