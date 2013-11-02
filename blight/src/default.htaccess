@@ -33,6 +33,34 @@ ErrorDocument 404 /{%WEB_PATH%}/404.html
 	RewriteRule ^$ index.php [L]
 </IfModule>
 
+
+# Caching
+<ifModule mod_headers.c>
+	ExpiresActive On
+
+	# Media files
+	<filesMatch ".(ico|gif|jpg|jpeg|png|flv|pdf|swf|mov|mp3|wmv|ppt|svg|ttf|otf|eot|woff)$">
+		# 1 month
+		ExpiresDefault A2419200
+		Header append Cache-Control "public"
+	</filesMatch>
+
+	# Assets
+	<filesMatch ".(xml|txt|js|css)$">
+		# 2 hours
+		ExpiresDefault A7200
+		Header append Cache-Control "private, must-revalidate"
+	</filesMatch>
+
+	# Do not cache pages
+	<filesMatch ".(php|htm|html)$">
+		ExpiresDefault A0
+		Header set Cache-Control "no-store, no-cache, must-revalidate, max-age=0"
+		Header set Pragma "no-cache"
+	</filesMatch>
+</ifModule>
+
+# Compression
 <ifmodule mod_deflate.c>
-	AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript
+	AddOutputFilterByType DEFLATE text/text text/html text/plain text/xml text/css application/x-javascript application/javascript image/svg+xml
 </ifmodule>
