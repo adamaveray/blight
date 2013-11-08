@@ -1,7 +1,7 @@
 {
 	"require": {
 		"twig/twig": "1.12.*",
-		"michelf/php-markdown": "1.3-beta5",
+		"michelf/php-markdown": "~1.3",
 		"phptypography/phptypography": "1.21",
 		"monolog/monolog": "1.4.*",
 		"cybits/minify": "dev-master"
