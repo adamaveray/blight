@@ -543,7 +543,11 @@ class Manager implements \Blight\Interfaces\Manager {
 			}
 
 			// Post not found - remove
-			$this->blog->getFileSystem()->deleteFile($file);
+			try {
+				$this->blog->getFileSystem()->deleteFile($file);
+			} catch(\Exception $e){
+				// Ignore
+			}
 		}
 	}
 

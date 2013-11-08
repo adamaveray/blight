@@ -584,7 +584,11 @@ class Renderer implements \Blight\Interfaces\Renderer {
 
 		// Delete old assets
 		foreach((array)$toDelete as $file){
-			$this->blog->getFileSystem()->deleteFile(str_replace($sourceDir, $targetDir, $file), true);
+			try {
+				$this->blog->getFileSystem()->deleteFile(str_replace($sourceDir, $targetDir, $file), true);
+			} catch(\Exception $e){
+				// Ignore
+			}
 		}
 	}
 };

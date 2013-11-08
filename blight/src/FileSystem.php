@@ -142,6 +142,11 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @throws \RuntimeException	Cannot delete the file
 	 */
 	public function deleteFile($path, $cleanup = false){
+		if(!file_exists($path)){
+			// Already deleted
+			return;
+		}
+
 		if(is_dir($path)){
 			$result	= rmdir($path);
 		} else {
