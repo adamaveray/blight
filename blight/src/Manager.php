@@ -1,6 +1,9 @@
 <?php
 namespace Blight;
 
+use \Blight\Interfaces\Models\Page as PageInterface;
+use \Blight\Interfaces\Models\Post as PostInterface;
+
 /**
  * Handles all raw posts and provides basic sorting and processing functionality
  */
@@ -16,6 +19,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	protected $postsByTag;
 	protected $postsByCategory;
 	protected $draftPosts;
+	protected $scheduledPosts;
 	protected $postExtension;
 
 	protected $draftsToPublish	= array();
@@ -85,14 +89,14 @@ class Manager implements \Blight\Interfaces\Manager {
 	}
 
 	/**
-	 * @param \Blight\Interfaces\Models\Post $post
+	 * @param PostInterface $post
 	 */
-	public function addDraftToPublish(\Blight\Interfaces\Models\Post $post){
+	public function addDraftToPublish(PostInterface $post){
 		$this->draftsToPublish[]	= $post;
 	}
 
 	/**
-	 * @return \Blight\Interfaces\Models\Post[]
+	 * @return PostInterface[]
 	 */
 	public function getDraftsToPublish(){
 		return $this->draftsToPublish;
@@ -102,7 +106,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * Converts a post file to a Post object
 	 *
 	 * @param string $rawPost	The path to a post file
-	 * @return \Blight\Interfaces\Models\Post		The post built from the provided file
+	 * @return PostInterface	The post built from the provided file
 	 */
 	protected function buildPost($rawPost){
 		$content	= $this->blog->getFileSystem()->loadFile($rawPost);
@@ -128,11 +132,11 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Moves a post source file to a more-logical location. Moves files to YYYY/MM/YYYY-MM-DD-post.md
 	 *
-	 * @param \Blight\Interfaces\Models\Post $post	The post to move
+	 * @param PostInterface $post	The post to move
 	 * @param string $currentPath	The current path to the post's file
 	 * @return bool	Whether the post file was moved to be published
 	 */
-	protected function organisePostFile(\Blight\Interfaces\Models\Post $post, $currentPath, $isDraft = false){
+	protected function organisePostFile(PostInterface $post, $currentPath, $isDraft = false){
 		// Check for special headers
 		$hasDate	= $post->hasMeta('date');
 		if(!$hasDate || $isDraft){
@@ -191,7 +195,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all pages found as Page objects
 	 *
-	 * @return array	An array of \Blight\Models\Page objects
+	 * @return PageInterface[]
 	 */
 	public function getPages(){
 		if(!isset($this->pages)){
@@ -233,12 +237,13 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves all draft posts found as Post objects
 	 *
-	 * @return array	An array of \Blight\Models\Page objects
+	 * @return PostInterface[]
 	 */
 	public function getDraftPosts(array $files = null){
 		if(!isset($this->draftPosts)){
 			$files	= (isset($files) ? $files : $this->getRawPosts(true));
 			$posts	= array();
+			$scheduledPosts	= array();
 
 			$publishDir	= $this->blog->getPathDrafts(self::DRAFT_PUBLISH_DIR);
 
@@ -265,13 +270,15 @@ class Manager implements \Blight\Interfaces\Manager {
 						// In publish directory
 						$willPublish	= true;
 
-					} else {
+					} else if($post->hasMeta('publish-at')){
 						// Check if scheduled
 						try {
-							$publishDate	= $post->getMeta('publish-at');
-							if(isset($publishDate)){
-								$publishDate	= new \DateTime($publishDate, $this->blog->getTimezone());
-								$willPublish	= ($publishDate < new \DateTime('now', $this->blog->getTimezone()));
+							$publishDate	= new \DateTime($post->getMeta('publish-at'), $this->blog->getTimezone());
+							if($publishDate < new \DateTime('now', $this->blog->getTimezone())){
+								$willPublish	= true;
+							} else {
+								// Scheduled in future
+								$scheduledPosts[]	= $post;
 							}
 						} catch(\Exception $e){
 							$willPublish	= false;
@@ -291,7 +298,8 @@ class Manager implements \Blight\Interfaces\Manager {
 				$posts[]	= $post;
 			}
 
-			$this->draftPosts	= $posts;
+			$this->draftPosts		= $posts;
+			$this->scheduledPosts	= $scheduledPosts;
 		}
 
 		return $this->filterItemsByFiles($this->draftPosts, $files);
@@ -304,7 +312,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	 * 		array(
 	 * 			'rss'	=> (bool|string)	// Whether to include RSS-only posts. Providing `'only'` will return only RSS-only posts
 	 * 		)
-	 * @return array			An array of posts
+	 * @return PostInterface[]
 	 */
 	public function getPosts($filters = null){
 		if(!isset($this->posts)){
@@ -337,7 +345,7 @@ class Manager implements \Blight\Interfaces\Manager {
 				$posts[]	= $post;
 			}
 
-			usort($posts, function(\Blight\Interfaces\Models\Post $a, \Blight\Interfaces\Models\Post $b){
+			usort($posts, function(PostInterface $a, PostInterface $b){
 				$aDate	= $a->getDate();
 				$bDate	= $b->getDate();
 
@@ -356,7 +364,7 @@ class Manager implements \Blight\Interfaces\Manager {
 
 		$posts	= array();
 		foreach($this->posts as $post){
-			/** @var \Blight\Interfaces\Models\Post $post */
+			/** @var PostInterface $post */
 			if($filters['rss'] !== true){
 				$isRSSOnly	= $post->getMeta('rss-only');
 				if($filters['rss'] === 'only' && !$isRSSOnly){
@@ -421,7 +429,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups all posts by publication year
 	 *
-	 * @return array	An array of \Blight\Containers\Year objects containing posts
+	 * @return \Blight\Containers\Year[]	Year container objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -444,7 +452,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups posts by tag
 	 *
-	 * @return array	An array of \Blight\Containers\Tag objects containing posts
+	 * @return \Blight\Containers\Tag[]	Tag collection objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -467,7 +475,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Groups posts by category
 	 *
-	 * @return array	An array of \Blight\Containers\Category objects containing posts
+	 * @return \Blight\Containers\Category[]	Category collection objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -490,7 +498,7 @@ class Manager implements \Blight\Interfaces\Manager {
 	/**
 	 * Retrieves additional utility pages, such as the 404 page.
 	 *
-	 * @return array	An array of \Blight\Models\Post objects
+	 * @return PageInterface[]
 	 */
 	public function getSupplementaryPages(){
 		$pages	= array();
@@ -503,8 +511,8 @@ class Manager implements \Blight\Interfaces\Manager {
 	}
 
 	/**
-	 * @param \Blight\Interfaces\Models\Post[] $posts
-	 * @return mixed
+	 * @param PostInterface[] $posts
+	 * @return void
 	 */
 	public function publishDrafts(array $posts){
 		foreach($posts as $post){
@@ -520,6 +528,8 @@ class Manager implements \Blight\Interfaces\Manager {
 
 	/**
 	 * Deletes any rendered drafts without an associated draft post
+	 *
+	 * @return void
 	 */
 	public function cleanupDrafts(){
 		$renderedExt	= 'html';
@@ -552,6 +562,13 @@ class Manager implements \Blight\Interfaces\Manager {
 	}
 
 
+	/**
+	 * Removes items whose original file is not in in $files
+	 *
+	 * @param PageInterface[] $items	The items to filter
+	 * @param array|null $files			The file paths to filter by
+	 * @return PageInterface[]			The items whose original files were within $files
+	 */
 	protected function filterItemsByFiles(array $items, $files){
 		if(!isset($files)){
 			// No filtering

@@ -1,6 +1,9 @@
 <?php
 namespace Blight\Interfaces;
 
+use \Blight\Interfaces\Models\Page as PageInterface;
+use \Blight\Interfaces\Models\Post as PostInterface;
+
 interface Manager {
 	/**
 	 * @param \Blight\Interfaces\Blog $blog
@@ -20,22 +23,22 @@ interface Manager {
 	public function getRawPosts($drafts = false);
 
 	/**
-	 * @param \Blight\Interfaces\Models\Post $post
+	 * @param PostInterface $post
 	 */
-	public function addDraftToPublish(\Blight\Interfaces\Models\Post $post);
+	public function addDraftToPublish(PostInterface $post);
 
 	/**
-	 * @return \Blight\Interfaces\Models\Post[]
+	 * @return PostInterface[]
 	 */
 	public function getDraftsToPublish();
 
 	/**
-	 * @return array	An array of \Blight\Models\Page objects
+	 * @return PageInterface[]
 	 */
 	public function getPages();
 
 	/**
-	 * @return array	An array of \Blight\Models\Page objects
+	 * @return PostInterface[]
 	 */
 	public function getDraftPosts();
 
@@ -44,12 +47,12 @@ interface Manager {
 	 * 		array(
 	 * 			'rss'	=> (bool|string)	// Whether to include RSS-only posts. Providing `'only'` will return only RSS-only posts
 	 * 		)
-	 * @return array			An array of posts
+	 * @return PostInterface[]
 	 */
 	public function getPosts($filters = null);
 
 	/**
-	 * @return array	An array of \Blight\Containers\Year objects containing posts
+	 * @return \Blight\Containers\Year[]	Year container objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -64,7 +67,7 @@ interface Manager {
 	public function getPostsByYear();
 
 	/**
-	 * @return array	An array of \Blight\Containers\Tag objects containing posts
+	 * @return \Blight\Containers\Tag[]	Tag collection objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -79,7 +82,7 @@ interface Manager {
 	public function getPostsByTag();
 
 	/**
-	 * @return array	An array of \Blight\Containers\Category objects containing posts
+	 * @return \Blight\Containers\Category[]	Category collection objects containing posts
 	 *
 	 * 		Example:
 	 * 		array(
@@ -99,7 +102,7 @@ interface Manager {
 	public function getSupplementaryPages();
 
 	/**
-	 * @param \Blight\Interfaces\Models\Post[] $posts
+	 * @param PostInterface[] $posts
 	 * @return mixed
 	 */
 	public function publishDrafts(array $posts);
