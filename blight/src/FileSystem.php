@@ -172,11 +172,20 @@ class FileSystem implements \Blight\Interfaces\FileSystem {
 	 * @param string $path		The path to the directory to be made
 	 * @param int $mode			The directory permissions mode to use
 	 * @param bool $recursive	Whether to create parent directories as needed
-	 * @throws \RuntimeException	Cannot create the directory
+	 * @param bool $matchParentOwnership	Whether to set directory owner permissions to match the parent
+	 *
+	 * @throws \RuntimeException
+	 * @throws \InvalidArgumentException
+	 *
 	 * @see mkdir()
 	 */
 	public function createDir($path, $mode = 0755, $recursive = true, $matchParentOwnership = true){
 		$path	= rtrim($path, '/');
+
+		if(trim($path) === ''){
+			throw new \InvalidArgumentException('No path given');
+		}
+
 		if(is_dir($path)){
 			// Already exists
 			return;
