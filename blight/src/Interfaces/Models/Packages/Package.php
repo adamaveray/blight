@@ -8,5 +8,9 @@ interface Package {
 	 */
 	public function __construct(\Blight\Interfaces\Blog $blog, $config = null);
 
+	public function getRawData();
+
+	public function setRawData(array $data);
+
 	public function setup();
 };
