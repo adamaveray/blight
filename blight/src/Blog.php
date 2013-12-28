@@ -75,6 +75,7 @@ class Blog implements \Blight\Interfaces\Blog {
 			'themes'		=> 'themes',
 			'plugins'		=> 'plugins',
 			'assets'		=> 'assets',
+			'data'			=> 'data',
 			'cache'			=> 'cache'
 		);
 		foreach($this->paths as $key => $configKey){
@@ -219,6 +220,17 @@ class Blog implements \Blight\Interfaces\Blog {
 	 */
 	public function getPathDraftsWeb($append = ''){
 		return $this->paths['drafts-web'].$append;
+	}
+
+	/**
+	 * Returns the path to the general blog data store
+	 *
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see get_root_path()
+	 */
+	public function getPathData($append = ''){
+		return $this->paths['data'].$append;
 	}
 
 	/**
