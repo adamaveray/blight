@@ -10,6 +10,9 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 
 	protected $packages;
 	protected $plugins;
+	protected $themes;
+
+	protected $dataHashes	= array();
 
 	/**
 	 * @param \Blight\Interfaces\Blog $blog
@@ -20,6 +23,7 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 		$packages	= $this->loadPackages($blog->getPathPlugins());
 		$this->packages	= $packages['package'];
 		$this->plugins	= $packages['plugin'];
+		$this->themes	= array();
 	}
 
 	/**
@@ -122,6 +126,22 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 			throw new \RuntimeException('Invalid package class type');
 		}
 
+		/** @var \Blight\Interfaces\Models\Packages\Package $instance */
+
+		// Load package data
+		$dataPath	= $this->blog->getPathData().(($instance instanceof \Blight\Interfaces\Models\Packages\Theme) ? 'theme' : $name).'.json';
+		try {
+			$data		= $this->parseData($this->blog->getFileSystem()->loadFile($dataPath));
+			$this->dataHashes[$name]	= md5(json_encode($data));
+			if(isset($data)){
+				$instance->setRawData($data);
+			}
+		} catch(\Exception $e){
+			// No data for package
+		}
+
+		$instance->setup();
+
 		return $instance;
 	}
 
@@ -130,6 +150,14 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * @return array			The processed manifest data
 	 */
 	protected function parseManifest($content){
+		return $this->parseData($content);
+	}
+
+	/**
+	 * @param string $content	The raw content from the data file
+	 * @return array			The processed data
+	 */
+	protected function parseData($content){
 		$parser	= new \Blight\Config();
 		return $parser->unserialize($content);
 	}
@@ -141,21 +169,25 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 	 * @throws \RuntimeException	Invalid theme package
 	 */
 	public function getTheme($themeName){
-		$path	= $this->blog->getPathThemes($themeName.'.phar');
-		if(!file_exists($path)){
-			throw new \RuntimeException('Theme `'.$themeName.'` not found');
+		if(!isset($this->themes[$themeName])){
+			$path	= $this->blog->getPathThemes($themeName.'.phar');
+			if(!file_exists($path)){
+				throw new \RuntimeException('Theme `'.$themeName.'` not found');
+			}
+
+			$isPhar	= (pathinfo($path, \PATHINFO_EXTENSION) == 'phar');
+			if($isPhar){
+				$path	= 'phar://'.$path;
+			}
+			$theme	= $this->initialisePackage($themeName, $path);
+			if(!($theme instanceof \Blight\Interfaces\Models\Packages\Theme)){
+				throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Models\Packages\Theme');
+			}
+
+			$this->themes[$themeName]	= $theme;
 		}
 
-		$isPhar	= (pathinfo($path, \PATHINFO_EXTENSION) == 'phar');
-		if($isPhar){
-			$path	= 'phar://'.$path;
-		}
-		$theme	= $this->initialisePackage($themeName, $path);
-		if(!($theme instanceof \Blight\Interfaces\Models\Packages\Theme)){
-			throw new \RuntimeException('Theme does not implement \Blight\Interfaces\Models\Packages\Theme');
-		}
-
-		return $theme;
+		return $this->themes[$themeName];
 	}
 
 	/**
@@ -184,6 +216,28 @@ class PackageManager implements \Blight\Interfaces\PackageManager {
 			$callback	= array($plugin, $callbackName);
 			if(is_callable($callback)){
 				call_user_func($callback, $params);
+			}
+		}
+	}
+
+	/**
+	 * Saves data for all packages
+	 */
+	public function cleanup(){
+		foreach(array_merge($this->packages, $this->plugins, $this->themes) as $name => $package){
+			/** @var \Blight\Interfaces\Models\Packages\Package $package */
+			$dataPath	= $this->blog->getPathData().(($package instanceof \Blight\Interfaces\Models\Packages\Theme) ? 'theme' : $name).'.json';
+
+			$data	= $package->getRawData();
+			if(isset($this->dataHashes[$name])){
+				$updateData	= (md5(json_encode($data)) !== $this->dataHashes[$name]);
+			} else {
+				$updateData	= (is_array($data) && count($data));
+			}
+
+			if($updateData){
+				// Data changed - save
+				$this->blog->getFileSystem()->createFile($dataPath, json_encode($data));
 			}
 		}
 	}
