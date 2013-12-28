@@ -50,6 +50,11 @@ Packages cannot override the `__construct()` method, and instead should implemen
 The class should be [namespaced](http://www.php.net/manual/en/language.namespaces.rationale.php) appropriately, along with any other classes in other files in the package.
 
 
+## Data
+
+Packages have the instance variable `$data`, which is an array the package can read and write values to that will persist between site builds. _The data will be stored in a user-editable JSON file._ This data store is not suitable for caching, etc, and instead should only be used to store configuration values, etc.
+
+
 ## Manifest
 
 The package's details and metadata is stored in the `package.json` file – a JSON file with the following components:

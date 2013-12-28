@@ -220,6 +220,7 @@ class Install {
 			'themes'		=> 'blog-data/themes',
 			'plugins'		=> 'blog-data/plugins',
 			'assets'		=> 'blog-data/assets',
+			'data'			=> 'blog-data/data',
 			'web'			=> 'www/_blog',
 			'drafts-web'	=> 'www/_drafts',
 			'cache'			=> 'cache',
@@ -290,6 +291,16 @@ class Install {
 			// Cannot write .htaccess
 			$feedback['file_htaccess']		= $htaccess;
 			$feedback['file_htaccess_path']	= $htaccessPath;
+		}
+
+		// Create default theme data
+		$themeDataPath		= $this->rootPath.$paths['data'].'/theme.json';
+		$themeDataContent	= '{'.PHP_EOL.'}';
+		$result	= file_put_contents($themeDataPath, $themeDataContent);
+		if(!$result){
+			// Cannot write theme data
+			$feedback['file_themedata']			= $themeDataContent;
+			$feedback['file_themedata_path']	= $themeDataPath;
 		}
 
 		if(count($feedback) > 0){

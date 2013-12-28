@@ -18,6 +18,7 @@ After installation, your directory structure should look like the following:
 		assets/
 		plugins/
 		themes/
+		data/
 
 	www/
 		.htaccess

@@ -10,7 +10,7 @@ class Config implements \Blight\Interfaces\Config {
 	 */
 	public function serialize($values){
 		$options	= 0;
-		if(false && defined('\JSON_PRETTY_PRINT')){
+		if(defined('\JSON_PRETTY_PRINT')){
 			$options	= \JSON_PRETTY_PRINT;
 		}
 		$result	= json_encode($values, $options);
