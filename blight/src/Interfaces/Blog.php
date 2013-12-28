@@ -86,6 +86,13 @@ interface Blog {
 	 * @return string			The path, with the provided string appended
 	 * @see getRootPath()
 	 */
+	public function getPathData($append = '');
+
+	/**
+	 * @param string $append	An additonal path fragment to append to the path
+	 * @return string			The path, with the provided string appended
+	 * @see getRootPath()
+	 */
 	public function getPathWWW($append = '');
 
 	/**
