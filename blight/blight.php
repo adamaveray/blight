@@ -242,7 +242,8 @@ $blog->getLogger()->info('Blog built', array(
 ));
 
 
-// Cache
+// Cleanup
+$blog->getPackageManager()->cleanup();
 $updateManager->saveState();
 
 if(IS_CLI) echo 'Blog built'.PHP_EOL;
