@@ -9,9 +9,7 @@ abstract class Package implements \Blight\Interfaces\Models\Packages\Package {
 	/** @var array $config */
 	protected $config;
 	/** @var array $data */
-	protected $data;
-
-	private $dataHash;
+	protected $data	= array();
 
 	protected $path;
 
@@ -112,7 +110,7 @@ abstract class Package implements \Blight\Interfaces\Models\Packages\Package {
 	 * @return $this
 	 */
 	final public function setRawData(array $data){
-		$this->data	= $data;
+		$this->data	= array_merge($this->data, $data);
 		return $this;
 	}
 
